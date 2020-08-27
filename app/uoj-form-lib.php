@@ -236,6 +236,8 @@ EOD;
 		}
 		
 		public function addBlogEditor(UOJBlogEditor $editor) {
+			// Warning: unused function
+			// Method blog_editor_init requires exactly two parameters
 			global $REQUIRE_LIB;
 			$REQUIRE_LIB['blog-editor'] = '';
 			
@@ -258,7 +260,7 @@ EOD;
 				},
 				'always_ok'
 			);
-		
+			// Method blog_editor_init requires exactly two parameters
 			$this->appendHTML(<<<EOD
 <script>blog_editor_init("$name");</script>
 EOD

@@ -86,8 +86,5 @@
 	$blog_editor->runAtServer();
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('write blog')) ?>
-<div class="text-right">
-<a href="/blog/65">这玩意儿怎么用？</a>
-</div>
 <?php $blog_editor->printHTML() ?>
 <?php echoUOJPageFooter() ?>
