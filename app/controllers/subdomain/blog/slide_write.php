@@ -43,6 +43,9 @@
 	function updateBlog($id, $data) {
 		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']} where id = {$id}");
 	}
+	function publishBlog($id, $data) {
+		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']}, is_draft = false where id = {$id}");
+	}
 	function insertSlide($data) {
 		DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, is_draft, post_time) values ('S', '".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, {$data['is_draft']}, now())");
 	}
@@ -58,8 +61,8 @@
 					deleteBlog($blog['id']);
 					insertSlide(array_merge($data, array('is_draft' => 0)));
 					$blog = array('id' => DB::insert_id(), 'tags' => array());
-					$ret['blog_write_url'] = "/slide/{$blog['id']}/write";
-					$ret['blog_url'] = "/blog/{$blog['id']}";
+					$ret['blog_write_url'] = "/blogof/".Auth::id()."/slide/{$blog['id']}/write";
+					$ret['blog_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}";
 				}
 			} else {
 				updateBlog($blog['id'], $data);
@@ -67,11 +70,12 @@
 		} else {
 			if ($data['is_hidden']) {
 				insertSlide(array_merge($data, array('is_draft' => 1)));
+				$blog = array('id' => DB::insert_id(), 'tags' => array());
 			} else {
 				insertSlide(array_merge($data, array('is_draft' => 0)));
 				$blog = array('id' => DB::insert_id(), 'tags' => array());
-				$ret['blog_write_url'] = "/slide/{$blog['id']}/write";
-				$ret['blog_url'] = "/blog/{$blog['id']}";
+				$ret['blog_write_url'] = "/blogof/".Auth::id()."/slide/{$blog['id']}/write";
+				$ret['blog_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}";
 			}
 		}
 		if ($data['tags'] !== $blog['tags']) {
