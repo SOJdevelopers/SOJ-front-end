@@ -41,6 +41,9 @@
 	function updateBlog($id, $data) {
 		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']} where id = {$id}");
 	}
+	function publishBlog($id, $data) {
+		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']}, is_draft = false where id = {$id}");
+	}
 	function insertBlog($data) {
 		DB::insert("insert into blogs (title, content, content_md, poster, is_hidden, is_draft, post_time) values ('".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, {$data['is_draft']}, now())");
 	}
@@ -53,11 +56,9 @@
 				if ($data['is_hidden']) {
 					updateBlog($blog['id'], $data);
 				} else {
-					deleteBlog($blog['id']);
-					insertBlog(array_merge($data, array('is_draft' => 0)));
-					$blog = array('id' => DB::insert_id(), 'tags' => array());
-					$ret['blog_write_url'] = "/blog/{$blog['id']}/write";
-					$ret['blog_url'] = "/blog/{$blog['id']}";
+					publishBlog($blog['id'], $data);
+					$ret['blog_write_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}/write";
+					$ret['blog_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}";
 				}
 			} else {
 				updateBlog($blog['id'], $data);
@@ -65,11 +66,12 @@
 		} else {
 			if ($data['is_hidden']) {
 				insertBlog(array_merge($data, array('is_draft' => 1)));
+				$blog = array('id' => DB::insert_id(), 'tags' => array());
 			} else {
 				insertBlog(array_merge($data, array('is_draft' => 0)));
 				$blog = array('id' => DB::insert_id(), 'tags' => array());
-				$ret['blog_write_url'] = "/blog/{$blog['id']}/write";
-				$ret['blog_url'] = "/blog/{$blog['id']}";
+				$ret['blog_write_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}/write";
+				$ret['blog_url'] = "/blogof/".Auth::id()."/blog/{$blog['id']}";
 			}
 		}
 		if ($data['tags'] !== $blog['tags']) {
