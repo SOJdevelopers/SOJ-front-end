@@ -26,11 +26,11 @@ class Upgrader {
 			self::runSQL(self::upgraderRoot().'/create_table_upgrades.sql');
 			echo "table upgrades created.\n";
 		}
-		DB::query('LOCK TABLES upgrades WRITE');
+		DB::query("LOCK TABLES upgrades WRITE");
 		
 		$fun();
 		
-		DB::query('UNLOCK TABLES');
+		DB::query("UNLOCK TABLES");
 	}
 	
 	public static function getStatus($name) {

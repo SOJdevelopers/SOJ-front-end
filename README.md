@@ -14,3 +14,8 @@ update group_info set group_type='S' where group_name='banned';
 ```bash
 mv utility/scripts utility/contest_scripts
 ```
+
+### update Aug 31 11:09
+```bash
+mkdir utility/group_scripts
+```

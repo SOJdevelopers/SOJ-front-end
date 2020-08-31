@@ -28,3 +28,21 @@ function isStatementMaintainer($user) {
 function isBannedUser($user) {
 	return isGroupAssociated($user, array('group_name' => 'banned'))['member_state'] === 'U';
 }
+
+function selectUsersByScript($selector = 'default', $args) {
+	$script = 'selector_' + $selector;
+	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
+	if (!(validateUsername($script) and is_file($file))) {
+		$file = UOJContext::documentRoot() . '/utility/group_scripts/selector_default.php';
+	}
+	include $file;
+}
+
+function operateUsersByScript($selector = 'default', $args) {
+	$script = 'operator_' + $selector;
+    $file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
+	if (!(validateUsername($script) and is_file($file))) {
+		$file = UOJContext::documentRoot() . '/utility/group_scripts/operator_default.php';
+	}
+	include $file;
+}
