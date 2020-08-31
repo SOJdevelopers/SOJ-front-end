@@ -39,7 +39,7 @@
 		if (!isset($_GET['lhs'])) {
 			become404Page();
 		}
-		if ($_GET['lhs'] !== '142') {
+		if ($_GET['lhs'] !== '181') {
 			fail("What are you doing ???!!!");
 		} else {
 			die_json(json_encode(array(

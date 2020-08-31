@@ -6,6 +6,71 @@
 		become403Page();
 	}
 
+	if (!isset($_GET['tab'])) {
+		redirectTo('/super-manage/analytics');
+	}
+
+	$cur_tab = $_GET['tab'];
+
+	$tabs_info = array(
+		'analytics' => array(
+			'name' => '统计信息',
+			'url' => '/super-manage/analytics',
+			'method' => 'showAnalytics'
+		),
+		'users' => array(
+			'name' => '用户操作',
+			'url' => '/super-manage/users',
+			'method' => 'showUserModification'
+		),
+		'groups' => array(
+			'name' => '组操作',
+			'url' => '/super-manage/groups',
+			'method' => 'showGroupModification'
+		),
+		'blogs' => array(
+			'name' => '博客管理',
+			'url' => '/super-manage/blogs',
+			'method' => 'showBlogLinks'
+		),
+		'submissions' => array(
+			'name' => '提交记录',
+			'url' => '/super-manage/submissions',
+			'method' => 'showSubmissions'
+		),
+		'custom-test' => array(
+			'name' => '自定义测试',
+			'url' => '/super-manage/custom-test',
+			'method' => "showCustomTests"
+		),
+		'send-message' => array(
+			'name' => '发送公告',
+			'url' => '/super-manage/send-message',
+			'method' => "showSystemMessages"
+		),
+		'links' => array(
+			'name' => '链接管理',
+			'url' => '/super-manage/links',
+			'method' => "showFriendLinks" 
+		)
+	);
+	
+	if (!isset($tabs_info[$cur_tab])) {
+		become404Page();
+	}
+
+function printHeader() {
+	echoUOJPageHeader('系统管理');
+	global $tabs_info, $cur_tab;
+	?>
+	<div class="row">
+	<div class="col-sm-3">
+		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills nav-stacked') ?>
+	</div>
+	<div class="col-sm-9">
+	<?php
+}
+
 function showAnalytics() {
 	$analytics = array();
 	$analytics['problems_count'] = DB::selectCount('select count(*) from problems');
@@ -20,6 +85,7 @@ function showAnalytics() {
 	$analytics['judge_client_count'] = DB::selectCount('select count(*) from judger_info');
 	$analytics['judge_client_online'] = DB::selectCount('select count(*) from judger_info where latest_login > date_sub(now(), interval 1 minute)');
 
+	printHeader();
 	?>
 	<div class="table-responsive">
 		<table class="table table-bordered table-hover table-striped table-text-center">
@@ -158,6 +224,7 @@ EOD;
 		}
 	}
 
+	printHeader();
 	echo '<h4>注册新用户：<a href="/register" target="_blank">链接</a></h4>';
 	echo '<p><del>这貌似已经变成了真实姓名修改器了？</del></p>';
 	$user_form->printHTML();
@@ -275,6 +342,8 @@ function showBlogLinks() {
 		deleteBlog($_POST['blog_del_id']);
 	};
 	$blog_deleter->runAtServer();
+
+	printHeader();
 	?>
 	<div>
 		<h4>添加到比赛链接</h4>
@@ -320,6 +389,8 @@ function showSubmissions() {
 		}
 	};
 	$contest_submissions_deleter->runAtServer();
+
+	printHeader();
 	?>
 	<div>
 		<h4>删除赛前提交记录</h4>
@@ -328,7 +399,9 @@ function showSubmissions() {
 
 	<div>
 		<h4>测评失败的提交记录</h4>
-		<?php echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), $myUser); ?>
+		<?php
+			echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), $myUser);
+		?>
 	</div>
 	<?php
 }
@@ -354,6 +427,8 @@ function showCustomTests() {
 		DB::delete("delete from custom_test_submissions order by id asc limit {$vdata['last']}");
 	};
 	$custom_test_deleter->runAtServer();
+
+	printHeader();
 	$custom_test_deleter->printHTML();
 
 	$submissions_pag = new Paginator(array(
@@ -413,14 +488,16 @@ function showSystemMessages() {
 		$purifier = HTML::purifier();
 		$msg_content = $purifier->purify($_POST['content']);
 		$user_result = DB::select("select username from user_info");
+		$users = array();
 		while ($row = DB::fetch($user_result)){
-			$user_to = $row['username'];
-			sendSystemMsg($user_to, $msg_title, $msg_content);
+			$users[] = $row['username'];
 		}
+		sendSystemMsgToUsers($users, $msg_title, $msg_content);
 		// die("$msg_content");
 	};
 	$sysmsg_form->runAtServer();
 
+	printHeader();
 	$sysmsg_form->printHTML();
 }
 
@@ -470,80 +547,53 @@ function showFriendLinks() {
 	};
 	$friend_links->runAtServer();
 
+	printHeader();
 	echo '<div>', '<h4>添加/删除链接</h4>';
 	$friend_links->printHTML();
 	echo '</div>';
 }
 
 function showGroupModification() {
-}
+	$groups = new UOJForm('groups');
+	$scripts = getGroupScripts('/utility/group_scripts/');
 
-	if (!isset($_GET['tab'])) {
-		redirectTo('/super-manage/analytics');
-	}
-
-	$cur_tab = $_GET['tab'];
-
-	$tabs_info = array(
-		'analytics' => array(
-			'name' => '统计信息',
-			'url' => '/super-manage/analytics',
-			'method' => 'showAnalytics'
-		),
-		'users' => array(
-			'name' => '用户操作',
-			'url' => '/super-manage/users',
-			'method' => 'showUserModification'
-		),
-		'groups' => array(
-			'name' => '组操作',
-			'url' => '/super-manage/groups',
-			'method' => 'showGroupModification'
-		),
-		'blogs' => array(
-			'name' => '博客管理',
-			'url' => '/super-manage/blogs',
-			'method' => 'showBlogLinks'
-		),
-		'submissions' => array(
-			'name' => '提交记录',
-			'url' => '/super-manage/submissions',
-			'method' => 'showSubmissions'
-		),
-		'custom-test' => array(
-			'name' => '自定义测试',
-			'url' => '/super-manage/custom-test',
-			'method' => "showCustomTests"
-		),
-		'send-message' => array(
-			'name' => '发送公告',
-			'url' => '/super-manage/send-message',
-			'method' => "showSystemMessages"
-		),
-		'links' => array(
-			'name' => '链接管理',
-			'url' => '/super-manage/links',
-			'method' => "showFriendLinks" 
-		)
+	$options = array();
+	foreach ($scripts['selector'] as $select)
+		$options[$select['filename']] = $select['description'];
+	$groups->addSelect('selector_type', $options, '选择器脚本', 'default');
+	$groups->addTextArea('selector_args', '选择器参数', '',
+		function ($x) {
+			if (strlen($x) > 1024) {
+				return '参数不能超过 1024 个字节';
+			}
+			return '';
+		},
+		null
 	);
 	
-	if (!isset($tabs_info[$cur_tab])) {
-		become404Page();
-	}
+	$options = array();
+	foreach ($scripts['operator'] as $select)
+		$options[$select['filename']] = $select['description'];
+	$groups->addSelect('operator_type', $options, '操作器脚本', 'default');
+
+	$groups->handle = function() {
+		$res = selectUsersByScript($_POST['selector_type'], $_POST['selector_args']);
+		return operateUsersByScript($_POST['selector_type'], $res);
+	};
+
+	$groups->runAtServer();
+
+	printHeader();
+	echo '<div>', '<h4>批量操作组</h4>';
+	$groups->printHTML();
+	echo '</div>';
+}
 
 	requireLib('shjs');
 	requireLib('morris');
+
+	$tabs_info[$cur_tab]['method']();
 ?>
-<?php echoUOJPageHeader('系统管理') ?>
-<div class="row">
-	<div class="col-sm-3">
-		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills nav-stacked') ?>
-	</div>
-	
-	<div class="col-sm-9">
-		<?php
-			$tabs_info[$cur_tab]['method']();
-		?>
 	</div>
 </div>
 <?php echoUOJPageFooter() ?>

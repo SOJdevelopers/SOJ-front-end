@@ -243,7 +243,9 @@ EOD;
 			foreach ($allow_rootdir as $r_dir => $_) {
 				echo "\t\t\t\t'{$r_dir}',\n\t\t\t\t'{$r_dir}/{$user_dir}',\n";
 			}
-			echo "\t\t\t\t'utility/contest_scripts',\n\t\t\t\t'pictures/emoticon'\n";
+			echo "\t\t\t\t'utility/contest_scripts',";
+			echo "\t\t\t\t'utility/group_scripts',";
+			echo "\n\t\t\t\t'pictures/emoticon'\n";
 		} else {
 			echo "\t\t\t\t'{$root_dir}/{$user_dir}'\n";
 		}

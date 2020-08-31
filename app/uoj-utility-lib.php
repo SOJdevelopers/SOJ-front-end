@@ -196,3 +196,16 @@ function sendSystemMsg($username, $title, $content) {
 	$title = DB::escape($title);
 	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values ('$username', '$title', '$content', now())");
 }
+
+function sendSystemMsgToUsers($users, $title, $content) {
+	$content = DB::escape($content);
+	$title = DB::escape($title);
+	$values = '';
+	$lst = false;
+	foreach ($users as $user) {
+		if ($lst) $values .= ",";
+		$lst = true;
+		$values .= "('$user', '$title', '$content', now())";
+	}
+	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values " . $values);
+}

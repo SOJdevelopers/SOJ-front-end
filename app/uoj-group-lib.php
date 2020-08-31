@@ -46,3 +46,46 @@ function operateUsersByScript($selector = 'default', $args) {
 	}
 	include $file;
 }
+
+function getGroupScripts($path) {
+	$path = rtrim($path, '/');
+	$dir = UOJContext::documentRoot() . '/' . $path;
+	$files = array_values(array_filter(
+		scandir($dir), function ($x) use ($dir) {
+			return pathinfo($x, PATHINFO_EXTENSION) === 'php' && is_file($dir . '/' . $x);
+		}
+	));
+	natsort($files);
+	$ret = array(
+		'selector' => array(),
+		'operator' => array()
+	);
+	$pattern_len = strlen('selector_');
+	foreach ($files as $file) {
+		$arr = pathinfo($file);
+		$type = 0;
+		if (strncmp($file, 'selector_' , $pattern_len) === 0)
+			$type = 1;
+		else if (strncmp($file, 'operator_' , $pattern_len) === 0)
+			$type = 2;
+		if ($type == 0) continue;
+		$realname = substr($arr['filename'], $pattern_len);
+		$conf = array(
+			'filename' => $realname,
+			'description' => $realname
+		);
+		$path_to_json = $dir.'/'.$arr['filename'].'.json';
+		if (is_file($path_to_json)) {
+			$res = json_decode(file_get_contents($path_to_json), true);
+			if (isset($res['description'])) {
+				$conf['description'] = $res['description'];
+			}
+		}
+		if ($type == 1) {
+			$ret['selector'][] = $conf;
+		} else {
+			$ret['operator'][] = $conf;
+		}
+	}
+	return $ret;
+}
