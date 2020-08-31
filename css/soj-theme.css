@@ -403,3 +403,15 @@ pre {
 	-o-user-modify: read-write-plaintext-only;
 	user-modify: read-write-plaintext-only;
 }
+
+a.uoj-index-ranklist:link {
+	color: #333;
+}
+
+a.uoj-index-ranklist:visited {
+	color: #333;
+}
+
+a.uoj-index-ranklist:hover {
+	color: #428bca;
+}

@@ -74,19 +74,19 @@
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<center><h3><a href="/ranklist"><?= UOJLocale::get('top rated') ?></a></h3></center>
+		<center><h3><a href="/ranklist" class="uoj-index-ranklist"><?= UOJLocale::get('top rated') ?></a></h3></center>
 		<?php echoRanklist(array('echo_full' => '', 'top10' => '')) ?>
 	</div>
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<center><h3><a href="/acranklist"><?= UOJLocale::get('top cutted') ?></a></h3></center>
+		<center><h3><a href="/acranklist" class="uoj-index-ranklist"><?= UOJLocale::get('top cutted') ?></a></3></center>
 		<?php echoACRanklist(array('echo_full' => '', 'top10' => '')) ?>
 	</div>
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<center><h3><a href="/groups"><?= UOJLocale::get('top rated groups') ?></a></h3></center>
+		<center><h3><a href="/groups" class="uoj-index-ranklist"><?= UOJLocale::get('top rated groups') ?></a></h3></center>
 		<?php echoGrouplist(array('echo_full' => '', 'top10' => '')) ?>
 	</div>
 </div>
