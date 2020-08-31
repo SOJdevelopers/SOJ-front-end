@@ -44,7 +44,7 @@
 		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']} where id = {$id}");
 	}
 	function publishBlog($id, $data) {
-		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']}, is_draft = false where id = {$id}");
+		DB::update("update blogs set title = '".DB::escape($data['title'])."', content = '".DB::escape($data['content'])."', content_md = '".DB::escape($data['content_md'])."', is_hidden = {$data['is_hidden']}, is_draft = false, post_time = now() where id = {$id}");
 	}
 	function insertSlide($data) {
 		DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, is_draft, post_time) values ('S', '".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, {$data['is_draft']}, now())");
