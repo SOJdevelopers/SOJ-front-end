@@ -74,29 +74,20 @@
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<h3><?= UOJLocale::get('top rated') ?></h3>
+		<center><h3><a href="/ranklist"><?= UOJLocale::get('top rated') ?></a></h3></center>
 		<?php echoRanklist(array('echo_full' => '', 'top10' => '')) ?>
-		<div class="text-center">
-			<a href="/ranklist"><?= UOJLocale::get('view all') ?></a>
-		</div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<h3><?= UOJLocale::get('top cutted') ?></h3>
+		<center><h3><a href="/acranklist"><?= UOJLocale::get('top cutted') ?></a></h3></center>
 		<?php echoACRanklist(array('echo_full' => '', 'top10' => '')) ?>
-		<div class="text-center">
-			<a href="/acranklist"><?= UOJLocale::get('view all') ?></a>
-		</div>
 	</div>
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<h3><?= UOJLocale::get('top rated groups') ?></h3>
+		<center><h3><a href="/groups"><?= UOJLocale::get('top rated groups') ?></a></h3></center>
 		<?php echoGrouplist(array('echo_full' => '', 'top10' => '')) ?>
-		<div class="text-center">
-			<a href="/groups"><?= UOJLocale::get('view all') ?></a>
-		</div>
 	</div>
 </div>
 <?php echoUOJPageFooter() ?>
