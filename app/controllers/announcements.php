@@ -32,5 +32,5 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
 <h3><?= UOJLocale::get('announcements') ?></h3>
-<?php echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', 'is_hidden = 0 and important_blogs.blog_id = blogs.id', 'order by level desc, important_blogs.blog_id desc', $header, 'echoBlogCell', $config); ?>
+<?php echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', 'is_hidden = 0 and important_blogs.blog_id = blogs.id', 'order by level desc, blogs.post_time desc', $header, 'echoBlogCell', $config); ?>
 <?php echoUOJPageFooter() ?>
