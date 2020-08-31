@@ -15,7 +15,7 @@
 				return 'fail';
 			}
 			$receiver = $_POST['receiver'];
-			$esc_message = mysql_real_escape_string($_POST['message']);
+			$esc_message = DB::escape($_POST['message']);
 			$sender = $myUser['username'];
 
 			if (!validateUsername($receiver) || !queryUser($receiver)) {
