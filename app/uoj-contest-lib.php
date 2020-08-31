@@ -224,9 +224,9 @@ function queryContestData($contest, $config = array()) {
 
 function calcStandings($contest, $contest_data, &$score, &$standings, $update_contests_submissions = false) {
 	$script = isset($contest['extra_config']['standings_script']) ? $contest['extra_config']['standings_script'] : 'builtin';
-	$file = UOJContext::documentRoot() . '/utility/scripts/' . $script . '.php';
+	$file = UOJContext::documentRoot() . '/utility/contest_scripts/' . $script . '.php';
 	if (!(validateUsername($script) and is_file($file))) {
-		$file = UOJContext::documentRoot() . '/utility/scripts/builtin.php';
+		$file = UOJContext::documentRoot() . '/utility/contest_scripts/builtin.php';
 	}
 	include $file;
 }

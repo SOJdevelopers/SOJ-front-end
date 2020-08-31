@@ -20,6 +20,7 @@
 	requirePHPLib('security');
 	requirePHPLib('contest');
 	requirePHPLib('html');
+	requirePHPLib('group');
 	
 	Session::init();
 	UOJTime::init();

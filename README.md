@@ -9,3 +9,8 @@ update group_info set group_type='S' where group_name='zhzx';
 update group_info set group_type='S' where group_name='zhjc';
 update group_info set group_type='S' where group_name='banned';
 ```
+
+### update Aug 31 11:04
+```bash
+mv utility/scripts utility/contest_scripts
+```
