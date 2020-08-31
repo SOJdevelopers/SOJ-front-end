@@ -30,21 +30,25 @@ function isBannedUser($user) {
 }
 
 function selectUsersByScript($selector = 'default', $args) {
-	$script = 'selector_' + $selector;
+	$script = 'selector_' . $selector;
 	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
 	if (!(validateUsername($script) and is_file($file))) {
 		$file = UOJContext::documentRoot() . '/utility/group_scripts/selector_default.php';
 	}
+	$result = NULL;
 	include $file;
+	return $result;
 }
 
 function operateUsersByScript($selector = 'default', $args) {
-	$script = 'operator_' + $selector;
-    $file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
+	$script = 'operator_'.$selector;
+	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
 	if (!(validateUsername($script) and is_file($file))) {
 		$file = UOJContext::documentRoot() . '/utility/group_scripts/operator_default.php';
 	}
+	$result = NULL;
 	include $file;
+	return $result;
 }
 
 function getGroupScripts($path) {
