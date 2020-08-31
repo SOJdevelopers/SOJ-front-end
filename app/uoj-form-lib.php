@@ -499,6 +499,8 @@ EOD;
 					}
 				}
 				echo <<<EOD
+					alert(data);
+					alert(data.extra);
 					if (data.extra != undefined) {
 						alert(data.extra);
 						ok = false;

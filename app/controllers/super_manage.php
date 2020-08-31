@@ -579,7 +579,7 @@ function showGroupModification() {
 	$groups->handle = function() {
 		$res = selectUsersByScript($_POST['selector_type'], $_POST['selector_args']);
 		$res = operateUsersByScript($_POST['selector_type'], $res);
-		redirectTo('/super-manage/groups?args='.$res);
+		return array("extra" => $res);
 	};
 
 	$groups->runAtServer();
