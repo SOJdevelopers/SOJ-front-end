@@ -151,5 +151,7 @@ return [
 	'sticky 3' => '三级置顶',
 	'at tip' => '可以用 @mike 来提到 mike 这个用户，mike 会被高亮显示。如果你真的想打 “@” 这个字符，请用 “@@”。',
 	'emoticon tip' => '想使用表情？参见<a href="/blog/791">表情指南</a>。',
-	'open source' => '开源项目'
+	'open source' => '开源项目',
+	'system groups' => '系统组',
+	'user groups' => '用户组'
 ];

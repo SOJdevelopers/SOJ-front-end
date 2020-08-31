@@ -1128,12 +1128,15 @@ function echoGrouplist($config = array()) {
 	
 	$gs = array();
 	$print_row = function($g, $now_cnt) use(&$gs, &$config) {
-		if (!$gs) {
-			$rank = DB::selectCount("select count(*) from group_info where rating > {$g['rating']}") + 1;
-		} else if ($g['rating'] == $gs[count($gs) - 1]['rating']) {
-			$rank = $gs[count($gs) - 1]['rank'];
-		} else {
-			$rank = $now_cnt;
+		if ($config['is_system_group']) $rank = '-';
+		else {
+			if (!$gs) {
+				$rank = DB::selectCount("select count(*) from group_info where rating > {$g['rating']} and group_type='N'") + 1;
+			} else if ($g['rating'] == $gs[count($gs) - 1]['rating']) {
+				$rank = $gs[count($gs) - 1]['rank'];
+			} else {
+				$rank = $now_cnt;
+			}
 		}
 
 		$g['rank'] = $rank;
@@ -1166,5 +1169,16 @@ function echoGrouplist($config = array()) {
 	if (isset($config['top10'])) $tail .= ' limit 10';
 
 	$config['get_row_index'] = '';
-	echoLongTable($col_names, 'group_info', '1', $tail, $header_row, $print_row, $config);
+
+	if (isset($config['more_details'])) {
+		$config['is_system_group'] = true;
+		echo "<h4>".UOJLocale::get('system groups')."</h4>";
+		echoLongTable($col_names, 'group_info', 'group_type = "S"', $tail, $header_row, $print_row, $config);
+		
+	}
+
+	$config['is_system_group'] = false;
+	if (!isset($config['top10']))
+		echo "<h4>".UOJLocale::get('user groups')."</h4>";
+	echoLongTable($col_names, 'group_info', 'group_type = "N"', $tail, $header_row, $print_row, $config);
 }

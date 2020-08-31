@@ -50,7 +50,7 @@
 		$dp = DB::escape($_POST['description']);
 		$av = DB::escape($_POST['avatar']);
 	
-		DB::insert("insert into group_info (group_name, description, avatar, joinable) values ('{$_POST['name']}', '$dp', '$av', '{$_POST['joinable']}')");
+		DB::insert("insert into group_info (group_name, description, avatar, joinable, group_type) values ('{$_POST['name']}', '$dp', '$av', '{$_POST['joinable']}', 'N')");
 		DB::insert("insert into group_members (group_name, username, member_state) values ('{$_POST['name']}', '{$myUser['username']}', 'A')");
 	};
 	$group_form->succ_href = '/groups';
