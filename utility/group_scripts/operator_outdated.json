@@ -3,7 +3,7 @@
 	"version" : "1.0",
 	"description" : "outdated",
 	"document" : [
-		"参数：json，[{\"username\"}]。",
+		"参数：json，[{\"username\":}]。",
 		"返回值：sql 的返回值。"
 	]
 }
