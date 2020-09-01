@@ -40,8 +40,8 @@ function selectUsersByScript($selector = 'default', $args) {
 	return $result;
 }
 
-function operateUsersByScript($selector = 'default', $args) {
-	$script = 'operator_'.$selector;
+function operateUsersByScript($operator = 'default', $args) {
+	$script = 'operator_'.$operator;
 	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
 	if (!(validateUsername($script) and is_file($file))) {
 		$file = UOJContext::documentRoot() . '/utility/group_scripts/operator_default.php';
@@ -49,6 +49,17 @@ function operateUsersByScript($selector = 'default', $args) {
 	$result = NULL;
 	include $file;
 	return $result;
+}
+
+function getScriptDocument($json) {
+	$json = UOJContext::documentRoot() . '/utility/group_scripts/' . $json;
+	if (is_file($json)) {
+		$res = json_decode(file_get_contents($json), true);
+		if (isset($res['document'])) {
+			return $res['document'];
+		}
+	}
+	return 'No such document.';
 }
 
 function getGroupScripts($path) {
@@ -76,11 +87,13 @@ function getGroupScripts($path) {
 		$realname = substr($arr['filename'], $pattern_len);
 		$conf = array(
 			'filename' => $realname,
-			'description' => $realname
+			'description' => $realname,
+			'jsonpath' => NULL
 		);
-		$path_to_json = $dir.'/'.$arr['filename'].'.json';
+		$path_to_json = $dir . '/' . $arr['filename'] . '.json';
 		if (is_file($path_to_json)) {
 			$res = json_decode(file_get_contents($path_to_json), true);
+			$conf['jsonpath'] = $arr['filename'] . '.json';
 			if (isset($res['description'])) {
 				$conf['description'] = $res['description'];
 			}

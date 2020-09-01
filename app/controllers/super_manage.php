@@ -554,8 +554,14 @@ function showFriendLinks() {
 }
 
 function showGroupModification() {
-	$groups = new UOJForm('groups');
+	/*
+	 * 因为 selector 和 operator 的组合在大部分场景的较方便。
+	 * 所以改成管道操作？以后再说，说不定用起来还不方便呢。
+	 */
+
 	$scripts = getGroupScripts('/utility/group_scripts/');
+	
+	$groups = new UOJForm('groups');
 
 	$options = array();
 	foreach ($scripts['selector'] as $select)
@@ -572,8 +578,8 @@ function showGroupModification() {
 	);
 	
 	$options = array();
-	foreach ($scripts['operator'] as $select)
-		$options[$select['filename']] = $select['description'];
+	foreach ($scripts['operator'] as $operate)
+		$options[$operate['filename']] = $operate['description'];
 	$groups->addSelect('operator_type', $options, '操作器脚本', 'default');
 
 	$groups->handle = function() {
@@ -582,14 +588,47 @@ function showGroupModification() {
 		echo $res;
 	};
 
+	$groups->submit_button_config['text'] = '提交操作';
+
 	$groups->succ_href = 'none';
 	$groups->ctrl_enter_submit = true;
+
 	$groups->setAjaxSubmit(<<<EOD
-function(response_text) { document.getElementById("result_textarea").innerHTML = response_text; }
+	function(response_text) { document.getElementById("result_textarea").innerHTML = response_text; }
 EOD
-	);
+);
+
+	$document = new UOJForm('document');
+	$options = array();
+	foreach ($scripts['selector'] as $select)
+		$options[$select['jsonpath']] = '[选择器]' . $select['description'];
+	foreach ($scripts['operator'] as $operate)
+		$options[$operate['jsonpath']] = '[操作器]' . $operate['description'];
+	$document->addSelect('jsonpath', $options, '脚本文档', 'selector_default.json');
+
+	$document->handle = function() {
+		$ret = getScriptDocument($_POST['jsonpath']);
+		$res = '';
+		$lst = false;
+		foreach ($ret as $content) {
+			if ($lst) $res .= "\n";
+			$lst = true;
+			$res .= $content;
+		}
+		echo $res;
+	};
+
+	$document->submit_button_config['text'] = '查询文档';
+
+	$document->succ_href = 'none';
+	$document->ctrl_enter_submit = true;
+	$document->setAjaxSubmit(<<<EOD
+	function(response_text) { document.getElementById("document_textarea").innerHTML = response_text; }
+EOD
+);
 
 	$groups->runAtServer();
+	$document->runAtServer();
 
 	printHeader();
 	$html = <<<EOD
@@ -599,9 +638,27 @@ EOD
 			<textarea id="result_textarea" class="form-control" readonly="readonly"> </textarea>
 		</div>
 	</div>
+
 EOD;
+
 	$groups->appendHTML($html);
 	$groups->printHTML();
+
+	echo '<hr>';
+
+	$html = <<<EOD
+	<div class="form-group">
+		<label class="col-sm-2 control-label">文档内容</label>
+		<div class="col-sm-10">
+			<textarea id="document_textarea" class="form-control" readonly="readonly"> </textarea>
+		</div>
+	</div>
+
+EOD;
+
+	$document->appendHTML($html);
+	$document->printHTML();
+
 }
 
 	requireLib('shjs');
