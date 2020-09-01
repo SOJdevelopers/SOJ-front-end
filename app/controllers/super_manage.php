@@ -592,7 +592,6 @@ EOD
 	$groups->runAtServer();
 
 	printHeader();
-	echo '<div>', '<h4>批量操作组</h4>';
 	$html = <<<EOD
 	<div class="form-group">
 		<label class="col-sm-2 control-label">返回值</label>
@@ -603,7 +602,6 @@ EOD
 EOD;
 	$groups->appendHTML($html);
 	$groups->printHTML();
-	echo '</div>';
 }
 
 	requireLib('shjs');
