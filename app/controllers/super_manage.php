@@ -594,7 +594,11 @@ function showGroupModification() {
 	$groups->ctrl_enter_submit = true;
 
 	$groups->setAjaxSubmit(<<<EOD
-	function(response_text) { document.getElementById("result_textarea").innerHTML = response_text; }
+	function(response_text) {
+		let obj = $("#result_textarea");
+		obj.text(response_text);
+		obj.trigger('input.autosize');
+	}
 EOD
 );
 
@@ -623,7 +627,11 @@ EOD
 	$document->succ_href = 'none';
 	$document->ctrl_enter_submit = true;
 	$document->setAjaxSubmit(<<<EOD
-	function(response_text) { document.getElementById("document_textarea").innerHTML = response_text; }
+	function(response_text) {
+		let obj = $("#document_textarea");
+		obj.text(response_text);
+		obj.trigger('input.autosize');
+	}
 EOD
 );
 

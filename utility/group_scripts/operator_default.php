@@ -1,3 +1,3 @@
 <?php
-$result = 'Test: got user rating:' . $args . '. Nothing changed.';
+$result = 'Wow! Rating:' . $args;
 ?>

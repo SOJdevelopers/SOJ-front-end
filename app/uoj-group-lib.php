@@ -59,7 +59,7 @@ function getScriptDocument($json) {
 			return $res['document'];
 		}
 	}
-	return 'No such document.';
+	return array("No such document.");
 }
 
 function getGroupScripts($path) {
@@ -88,12 +88,11 @@ function getGroupScripts($path) {
 		$conf = array(
 			'filename' => $realname,
 			'description' => $realname,
-			'jsonpath' => NULL
+			'jsonpath' => $arr['filename'] . '.json'
 		);
 		$path_to_json = $dir . '/' . $arr['filename'] . '.json';
 		if (is_file($path_to_json)) {
 			$res = json_decode(file_get_contents($path_to_json), true);
-			$conf['jsonpath'] = $arr['filename'] . '.json';
 			if (isset($res['description'])) {
 				$conf['description'] = $res['description'];
 			}
