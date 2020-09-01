@@ -579,13 +579,29 @@ function showGroupModification() {
 	$groups->handle = function() {
 		$res = selectUsersByScript($_POST['selector_type'], $_POST['selector_args']);
 		$res = operateUsersByScript($_POST['selector_type'], $res);
-		return array("extra" => $res);
+		echo $res;
 	};
+
+	$groups->succ_href = 'none';
+	$groups->ctrl_enter_submit = true;
+	$groups->setAjaxSubmit(<<<EOD
+function(response_text) { document.getElementById("result_textarea").innerHTML = response_text; }
+EOD
+	);
 
 	$groups->runAtServer();
 
 	printHeader();
 	echo '<div>', '<h4>批量操作组</h4>';
+	$html = <<<EOD
+	<div class="form-group">
+		<label class="col-sm-2 control-label">返回值</label>
+		<div class="col-sm-10">
+			<textarea id="result_textarea" class="form-control" readonly="readonly"> </textarea>
+		</div>
+	</div>
+EOD;
+	$groups->appendHTML($html);
 	$groups->printHTML();
 	echo '</div>';
 }

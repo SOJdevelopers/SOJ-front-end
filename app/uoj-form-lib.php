@@ -499,8 +499,6 @@ EOD;
 					}
 				}
 				echo <<<EOD
-					alert(data);
-					alert(data.extra);
 					if (data.extra != undefined) {
 						alert(data.extra);
 						ok = false;
@@ -616,6 +614,10 @@ EOD;
 		}
 	}
 	
+	/*
+	 * Definition ended
+	 */
+
 	function newAddDelCmdForm($form_name, $validate, $handle, $final = null) {
 		$form = new UOJForm($form_name);
 		$form->addTextArea(
