@@ -1,6 +1,8 @@
 /.htaccess
 /app/.config.php
 /utility
+!/utility/contest_scripts
+!/utility/group_scripts
 /js
 /fonts
 /css
