@@ -38,9 +38,9 @@ return [
 	],
 	'mail' => [
 		'noreply' => [
-			'username' => 'StupidOnlineJudge@163.com',
-			'password' => 'shaochengxi117',
-			'host' => 'smtp.163.com',
+			'username' => 'uoj@uoj.com',
+			'password' => '1145141919810',
+			'host' => 'smtp.uoj.com',
 			'secure' => 'ssl',
 			'port' => 465
 		]
