@@ -198,6 +198,17 @@ function getUserLink(username, rating) {
 	return '<a class="uoj-username' + (rating >= 2600 ? ' legendary' : '') + '" href="' + uojHome + '/user/profile/' + username + '" style="color: ' + getColOfRating(rating) + '">' + text + '</a>';
 }
 
+function getUserWithoutLink(username, rating) {
+	if (!username) {
+		return '';
+	}
+	var text = username;
+	if (username.charAt(0) == '@') {
+		username = username.substr(1);
+	}
+	return '<a class="uoj-username' + (rating >= 2600 ? ' legendary' : '') + '" style="color: ' + getColOfRating(rating) + '">' + text + '</a>';
+}
+
 function getUserSpan(username, rating) {
 	if (!username) {
 		return '';
@@ -215,6 +226,14 @@ function getGroupLink(groupname, rating) {
 	}
 	var text = groupname;
 	return '<a class="uoj-username' + (rating >= 2600 ? ' legendary' : '') + '" href="' + uojHome + '/group/' + groupname + '" style="color: ' + getColOfRating(rating) + '">' + text + '</a>';
+}
+
+function getGroupWithoutLink(groupname, rating) {
+	if (!groupname) {
+		return '';
+	}
+	var text = groupname;
+	return '<a class="uoj-username' + (rating >= 2600 ? ' legendary' : '') + '" style="color: ' + getColOfRating(rating) + '">' + text + '</a>';
 }
 
 function replaceWithHighlightUsername() {
@@ -1230,7 +1249,7 @@ function resultBetter(cur, best) {
 
 // standings = [[score, time, [name, rating], rank, estimate]...]
 // score = {name: [[score, time, submission-id, estimate], ...], name2: ..., ...}
-function showStandings(getLink) {
+function showStandings(getLink, doNotShowSubmissionLinks) {
 	var best = [], cur, col, full_score = 0;
 	if (getLink === undefined) {
 		getLink = getUserLink;
@@ -1287,7 +1306,10 @@ function showStandings(getLink) {
 						col_tr += '>' + col[3] + '</span>';
 						col_tr += ']</sup>';
 					}
-					col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
+					if (doNotShowSubmissionLinks === undefined)
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
+					else
+						col_tr += '<a class="uoj-score"';
 					if (full_scores[i] !== 100) {
 						col_tr += ' data-max="' + full_scores[i] + '"';
 					}
@@ -1317,7 +1339,7 @@ function showStandings(getLink) {
 
 // standings = [[totalAC, raw_penalty, [name, rating], rank, wa_penalty]...]
 // score = {name: [[hasAC, penalty, lastID, submit_times], ...], name2: ..., ...}
-function showStandingsACM(wa_penalty, getLink) {
+function showStandingsACM(wa_penalty, getLink, doNotShowSubmissionLinks) {
 	var best = [], cur, col;
 	if (wa_penalty === undefined) {
 		wa_penalty = 1200;
@@ -1354,7 +1376,11 @@ function showStandingsACM(wa_penalty, getLink) {
 				if (col !== null) {
 					col_tr += col[0] === 1 && best[i][2] === col[2] ? '<td class="success">' : '<td>';
 					col_tr += '<div>';
-					col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score">' + (col[0] === 1 ? '+' : '-') + (col[0] === 1 && col[3] === 0 ? '' : col[3] + 1) + '</a>';
+					if (doNotShowSubmissionLinks === undefined)
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score">';
+					else
+						col_tr += '<a class="uoj-score">';
+					col_tr += (col[0] === 1 ? '+' : '-') + (col[0] === 1 && col[3] === 0 ? '' : col[3] + 1) + '</a>';
 					col_tr += '</div>';
 					if (col[1] != undefined) col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
 				} else
