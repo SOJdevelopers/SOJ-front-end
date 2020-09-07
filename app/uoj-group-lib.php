@@ -79,9 +79,9 @@ function getGroupScripts($path) {
 	foreach ($files as $file) {
 		$arr = pathinfo($file);
 		$type = 0;
-		if (strncmp($file, 'selector_' , $pattern_len) === 0)
+		if (strStartWith($file, 'selector_'))
 			$type = 1;
-		else if (strncmp($file, 'operator_' , $pattern_len) === 0)
+		else if (strStartWith($file, 'operator_'))
 			$type = 2;
 		if ($type == 0) continue;
 		$realname = substr($arr['filename'], $pattern_len);
