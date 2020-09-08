@@ -183,7 +183,7 @@ function deleteBlogComment($id, $blog_id) {
 	if ($r) {
 		DB::update("update blogs set latest_comment = '{$r['post_time']}', latest_commenter = '{$r['poster']}' where id = {$blog_id}");
 	} else {
-		DB::update("update blogs set latest_comment = null, latest_commenter = null where id = {$blog_id}");
+		DB::update("update blogs set latest_comment = post_time, latest_commenter = null where id = {$blog_id}");
 	}
 }
 
