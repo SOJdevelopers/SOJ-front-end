@@ -107,6 +107,7 @@ return [
 	'enter your realname' => 'Enter your realname',
 	'realname' => 'Real name',
 	'api password' => 'API password',
+	'regenerate api password' => 'Regenerate API password',
 	'uploaded files list' => 'File list',
 	'no comment yet' => 'No comments yet',
 	'edit' => 'Edit',

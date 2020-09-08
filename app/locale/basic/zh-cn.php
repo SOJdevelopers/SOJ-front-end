@@ -107,6 +107,7 @@ return [
 	'enter your realname' => '输入真实姓名',
 	'realname' => '真实姓名',
 	'api password' => 'API 密钥',
+	'regenerate api password' => '重新生成 API 密钥',
 	'uploaded files list' => '文件列表',
 	'no comment yet' => '暂无评论',
 	'edit' => '修改',

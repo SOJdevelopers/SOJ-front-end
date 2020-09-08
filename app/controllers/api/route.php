@@ -9,6 +9,5 @@ Route::group([
         Route::any('/api/problem', '/api/problem.php');
         Route::any('/api/contest', '/api/contest.php');
         Route::any('/api/group', '/api/group.php');
-        Route::any('/api/regentoken', '/api/regentoken.php');
     }
 );

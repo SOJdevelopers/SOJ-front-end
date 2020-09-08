@@ -3,6 +3,13 @@
 		redirectToLogin();
 	}
 
+	if (isset($_POST['regenerate_apipassword'])) {
+		global $myUser;
+		$passwd = uojRandString(10);
+		DB::update("update user_info set svn_password='$passwd' where username='{$myUser['username']}'");
+		die('ok');
+	}
+
 	function handlePost() {
 		global $myUser;
 		if (!isset($_POST['old_password']))
