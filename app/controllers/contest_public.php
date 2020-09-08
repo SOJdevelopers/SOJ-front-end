@@ -3,15 +3,15 @@
 		become404Page();
 	}
 
-    genMoreContestInfo($contest);
-    
-    $published = $contest['extra_config']['publish_standings'];
+	genMoreContestInfo($contest);
+
+	$published = $contest['extra_config']['publish_standings'];
 	if (!isset($published) || $published !== true) {
-        become404Page();
-    }
+		become404Page();
+	}
 
 	$rgroup = isset($contest['extra_config']['is_group_contest']);
-    
+
 	function echoStandings() {
 		global $contest;
 
@@ -28,16 +28,16 @@
 
 	function echoContestCountdown() {
 		global $contest;
-	 	$rest_second = $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
-	 	$time_str = UOJTime::$time_now_str;
-	 	$contest_ends_in = UOJLocale::get('contests::contest ends in');
-	 	echo <<<EOD
- 		<div class="panel panel-info">
- 			<div class="panel-heading">
- 				<h3 class="panel-title">$contest_ends_in</h3>
- 			</div>
- 			<div class="panel-body text-center countdown" data-rest="$rest_second"></div>
- 		</div>
+		$rest_second = $contest['end_time']->getTimestamp() - UOJTime::$time_now->getTimestamp();
+		$time_str = UOJTime::$time_now_str;
+		$contest_ends_in = UOJLocale::get('contests::contest ends in');
+		echo <<<EOD
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">$contest_ends_in</h3>
+			</div>
+			<div class="panel-body text-center countdown" data-rest="$rest_second"></div>
+		</div>
 		<script type="text/javascript">
 			checkContestNotice({$contest['id']}, '$time_str');
 		</script>
@@ -56,34 +56,33 @@ EOD;
 			$title = UOJLocale::get('contests::contest final testing');
 		}
 		echo <<<EOD
- 		<div class="panel panel-info">
- 			<div class="panel-heading">
- 				<h3 class="panel-title">$title</h3>
- 			</div>
- 			<div class="panel-body">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">$title</h3>
+			</div>
+			<div class="panel-body">
 				<div class="progress bot-buffer-no">
 					<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="$rop" aria-valuemin="0" aria-valuemax="100" style="width: {$rop}%; min-width: 20px;">{$rop}%</div>
 				</div>
 			</div>
- 		</div>
+		</div>
 EOD;
 	}
 
 	function echoContestFinished() {
 		$title = UOJLocale::get('contests::contest ended');
 		echo <<<EOD
- 		<div class="panel panel-info">
- 			<div class="panel-heading">
- 				<h3 class="panel-title">$title</h3>
- 			</div>
- 		</div>
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">$title</h3>
+			</div>
+		</div>
 EOD;
 	}
 
-    $PageTitle = HTML::stripTags($contest['name']);
-    $PageMainTitle = UOJConfig::$data['profile']['oj-name'];
-    $PageMainTitleOnSmall = UOJConfig::$data['profile']['oj-name-short'];
-
+	$PageTitle = HTML::stripTags($contest['name']);
+	$PageMainTitle = UOJConfig::$data['profile']['oj-name'];
+	$PageMainTitleOnSmall = UOJConfig::$data['profile']['oj-name-short'];
 ?>
 <!DOCTYPE html>
 <html lang="<?= UOJLocale::locale() ?>">
@@ -159,12 +158,10 @@ EOD;
                     <div class="col-sm-12">
                         <?= HTML::tablist($tabs_info, $cur_tab) ?>
                         <div class="top-buffer-md">
-                        <?php
-                            echoStandings();
-                        ?>
+                        <?php echoStandings(); ?>
                         </div>
                     </div>
-                    
+
                     <div class="col-sm-12"> <hr/> </div>
 
                     <div class="col-sm-3">
@@ -180,19 +177,19 @@ EOD;
                     </div>
                     <div class="col-sm-3">
                         <?php if ($contest['extra_config']['standings_version'] == 1) { ?>
-                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>	
+                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>
                         <p><strong>注意：比赛时只显示测样例的结果。</strong></p>
                         <?php } elseif ($contest['extra_config']['standings_version'] == 2) {?>
-                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>	
+                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>
                         <p><strong>注意：比赛时只显示测样例的结果。</strong></p>
                         <?php } elseif ($contest['extra_config']['standings_version'] == 3) { ?>
-                        <p>此次比赛为 IOI 赛制。</p>	
+                        <p>此次比赛为 IOI 赛制。</p>
                         <p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
                         <?php } elseif ($contest['extra_config']['standings_version'] == 4) { ?>
-                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>	
+                        <p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>
                         <p><strong>注意：比赛时只显示测样例的结果。</strong></p>
                         <?php } elseif ($contest['extra_config']['standings_version'] == 5) { ?>
-                        <p>此次比赛为 ACM 赛制 (单次错误提交罚时 1200 秒)。</p>	
+                        <p>此次比赛为 ACM 赛制 (单次错误提交罚时 1200 秒)。</p>
                         <p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
                         <?php } else { ?>
                         <p>此次比赛为随机赛制，请联系管理员。</p>

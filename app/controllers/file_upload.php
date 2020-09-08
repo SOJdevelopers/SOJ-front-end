@@ -244,7 +244,7 @@ EOD;
 				echo "\t\t\t\t'{$r_dir}',\n\t\t\t\t'{$r_dir}/{$user_dir}',\n";
 			}
 			echo "\t\t\t\t'utility/contest_scripts',";
-			echo "\t\t\t\t'utility/group_scripts',";
+			echo "\n\t\t\t\t'utility/group_scripts',";
 			echo "\n\t\t\t\t'pictures/emoticon'\n";
 		} else {
 			echo "\t\t\t\t'{$root_dir}/{$user_dir}'\n";

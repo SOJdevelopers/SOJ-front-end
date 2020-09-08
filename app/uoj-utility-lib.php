@@ -203,7 +203,7 @@ function sendSystemMsgToUsers($users, $title, $content) {
 	$values = '';
 	$lst = false;
 	foreach ($users as $user) {
-		if ($lst) $values .= ",";
+		if ($lst) $values .= ',';
 		$lst = true;
 		$values .= "('$user', '$title', '$content', now())";
 	}

@@ -41,20 +41,20 @@
 		'custom-test' => array(
 			'name' => '自定义测试',
 			'url' => '/super-manage/custom-test',
-			'method' => "showCustomTests"
+			'method' => 'showCustomTests'
 		),
 		'send-message' => array(
 			'name' => '发送公告',
 			'url' => '/super-manage/send-message',
-			'method' => "showSystemMessages"
+			'method' => 'showSystemMessages'
 		),
 		'links' => array(
 			'name' => '链接管理',
 			'url' => '/super-manage/links',
-			'method' => "showFriendLinks" 
+			'method' => 'showFriendLinks'
 		)
 	);
-	
+
 	if (!isset($tabs_info[$cur_tab])) {
 		become404Page();
 	}
@@ -487,13 +487,12 @@ function showSystemMessages() {
 		$msg_title = HTML::escape($_POST['title']);
 		$purifier = HTML::purifier();
 		$msg_content = $purifier->purify($_POST['content']);
-		$user_result = DB::select("select username from user_info");
+		$user_result = DB::select('select username from user_info');
 		$users = array();
 		while ($row = DB::fetch($user_result)){
 			$users[] = $row['username'];
 		}
 		sendSystemMsgToUsers($users, $msg_title, $msg_content);
-		// die("$msg_content");
 	};
 	$sysmsg_form->runAtServer();
 
@@ -560,7 +559,7 @@ function showGroupModification() {
 	 */
 
 	$scripts = getGroupScripts('/utility/group_scripts/');
-	
+
 	$groups = new UOJForm('groups');
 
 	$options = array();
@@ -576,7 +575,7 @@ function showGroupModification() {
 		},
 		null
 	);
-	
+
 	$options = array();
 	foreach ($scripts['operator'] as $operate)
 		$options[$operate['filename']] = $operate['description'];
