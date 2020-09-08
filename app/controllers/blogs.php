@@ -24,7 +24,7 @@
 	$header .= '<th style="width: 180px">' . UOJLocale::get('appraisal') . '</th>';
 	$header .= '</tr>';
 	$config = array();
-	$config['table_classes'] = array('table', 'table-hover');
+	$config['table_classes'] = array('table', 'table-hover', 'table-vertical-middle');
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 <div class="pull-right btn-group">
