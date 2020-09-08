@@ -19,8 +19,8 @@
 	}
 	$header = '<tr>';
 	$header .= '<th>' . UOJLocale::get('title') . '</th>';
-	$header .= '<th style="width: 140px">' . '<button id="input-sortby-post" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-sort-by-attributes-alt"></span></button> ' . UOJLocale::get('publish time') . '</th>';
-	$header .= '<th style="width: 140px">' . '<button id="input-sortby-active" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-sort-by-attributes-alt"></span></button> ' . UOJLocale::get('latest comment') . '</th>';
+	$header .= '<th style="width: 140px">' . '<button id="input-sortby-post" class="btn btn-' . (isset($_COOKIE['blogs_sortby']) ? 'default' : 'primary') . ' btn-xs"><span class="glyphicon glyphicon-sort-by-attributes-alt"></span></button> ' . UOJLocale::get('publish time') . '</th>';
+	$header .= '<th style="width: 140px">' . '<button id="input-sortby-active" class="btn btn-' . (isset($_COOKIE['blogs_sortby']) ? 'primary' : 'default') . ' btn-xs"><span class="glyphicon glyphicon-sort-by-attributes-alt"></span></button> ' . UOJLocale::get('latest comment') . '</th>';
 	$header .= '<th style="width: 180px">' . UOJLocale::get('appraisal') . '</th>';
 	$header .= '</tr>';
 	$config = array();
