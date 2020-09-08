@@ -9,6 +9,7 @@
 /uploads/*
 /app/upgrade/*
 /app/vendor/*
+!/js/blog-editor
 !/js/blog-editor/blog-editor.js
 !/css/soj-theme.css
 !/js/soj.js
