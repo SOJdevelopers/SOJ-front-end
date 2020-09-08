@@ -4,6 +4,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/app/uoj-lib.php';
 
 require UOJContext::documentRoot() . '/app/route.php';
 require UOJContext::documentRoot() . '/app/controllers/subdomain/blog/route.php';
+require UOJContext::documentRoot() . '/app/controllers/api/route.php';
 
 include UOJContext::documentRoot() . '/app/controllers' . call_user_func(function() {
 	$route = Route::dispatch();

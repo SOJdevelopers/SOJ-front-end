@@ -67,8 +67,6 @@ Route::group([
 		Route::any('/file-upload', '/file_upload.php');
 		Route::any('/super-manage(?:/{tab})?', '/super_manage.php');
 
-		Route::any('/api/{tab}', '/api.php');
-
 		Route::any('/download.php', '/download.php');
 
 		Route::any('/click-zan', '/click_zan.php');
