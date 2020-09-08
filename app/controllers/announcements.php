@@ -21,9 +21,9 @@
 		echo '</tr>';
 	}
 	$header = '<tr>';
-	$header .= '<th width="60%">' . UOJLocale::get('title') . '</th>';
-	$header .= '<th width="20%">' . UOJLocale::get('publisher') .  '</th>';
-	$header .= '<th width="20%">' . UOJLocale::get('publish time') . '</th>';
+	$header .= '<th style="width: 60%">' . UOJLocale::get('title') . '</th>';
+	$header .= '<th style="width: 20%">' . UOJLocale::get('publisher') .  '</th>';
+	$header .= '<th style="width: 20%">' . UOJLocale::get('publish time') . '</th>';
 	$header .= '</tr>';
 	$config = [
 		'table_classes' => ['table', 'table-hover'],

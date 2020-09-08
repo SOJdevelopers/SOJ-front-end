@@ -51,7 +51,7 @@
 				<td><a href="/submissions?problem_id={$problem['id']}">&times;{$problem['submit_num']}</a></td>
 				<td>
 					<div class="progress bot-buffer-no">
-						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="$perc" aria-valuemin="0" aria-valuemax="100" style="width: $perc%; min-width: 20px;">{$perc}%</div>
+						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="$perc" aria-valuemin="0" aria-valuemax="100" style="width: {$perc}%; min-width: 20px;">{$perc}%</div>
 					</div>
 				</td>
 EOD;
@@ -95,14 +95,14 @@ EOD;
 	}
 
 	$header = '<tr>';
-	$header .= '<th class="text-center" style="width:5em;">ID</th>';
+	$header .= '<th class="text-center" style="width: 5em">ID</th>';
 	$header .= '<th>' . UOJLocale::get('problems::problem') . '</th>';
 	if (isset($_COOKIE['show_submit_mode'])) {
-		$header .= '<th class="text-center" style="width:5em;">' . UOJLocale::get('problems::ac') . '</th>';
-		$header .= '<th class="text-center" style="width:5em;">' . UOJLocale::get('problems::submit') . '</th>';
-		$header .= '<th class="text-center" style="width:150px;">' . UOJLocale::get('problems::ac ratio') . '</th>';
+		$header .= '<th class="text-center" style="width: 5em">' . UOJLocale::get('problems::ac') . '</th>';
+		$header .= '<th class="text-center" style="width: 5em">' . UOJLocale::get('problems::submit') . '</th>';
+		$header .= '<th class="text-center" style="width: 150px">' . UOJLocale::get('problems::ac ratio') . '</th>';
 	}
-	$header .= '<th class="text-center" style="width:180px;">' . UOJLocale::get('appraisal') . '</th>';
+	$header .= '<th class="text-center" style="width: 180px">' . UOJLocale::get('appraisal') . '</th>';
 	$header .= '</tr>';
 	
 	$tabs_info = array(

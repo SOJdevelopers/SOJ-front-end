@@ -171,7 +171,7 @@ function deleteBlog($id) {
 	DB::delete("delete from blogs_tags where blog_id = $id");
 }
 
-function deleteBlogComment($id) {
+function deleteBlogComment($id, $blog_id) {
 	if (!validateUInt($id)) {
 		return;
 	}
@@ -179,6 +179,12 @@ function deleteBlogComment($id) {
 	DB::delete("delete from click_zans where type = 'BC' and target_id = $id");
 	DB::delete("delete from blogs_comments where reply_id = $id");
 	DB::delete("delete from blogs_comments where id = $id");
+	$r = DB::selectFirst("select id, post_time, poster from blogs_comments where blog_id = {$blog_id} order by id desc limit 1");
+	if ($r) {
+		DB::update("update blogs set latest_comment = '{$r['post_time']}', latest_commenter = '{$r['poster']}' where id = {$blog_id}");
+	} else {
+		DB::update("update blogs set latest_comment = null, latest_commenter = null where id = {$blog_id}");
+	}
 }
 
 function deleteSubmission($submission) {

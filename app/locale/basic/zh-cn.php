@@ -68,7 +68,7 @@ return [
 	'male' => '男',
 	'female' => '女',
 	'publisher' => '发表者',
-	'publish time' => '发表日期',
+	'publish time' => '发表时间',
 	'his blog' => ' 的博客',
 	'enter about me' => '输入博客 ID',
 	'fill 0 if you dont want to show' => '不显示则填 0',
@@ -154,5 +154,6 @@ return [
 	'emoticon tip' => '想使用表情？参见<a href="/blog/791">表情指南</a>。',
 	'open source' => '开源项目',
 	'system groups' => '系统组',
-	'user groups' => '用户组'
+	'user groups' => '用户组',
+	'latest comment' => '最新评论'
 ];

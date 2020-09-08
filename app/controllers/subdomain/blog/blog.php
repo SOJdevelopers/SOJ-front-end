@@ -24,12 +24,12 @@
 		}
 
 		if (isSuperUser(Auth::user()) || Auth::id() === $blog['poster'] || Auth::id() === $comment['poster']) {
-			deleteBlogComment($_POST['id']);
+			deleteBlogComment($_POST['id'], $blog['id']);
 			die('ok');
 		} else if ($comment['reply_id'] != 0) {
-			$father = queryBlogComment($comment['reply_id']);
-			if (Auth::id() === $father['poster']) {
-				deleteBlogComment($_POST['id']);
+			$parent = queryBlogComment($comment['reply_id']);
+			if (Auth::id() === $parent['poster']) {
+				deleteBlogComment($_POST['id'], $blog['id']);
 				die('ok');
 			}
 		}
@@ -57,9 +57,10 @@
 		list($comment, $referrers) = uojHandleSign($comment);
 		
 		$esc_comment = DB::escape($comment);
-		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', '{$blog['id']}', '$esc_comment', 0, now(), 0)");
+		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', {$blog['id']}, '{$esc_comment}', 0, now(), 0)");
+		DB::update("update blogs set latest_comment = now() and latest_commenter = '{$myUser['username']}'");
 		$comment_id = DB::insert_id();
-		
+
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$comment_id}");
 		$page = floor($rank / 20) + 1;
 		
@@ -118,7 +119,8 @@
 		$reply_id = $_POST['reply_id'];
 		
 		$esc_comment = DB::escape($comment);
-		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', '{$blog['id']}', '$esc_comment', $reply_id, now(), 0)");
+		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', {$blog['id']}, '{$esc_comment}', {$reply_id}, now(), 0)");
+		DB::update("update blogs set latest_comment = now() and latest_commenter = '{$myUser['username']}' where id = {$blog['id']}");
 		$comment_id = DB::insert_id();
 		
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$reply_id}");

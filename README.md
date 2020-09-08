@@ -19,3 +19,15 @@ mv utility/scripts utility/contest_scripts
 ```bash
 mkdir utility/group_scripts
 ```
+
+### update Sep 8
+```sql
+alter table blogs add latest_comment datetime not null;
+alter table blogs add latest_commenter varchar(20) not null;
+
+# History
+update blogs left join (
+select * from (select id, blog_id, post_time, poster from blogs_comments order by id desc limit 1919810) tmp1 group by blog_id
+) tmp2 on blogs.id = tmp2.blog_id set blogs.latest_comment = tmp2.post_time, blogs.latest_commenter = tmp2.poster;
+
+```

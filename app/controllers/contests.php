@@ -59,7 +59,7 @@ EOD;
 		echo '<td>', '<a href="', HTML::timeanddate_url($contest['start_time'], array('duration' => $contest['last_min'])), '">', $contest['start_time_str'], '</a>', '</td>';
 		echo '<td>', UOJLocale::get('hours', $last_hour), '</td>';
 		echo '<td>', '<a href="/contest/', $contest['id'], '/registrants"><span class="glyphicon glyphicon-user"></span> &times;', $contest['player_num'], '</a>', '</td>';
-		echo '<td>', '<div class="text-left">', $click_zan_block, '</div>', '</td>';
+		echo '<td class="text-left">', $click_zan_block, '</td>';
 		echo '</tr>';
 	}
 ?>

@@ -154,5 +154,6 @@ return [
 	'emoticon tip' => 'Want to use emoticons? Here is the <a href="/blog/791">emoticon guide</a>.',
 	'open source' => 'UOJ on Github',
 	'system groups' => 'System Groups',
-	'user groups' => 'User Groups'
+	'user groups' => 'User Groups',
+	'latest comment' => 'Latest comment'
 ];
