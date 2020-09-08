@@ -12,7 +12,7 @@
 		if ($blog['latest_commenter']) {
 			echo '<td><div>', $blog['latest_comment'], '</div><div>', getUserLink($blog['latest_commenter']), '</div></td>';
 		} else {
-			echo '<td>', UOJLocale::get('no comment'), '</td>';
+			echo '<td><div class="text-muted">', UOJLocale::get('no comment'), '</div></td>';
 		}
 		echo '<td>', getClickZanBlock('B', $blog['id'], $blog['zan']), '</td>';
 		echo '</tr>';
