@@ -1,0 +1,9 @@
+{
+	"author" : "daklqw",
+	"version" : "1.0",
+	"description" : "默认操作器",
+	"document" : [
+		"参数：单个字符串，表示 rating。",
+		"返回值：单个字符串，把用户 rating 格式化输出。"
+	]
+}

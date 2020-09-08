@@ -1,0 +1,9 @@
+{
+	"author" : "daklqw",
+	"version" : "1.0",
+	"description" : "默认选择器",
+	"document" : [
+		"参数：单个字符串，表示用户名。",
+		"返回值：数字，表示 rating。"
+	]
+}

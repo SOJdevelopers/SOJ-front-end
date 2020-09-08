@@ -13,5 +13,7 @@
 !/js/blog-editor/blog-editor.js
 !/css/soj-theme.css
 !/js/soj.js
+!/utility/contest_scripts
 !/utility/contest_scripts/*
+!/utility/group_scripts
 !/utility/group_scripts/*
