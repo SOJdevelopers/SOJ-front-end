@@ -18,7 +18,7 @@
 		$contest_data = queryContestData($contest);
 		calcStandings($contest, $contest_data, $score, $standings);
 
-		uojIncludeView('contest-standings', [
+		uojIncludeView('contest-standings-public', [
 			'contest' => $contest,
 			'standings' => $standings,
 			'score' => $score,
