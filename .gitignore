@@ -3,7 +3,7 @@
 /utility/*
 !/utility/contest_scripts/*
 !/utility/group_scripts/*
-/js
+/js/*
 !/js/blog-editor/blog-editor.js
 !/css/soj-theme.css
 !/js/soj.js
