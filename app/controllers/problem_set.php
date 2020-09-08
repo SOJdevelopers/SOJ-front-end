@@ -85,7 +85,7 @@ EOD;
 
 	if (isset($_GET['search'])) {
 		$esc_search = DB::escape($_GET['search']);
-     	$cond[] = "(title like '%{$esc_search}%' or id like '%{$esc_search}%')";
+     	$cond[] = "(title like '%{$esc_search}%' or id like '%{$esc_search}%' or exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag like '%{$esc_search}%'))";
 	}
 
 	if ($cond) {
@@ -142,7 +142,7 @@ EOD;
 	</div>
 	<div class="col-sm-4 col-sm-pull-4">
 		<form id="form-search" class="input-group form-group" method="get">
-		<input type="text" class="form-control" name="search" placeholder="<?= UOJLocale::get('search')?>" <?= isset($_GET['search']) ? 'value="' . HTML::escape($_GET['search']) . '" ' : '' ?>/>  
+		<input type="text" class="form-control" name="search" placeholder="<?= UOJLocale::get('search problem')?>" <?= isset($_GET['search']) ? 'value="' . HTML::escape($_GET['search']) . '" ' : '' ?>/>  
 			<span class="input-group-btn">
 				<button type="submit" class="btn btn-search btn-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button>  
 			</span>

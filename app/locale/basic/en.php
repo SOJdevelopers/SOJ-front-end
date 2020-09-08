@@ -16,6 +16,7 @@ return [
 	'all the announcements' => 'All the Announcements……',
 	'help' => 'Help',
 	'search' => 'Search',
+	'search problem' => 'Search by title / ID / tags',
 	'top rated' => 'Top rated',
 	'top cutted' => 'Top accepted',
 	'top rated groups' => 'Top rated groups',

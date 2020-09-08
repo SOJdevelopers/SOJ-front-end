@@ -16,6 +16,7 @@ return [
 	'all the announcements' => '所有公告……',
 	'help' => '帮助',
 	'search' => '搜索',
+	'search problem' => '按 标题 / ID / 标签 搜索',
 	'top rated' => '比赛排行榜',
 	'top cutted' => '切题排行榜',
 	'top rated groups' => '组排行榜',

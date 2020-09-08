@@ -1249,7 +1249,7 @@ function resultBetter(cur, best) {
 
 // standings = [[score, time, [name, rating], rank, estimate]...]
 // score = {name: [[score, time, submission-id, estimate], ...], name2: ..., ...}
-function showStandings(getLink, doNotShowSubmissionLinks) {
+function showStandings(getLink, doNotShowLinks) {
 	var best = [], cur, col, full_score = 0;
 	if (getLink === undefined) {
 		getLink = getUserLink;
@@ -1271,7 +1271,10 @@ function showStandings(getLink, doNotShowSubmissionLinks) {
 			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
 			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
 			problems.map(function(col, idx) {
-				return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
+				if (doNotShowLinks === undefined)
+					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
+				else
+					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
 			}).join('') +
 		'</tr>',
 		function(row) {
@@ -1306,7 +1309,7 @@ function showStandings(getLink, doNotShowSubmissionLinks) {
 						col_tr += '>' + col[3] + '</span>';
 						col_tr += ']</sup>';
 					}
-					if (doNotShowSubmissionLinks === undefined)
+					if (doNotShowLinks === undefined)
 						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
 					else
 						col_tr += '<a class="uoj-score"';
@@ -1339,7 +1342,7 @@ function showStandings(getLink, doNotShowSubmissionLinks) {
 
 // standings = [[totalAC, raw_penalty, [name, rating], rank, wa_penalty]...]
 // score = {name: [[hasAC, penalty, lastID, submit_times], ...], name2: ..., ...}
-function showStandingsACM(wa_penalty, getLink, doNotShowSubmissionLinks) {
+function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 	var best = [], cur, col;
 	if (wa_penalty === undefined) {
 		wa_penalty = 1200;
@@ -1361,7 +1364,10 @@ function showStandingsACM(wa_penalty, getLink, doNotShowSubmissionLinks) {
 			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
 			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
 			problems.map(function(col, idx) {
-				return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
+				if (doNotShowLinks === undefined)
+					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
+				else
+					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
 			}).join('') +
 		'</tr>',
 		function(row) {
@@ -1376,7 +1382,7 @@ function showStandingsACM(wa_penalty, getLink, doNotShowSubmissionLinks) {
 				if (col !== null) {
 					col_tr += col[0] === 1 && best[i][2] === col[2] ? '<td class="success">' : '<td>';
 					col_tr += '<div>';
-					if (doNotShowSubmissionLinks === undefined)
+					if (doNotShowLinks === undefined)
 						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score">';
 					else
 						col_tr += '<a class="uoj-score">';
