@@ -146,7 +146,7 @@ EOD;
 	<body role="document">
 		<div class="container theme-showcase" role="main">
 			<div>
-				<h1 class="hidden-xs"><a href="<?= HTML::url('/') ?>"><img src="<?= HTML::url('/pictures/SOJ_small.png') ?>" alt="SOJ Logo" class="img-rounded" style="width: 39px; height: 39px" /></a> <?= $PageMainTitle ?></h1>
+				<h1 class="hidden-xs"><img src="<?= HTML::url('/pictures/SOJ_small.png') ?>" alt="SOJ Logo" class="img-rounded" style="width: 39px; height: 39px" /> <?= $PageMainTitle ?></h1>
 				<h1 class="visible-xs"><?= $PageMainTitleOnSmall ?></h1>
 			</div>
 			<div class="uoj-content">
