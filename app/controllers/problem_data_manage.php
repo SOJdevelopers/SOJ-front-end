@@ -619,7 +619,10 @@ EOD
 	$problem_lock_form->submit_button_config['class_str'] = 
 		$problem['data_locked'] ? 'btn btn-danger btn-block' : 'btn btn-success btn-block';
 	$problem_lock_form->submit_button_config['text'] = $problem['data_locked'] ? '题目数据已锁定' : '锁定题目数据';
-	$problem_lock_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked'])
+		$problem_lock_form->submit_button_config['smart_confirm'] = '';
+	else
+		$problem_lock_form->submit_button_config['confirm_text'] = '你真的要解锁题目数据吗？';
 
 	if (!$problem['data_locked']) {
 		$hackable_form->runAtServer();
