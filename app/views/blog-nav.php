@@ -13,7 +13,7 @@
 			<ul class="nav navbar-nav">
 				<li><a href="<?= HTML::blog_url(UOJContext::userid(), '/archive')?>"><?= UOJLocale::get('archive') ?></a></li>
 				<li><a href="<?= HTML::blog_url(UOJContext::userid(), '/aboutme')?>"><?= UOJLocale::get('about me') ?></a></li>
-				<li><a href="<?= HTML::url('/') ?>">SOJ</a></li>
+				<li><a href="<?= HTML::url('/') ?>"><?=UOJConfig::$data['profile']['oj-name-short']?></a></li>
 			</ul>
 		</div>
 	</div>

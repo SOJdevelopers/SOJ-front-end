@@ -31,3 +31,8 @@ select * from (select id, blog_id, post_time, poster from blogs_comments order b
 ) tmp2 on blogs.id = tmp2.blog_id set blogs.latest_comment = tmp2.post_time, blogs.latest_commenter = tmp2.poster;
 
 ```
+
+### update Oct 8
+```sql
+alter table problems add data_locked tinyint(1);
+```
