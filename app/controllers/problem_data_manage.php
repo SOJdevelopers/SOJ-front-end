@@ -83,7 +83,9 @@
 	$info_form = new UOJForm('info');
 	$download_url = HTML::url("/download.php?type=problem&id={$problem['id']}");
 	$data_url = HTML::url("/download.php?type=data&id={$problem['id']}");
-	$info_form->appendHTML(<<<EOD
+
+	if (!$problem['data_locked']) {
+		$info_form->appendHTML(<<<EOD
 <div class="form-group">
 	<label class="col-sm-3 control-label">zip 上传数据</label>
 	<div class="col-sm-9">
@@ -97,7 +99,9 @@
 </div>
 
 EOD
-	);
+		);
+	}
+
 	$info_form->appendHTML(<<<EOD
 <div class="form-group">
 	<label class="col-sm-3 control-label">problem_{$problem['id']}.zip</label>
@@ -168,32 +172,39 @@ $esc_extra_config
 </div>
 EOD
 	);
-
-	$info_form->addVInput('submission_requirement', 'text', '提交文件配置', $problem['submission_requirement'],
-		function ($submission_requirement, &$vdata) {
-			$submission_requirement = json_decode($submission_requirement, true);
-			if ($submission_requirement === null) {
-				return '不是合法的JSON';
+	if ($problem['data_locked']) {
+		$info_form->no_submit = true;
+	} else {
+		$info_form->addVInput('submission_requirement', 'text', '提交文件配置', $problem['submission_requirement'],
+			function ($submission_requirement, &$vdata) {
+				$submission_requirement = json_decode($submission_requirement, true);
+				if ($submission_requirement === null) {
+					return '不是合法的JSON';
+				}
+				$vdata['submission_requirement'] = json_encode($submission_requirement);
+			},
+			null);
+		$info_form->addVInput('extra_config', 'text', '其它配置', $problem['extra_config'],
+			function ($extra_config, &$vdata) {
+				$extra_config = json_decode($extra_config, true);
+				if ($extra_config === null) {
+					return '不是合法的JSON';
+				}
+				$vdata['extra_config'] = json_encode($extra_config);
+			},
+			null);
+		
+			
+		$info_form->handle = function(&$vdata) {
+			global $problem;
+			if ($problem['data_locked']) {
+				becomeMsgPage('<div>Problem data locked.</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
-			$vdata['submission_requirement'] = json_encode($submission_requirement);
-		},
-		null);
-	$info_form->addVInput('extra_config', 'text', '其它配置', $problem['extra_config'],
-		function ($extra_config, &$vdata) {
-			$extra_config = json_decode($extra_config, true);
-			if ($extra_config === null) {
-				return '不是合法的JSON';
-			}
-			$vdata['extra_config'] = json_encode($extra_config);
-		},
-		null);
-	$info_form->handle = function(&$vdata) {
-		global $problem;
-		$esc_submission_requirement = DB::escape($vdata['submission_requirement']);
-		$esc_extra_config = DB::escape($vdata['extra_config']);
-		DB::update("update problems set submission_requirement = '$esc_submission_requirement', extra_config = '$esc_extra_config' where id = {$problem['id']}");
-	};
-
+			$esc_submission_requirement = DB::escape($vdata['submission_requirement']);
+			$esc_extra_config = DB::escape($vdata['extra_config']);
+			DB::update("update problems set submission_requirement = '$esc_submission_requirement', extra_config = '$esc_extra_config' where id = {$problem['id']}");
+		};
+	}
 	class DataDisplayer {
 		public $problem_conf = array();
 		public $data_files = array();
@@ -423,77 +434,87 @@ EOD
 		die();
 	}
 
-	$hackable_form = new UOJForm('hackable');
-	$hackable_form->handle = function() {
-		global $problem, $myUser;
-		$problem['hackable'] = !$problem['hackable'];
-		set_time_limit(600);
-		$ret = svnSyncProblemData($problem, $myUser);
-		if ($ret) {
-			becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
-		}
-		
-		$hackable = $problem['hackable'] ? 1 : 0;
-		DB::update("update problems set hackable = $hackable where id = {$problem['id']}");
-	};
-	$hackable_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
-	$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用hack' : '允许使用hack';
-	$hackable_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked']) {
+		$hackable_form = new UOJForm('hackable');
+		$hackable_form->handle = function() {
+			global $problem, $myUser;
+			$problem['hackable'] = !$problem['hackable'];
+			set_time_limit(600);
+			$ret = svnSyncProblemData($problem, $myUser);
+			if ($ret) {
+				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+			}
+			
+			$hackable = $problem['hackable'] ? 1 : 0;
+			DB::update("update problems set hackable = $hackable where id = {$problem['id']}");
+		};
+		$hackable_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
+		$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用hack' : '允许使用hack';
+		$hackable_form->submit_button_config['smart_confirm'] = '';
+	}
 
-	$data_form = new UOJForm('data');
-	$data_form->handle = function() {
-		global $problem, $myUser;
-		set_time_limit(600);
-		$ret = svnSyncProblemData($problem, $myUser);
-		if ($ret) {
-			becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
-		}
-	};
-	$data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
-	$data_form->submit_button_config['text'] = '与svn仓库同步';
-	$data_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked']) {
+		$data_form = new UOJForm('data');
+		$data_form->handle = function() {
+			global $problem, $myUser;
+			set_time_limit(600);
+			$ret = svnSyncProblemData($problem, $myUser);
+			if ($ret) {
+				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+			}
+		};
+		$data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$data_form->submit_button_config['text'] = '与svn仓库同步';
+		$data_form->submit_button_config['smart_confirm'] = '';
+	}
 
-	$fast_data_form = new UOJForm('fast_data');
-	$fast_data_form->handle = function() {
-		global $problem, $myUser;
-		set_time_limit(600);
-		$ret = svnFastSyncProblemData($problem, $myUser);
-		if ($ret) {
-			becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
-		}
-	};
-	$fast_data_form->submit_button_config['class_str'] = 'btn btn-success btn-block';
-	$fast_data_form->submit_button_config['text'] = '<sup>new</sup> 快速 (非编译) 同步';
-	$fast_data_form->submit_button_config['confirm_text'] = '你真的要快速同步 (非编译同步) 吗？\nWarning: 快速同步只适用于不改变任何代码的情形，否则请使用完全同步 (与svn仓库同步)。';
-	
-	$clear_data_form = new UOJForm('clear_data');
-	$clear_data_form->handle = function() {
-		global $problem;
-		svnClearProblemData($problem);
-	};
-	$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
-	$clear_data_form->submit_button_config['text'] = '清空题目数据';
-	$clear_data_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked']) {
+		$fast_data_form = new UOJForm('fast_data');
+		$fast_data_form->handle = function() {
+			global $problem, $myUser;
+			set_time_limit(600);
+			$ret = svnFastSyncProblemData($problem, $myUser);
+			if ($ret) {
+				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
+			}
+		};
+		$fast_data_form->submit_button_config['class_str'] = 'btn btn-success btn-block';
+		$fast_data_form->submit_button_config['text'] = '<sup>new</sup> 快速 (非编译) 同步';
+		$fast_data_form->submit_button_config['confirm_text'] = '你真的要快速同步 (非编译同步) 吗？\nWarning: 快速同步只适用于不改变任何代码的情形，否则请使用完全同步 (与svn仓库同步)。';
+	}
 
-	$rejudge_form = new UOJForm('rejudge');
-	$rejudge_form->handle = function() {
-		global $problem;
-		rejudgeProblem($problem);
-	};
-	$rejudge_form->succ_href = "/submissions?problem_id={$problem['id']}";
-	$rejudge_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
-	$rejudge_form->submit_button_config['text'] = '重测该题';
-	$rejudge_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked']) {
+		$clear_data_form = new UOJForm('clear_data');
+		$clear_data_form->handle = function() {
+			global $problem;
+			svnClearProblemData($problem);
+		};
+		$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$clear_data_form->submit_button_config['text'] = '清空题目数据';
+		$clear_data_form->submit_button_config['smart_confirm'] = '';
+	}
 
-	$rejudgege97_form = new UOJForm('rejudgege97');
-	$rejudgege97_form->handle = function() {
-		global $problem;
-		rejudgeProblemGe97($problem);
-	};
-	$rejudgege97_form->succ_href = "/submissions?problem_id={$problem['id']}";
-	$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
-	$rejudgege97_form->submit_button_config['text'] = '重测不低于 97 分的程序';
-	$rejudgege97_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked']) {
+		$rejudge_form = new UOJForm('rejudge');
+		$rejudge_form->handle = function() {
+			global $problem;
+			rejudgeProblem($problem);
+		};
+		$rejudge_form->succ_href = "/submissions?problem_id={$problem['id']}";
+		$rejudge_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$rejudge_form->submit_button_config['text'] = '重测该题';
+		$rejudge_form->submit_button_config['smart_confirm'] = '';
+
+		$rejudgege97_form = new UOJForm('rejudgege97');
+		$rejudgege97_form->handle = function() {
+			global $problem;
+			rejudgeProblemGe97($problem);
+		};
+		$rejudgege97_form->succ_href = "/submissions?problem_id={$problem['id']}";
+		$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$rejudgege97_form->submit_button_config['text'] = '重测不低于 97 分的程序';
+		$rejudgege97_form->submit_button_config['smart_confirm'] = '';
+	}
 
 	$view_type_form = new UOJForm('view_type');
 	$view_type_form->addVSelect('view_content_type',
@@ -534,7 +555,7 @@ EOD
 	};
 	$view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
 	
-	if ($problem['hackable']) {
+	if (!$problem['data_locked'] && $problem['hackable']) {
 		$test_std_form = new UOJForm('test_std');
 		$test_std_form->handle = function() {
 			global $myUser, $problem;
@@ -588,14 +609,32 @@ EOD
 		$test_std_form->runAtServer();
 	}
 	
-	$hackable_form->runAtServer();
+	$problem_lock_form = new UOJForm('problem_lock');
+	$problem_lock_form->handle = function() {
+		global $problem, $myUser;
+		$problem['data_locked'] = !$problem['data_locked'];
+		$hackable = $problem['data_locked'] ? 1 : 0;
+		DB::update("update problems set data_locked = $hackable where id = {$problem['id']}");
+	};
+	$problem_lock_form->submit_button_config['class_str'] = 
+		$problem['data_locked'] ? 'btn btn-danger btn-block' : 'btn btn-success btn-block';
+	$problem_lock_form->submit_button_config['text'] = $problem['data_locked'] ? '题目数据已锁定' : '锁定题目数据';
+	$problem_lock_form->submit_button_config['smart_confirm'] = '';
+
+	if (!$problem['data_locked']) {
+		$hackable_form->runAtServer();
+	}
 	$view_type_form->runAtServer();
-	$data_form->runAtServer();
-	$fast_data_form->runAtServer();
-	$clear_data_form->runAtServer();
-	$rejudge_form->runAtServer();
-	$rejudgege97_form->runAtServer();
+	if (!$problem['data_locked']) {
+		$data_form->runAtServer();
+		$fast_data_form->runAtServer();
+		$clear_data_form->runAtServer();
+		$rejudge_form->runAtServer();
+		$rejudgege97_form->runAtServer();
+	}
+	$problem_lock_form->runAtServer();
 	$info_form->runAtServer();
+
 ?>
 <?php
 	$REQUIRE_LIB['dialog'] = '';
@@ -652,10 +691,12 @@ EOD
 <?php } else { ?>
 				<span class="glyphicon glyphicon-remove"></span> hack功能已禁止
 <?php }
-				$hackable_form->printHTML();
+	if (!$problem['data_locked']) {
+		$hackable_form->printHTML();
+	}
 ?>
 		</div>
-<?php if ($problem['hackable']) { ?>
+<?php if (!$problem['data_locked'] && $problem['hackable']) { ?>
 		<div class="top-buffer-md">
 			<?php $test_std_form->printHTML(); ?>
 		</div>
@@ -666,6 +707,7 @@ EOD
 				<?php $view_type_form->printHTML(); ?>
 			</div>
 		</div>
+<?php if (!$problem['data_locked']) { ?>
 		<div class="top-buffer-md">
 			<?php $data_form->printHTML(); ?>
 		</div>
@@ -684,8 +726,13 @@ EOD
 		<div class="top-buffer-md">
 			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
 		</div>
+<?php } ?>
+		<div class="top-buffer-md">
+			<?php $problem_lock_form->printHTML(); ?>
+		</div>
 	</div>
 
+<?php if (!$problem['data_locked']) { ?>
 	<div class="modal fade" id="UploadDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   		<div class="modal-dialog">
     			<div class="modal-content">
@@ -710,5 +757,6 @@ EOD
     			</div>
   		</div>
 	</div>
+<?php } ?>
 </div>
 <?php echoUOJPageFooter() ?>
