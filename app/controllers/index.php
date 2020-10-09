@@ -7,7 +7,7 @@
 
 	$links = DB::selectAll('select name, url from links order by name asc limit 5');
 ?>
-<?php echoUOJPageHeader('SOJ') ?>
+<?php echoUOJPageHeader(UOJConfig::$data['profile']['oj-name-short']) ?>
 <div class="panel panel-default">
 	<div class="panel-body">
 		<div class="row">

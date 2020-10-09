@@ -32,3 +32,8 @@ select * from (select id, blog_id, post_time, poster from blogs_comments order b
 
 update blogs set latest_comment = post_time where latest_comment = 0 and is_draft = 0;
 ```
+
+### update Oct 8
+```sql
+alter table problems add data_locked tinyint(1);
+```
