@@ -26,7 +26,7 @@
 		<p>Pascal 的编译器是 fpc 2.6.2，编译命令：<code>fpc code.pas -O2</code>。</p>
 		<p>Java8 的 JDK 版本是 jdk-8u152，编译命令：<code>javac code.java</code>。</p>
 		<p>Python 会先编译为优化过的字节码 <samp>.pyo</samp> 文件。支持的 Python 版本分别为 Python 2.7 和 3.4。</p>
-		<p>评测机效率见 <a href='/blog/502'> 理性理解 Stupid OJ 测评机速度</a>。</p>
+		<p>评测机效率见 <a href="/blog/502"> 理性理解 Stupid OJ 测评机速度</a>。</p>
 	</section>
 	<section>
 		<header>
