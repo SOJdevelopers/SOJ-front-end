@@ -1,5 +1,13 @@
 <?php
-if (!$args || !isset($args))
-	$args = 'root';
-$result = DB::selectFirst("select rating from user_info where username='{$args}'")["rating"];
-?>
+$cols = preg_split('/[\n\r]/', $args, -1, PREG_SPLIT_NO_EMPTY);
+$result = array();
+foreach ($cols as $col) {
+    $tmp = array();
+    $ele = preg_split('/[,"\']/', $col, -1, PREG_SPLIT_NO_EMPTY);
+    foreach ($ele as $p) {
+        $p = trim($p);
+        // if (!($p = trim($p))) continue;
+        $tmp []= $p;
+    }
+    $result []= $tmp;
+}

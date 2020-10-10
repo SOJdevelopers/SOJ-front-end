@@ -619,7 +619,10 @@ EOD
 	$problem_lock_form->submit_button_config['class_str'] = 
 		$problem['data_locked'] ? 'btn btn-danger btn-block' : 'btn btn-success btn-block';
 	$problem_lock_form->submit_button_config['text'] = $problem['data_locked'] ? '题目数据已锁定' : '锁定题目数据';
-	$problem_lock_form->submit_button_config['smart_confirm'] = '';
+	if (!$problem['data_locked'])
+		$problem_lock_form->submit_button_config['smart_confirm'] = '';
+	else
+		$problem_lock_form->submit_button_config['confirm_text'] = '你真的要解锁题目数据吗？';
 
 	if (!$problem['data_locked']) {
 		$hackable_form->runAtServer();
@@ -735,26 +738,65 @@ EOD
 <?php if (!$problem['data_locked']) { ?>
 	<div class="modal fade" id="UploadDataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   		<div class="modal-dialog">
-    			<div class="modal-content">
-      				<div class="modal-header">
-        				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        				<h4 class="modal-title" id="myModalLabel">上传数据</h4>
-      				</div>
-      				<div class="modal-body">
-        				<form action="" method="post" enctype="multipart/form-data" role="form">
-  						<div class="form-group">
-    							<label for="exampleInputFile">文件</label>
-    							<input type="file" name="problem_data_file" id="problem_data_file">
-    							<p class="help-block">请上传.zip文件</p>
-  						</div>
-						<input type="hidden" name="problem_data_file_submit" value="submit">
-  						<button type="submit" class="btn btn-success">上传</button>
-					</form>
-      				</div>
-      				<div class="modal-footer">
-        				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-      				</div>
-    			</div>
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+					<h4 class="modal-title" id="myModalLabel">上传数据</h4>
+				</div>
+				<div class="modal-body">
+					<form action="" method="post" enctype="multipart/form-data" role="form">
+					<div class="form-group">
+						<label for="exampleInputFile">文件</label>
+						<style>
+							#problem_data_file {
+								position: absolute;
+								width: 100%;
+								height: 100%;
+								opacity: 0;
+								left: 0px;
+								top: 0px;
+							}
+							.highbox {
+								line-height: 122.43px;
+								border: 2px dashed fuchsia;
+							}
+							.highbox.hover {
+								line-height: 114.43px;
+								border: 6px solid fuchsia;
+							}
+						</style>
+						<div class="highbox" id="problem_data_box">
+							<input type="file" name="problem_data_file" id="problem_data_file">
+							<div class="text-center" id="problem_data_file_name">请上传.zip文件，支持拖放</div>
+						</div>
+						<script>
+							$("#problem_data_file").change(function () {
+								var path = $(this).val(), posL = path.lastIndexOf('/'), posR = path.lastIndexOf('\\');
+								var str = path.substr(Math.max(posL, posR) + 1);
+								if (!str) str = "请上传.zip文件，支持拖放";
+								$("#problem_data_file_name").text(str);
+							});
+							$("#problem_data_box")
+								.on("dragenter", function (e) {
+									$("#problem_data_box").addClass("hover");
+								})
+								.on("dragleave", function (e) {
+									$("#problem_data_box").removeClass("hover");
+								})
+								.on("drop", function (e) {
+									$("#problem_data_box").removeClass("hover");
+								});
+						</script>
+						<!--<p class="help-block">请上传.zip文件</p>-->
+					</div>
+					<input type="hidden" name="problem_data_file_submit" value="submit">
+					<button type="submit" class="btn btn-success btn-block btn-lg">上传</button>
+				</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
   		</div>
 	</div>
 <?php } ?>

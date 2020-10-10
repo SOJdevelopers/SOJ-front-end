@@ -1,3 +1,3 @@
 <?php
-$result = 'Wow! Rating:' . $args;
+print_r($args);
 ?>
