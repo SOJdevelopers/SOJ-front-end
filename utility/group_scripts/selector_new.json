@@ -1,0 +1,9 @@
+{
+	"author" : "yhx-12243",
+	"version" : "1.0",
+	"description" : "new",
+	"document" : [
+		"参数：无。",
+		"返回值：json，[{\"username\":}]，表示待审核的用户。"
+	]
+}

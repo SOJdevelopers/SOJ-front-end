@@ -37,7 +37,7 @@
 		$esc_email = DB::escape($email);
 		
 		$svn_pw = uojRandString(10);
-		DB::insert("insert into user_info (username, email, password, svn_password, register_time, latest_login) values ('$username', '$esc_email', '$password', '$svn_pw', now(), now())");
+		DB::insert("insert into user_info (username, email, password, svn_password, register_time, latest_login, remote_addr, http_x_forwarded_for) values ('$username', '$esc_email', '$password', '$svn_pw', now(), now(), '" . DB::escape($_SERVER['REMOTE_ADDR']) . "', '" . DB::escape($_SERVER['HTTP_X_FORWARDED_FOR']) . "')");
 
 		return "欢迎你！{$username}，你已成功注册。";
 	}
