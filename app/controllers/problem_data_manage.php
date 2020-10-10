@@ -757,6 +757,7 @@ EOD
 								top: 0px;
 							}
 							.highbox {
+								position: relative;
 								line-height: 122.43px;
 								border: 2px dashed fuchsia;
 							}
