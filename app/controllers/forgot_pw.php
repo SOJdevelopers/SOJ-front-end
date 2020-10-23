@@ -23,6 +23,7 @@
 		$oj_name_short = UOJConfig::$data['profile']['oj-name-short'];
 		$sufs = base64url_encode($user['username'] . '.' . md5($user['username'] . '+' . $password));
 		$url = HTML::url('/reset-password', array('params' => array('p' => $sufs)));
+		error_log($user['username'] . ' : ' . $url);
 		$html = <<<EOD
 <base target="_blank" />
 
