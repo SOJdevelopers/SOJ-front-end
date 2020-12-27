@@ -13,13 +13,10 @@
 		if (!queryContestProblemRank($contest, $problem)) {
 			become404Page();
 		}
-		if (!isContestProblemVisibleToUser($problem, $contest, $myUser)) {
-			become404Page();
-		}
-	} else {
-		if (!isProblemVisibleToUser($problem, $myUser)) {
-			become404Page();
-		}
+	}
+
+	if (!isProblemVisible(Auth::user(), $problem, $contest)) {
+		become404Page();
 	}
 
 	function scoreDistributionData() {
@@ -60,15 +57,14 @@
 	}
 	
 	$submissions_sort_by_choice = !isset($_COOKIE['submissions-sort-by-code-length']) ? 'time' : 'tot_size';
-?>
-<?php
+
 	$REQUIRE_LIB['morris'] = '';
 ?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
 <h1 class="page-header text-center"><?= $problem['title'] ?> <?= UOJLocale::get('problems::statistics') ?></h1>
 
-<?php if ($contest && !hasContestPermission($myUser, $contest) && $contest['cur_progress'] <= CONTEST_IN_PROGRESS) { ?>
+<?php if ($contest && !hasContestPermission(Auth::user(), $contest) && $contest['cur_progress'] <= CONTEST_IN_PROGRESS) { ?>
 <h2 class="text-center text-muted">比赛尚未结束</h2>
 <?php } else { ?>
 <h2 class="text-center"><?= UOJLocale::get('problems::accepted submissions') ?></h2>

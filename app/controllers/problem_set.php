@@ -25,7 +25,7 @@
 	}
 	
 	function echoProblem($problem) {
-		if (isProblemVisibleToUser($problem, Auth::user())) {
+		if (isProblemVisible(Auth::user(), $problem)) {
 			echo '<tr class="text-center">';
 			if ($problem['submission_id']) {
 				echo '<td class="success">';

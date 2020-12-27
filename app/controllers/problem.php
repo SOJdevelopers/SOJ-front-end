@@ -10,60 +10,45 @@
 		redirectToLogin();
 	}
 
+	if (!checkGroup(Auth::user(), $problem)) {
+		become404Page();
+	}
+
 	$problem_content = queryProblemContent($problem['id']);
 
 	$contest = validateUInt($_GET['contest_id']) ? queryContest($_GET['contest_id']) : null;
 	if ($contest != null) {
 		genMoreContestInfo($contest);
 		$rgroup = isset($contest['extra_config']['is_group_contest']);
-		$problem_rank = queryContestProblemRank($contest, $problem);
-		if ($problem_rank == null) {
-			become404Page();
-		} else {
+		$agent = Auth::id();
+		if ($problem_rank = queryContestProblemRank($contest, $problem)) {
 			$problem_letter = chr(64 + $problem_rank);
 		}
 	}
 
-	$is_in_contest = false;
+	$is_in_contest = $contest != null && $contest['cur_progress'] === CONTEST_IN_PROGRESS;
 	$ban_in_contest = false;
-	$statement_maintainable = isStatementMaintainer(Auth::user()) && isProblemVisibleToUser($problem, Auth::user());
+	$is_visible = isProblemVisible(Auth::user(), $problem);
+	$statement_maintainable = $is_visible && isStatementMaintainer(Auth::user());
 
 	if ($contest != null) {
 		if (!hasContestPermission(Auth::user(), $contest)) {
-			if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
+			if ($contest['cur_progress'] === CONTEST_NOT_STARTED) {
 				become404Page();
-			} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
+			} elseif ($contest['cur_progress'] === CONTEST_IN_PROGRESS) {
 				if ($rgroup) {
-					$gs = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')");
-					$group = DB::fetch($gs);
-					if (!$group) {
-						becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。比赛结束后再来看吧～</p>');
-					}
-					if (DB::fetch($gs)) {
-						becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的组中有多于一个报名比赛，已违反比赛规则。比赛结束后再来看吧～</p>');
-					}
-					$is_in_contest = true;
-					DB::update("update contests_registrants set has_participated = 1 where username = '{$group['username']}' and contest_id = {$contest['id']}");
-					$group = queryGroup($group['username']);
+					$group = queryRegisteredGroup(Auth::user(), $contest);
+					$agent = $group['group_name'];
 				} else {
-					if (!hasRegistered(Auth::user(), $contest)) {
-						becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。如果比赛尚未结束，你可以<a href="/contest/' . $contest['id'] . '/register">报名</a>。</p>');
-					} else {
-						$is_in_contest = true;
-						DB::update("update contests_registrants set has_participated = 1 where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
-					}
+					queryRegisteredUser(Auth::user(), $contest);
 				}
+				DB::update("update contests_registrants set has_participated = 1 where username = '{$agent}' and contest_id = {$contest['id']}");
 			} else {
-				if (!checkGroup($problem, Auth::user())) {
-					become404Page();
-				}
-				$ban_in_contest = !isProblemVisibleToUser($problem, Auth::user());
+				$ban_in_contest = !$is_visible;
 			}
 		}
-	} else {
-		if (!isProblemVisibleToUser($problem, Auth::user())) {
-			become404Page();
-		}
+	} elseif (!$is_visible) {
+		become404Page();
 	}
 
 	$submission_requirement = json_decode($problem['submission_requirement'], true);
@@ -105,7 +90,7 @@
 	}
 	
 	function handleUpload($zip_file_name, $content, $tot_size, $estimate) {
-		global $problem, $contest, $myUser, $is_in_contest, $rgroup, $group;
+		global $problem, $contest, $myUser, $agent, $is_in_contest;
 		
 		$content['config'][] = array('problem_id', $problem['id']);
 		if ($is_in_contest && !isset($contest['extra_config']["problem_{$problem['id']}"])) {
@@ -131,9 +116,8 @@
 		$result_json = json_encode($result);
 		
 		if ($is_in_contest) {
-			$submitter = ($rgroup ? $group['group_name'] : Auth::id());
 			Cookie::set("estimate_{$problem['id']}", $estimate, time() + 60 * 60 * 24 * 365, '/');
-			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$submitter', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', 0, $estimate)");
+			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$agent', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', 0, $estimate)");
 		} else {
 			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden) values ({$problem['id']}, now(), '{$myUser['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', {$problem['is_hidden']})");
 		}
@@ -166,13 +150,12 @@
  	}
 
 	function checkCoolDown() {
-		global $ban_in_contest, $problem, $problem_extra_config, $is_in_contest, $rgroup, $group;
+		global $ban_in_contest, $problem, $problem_extra_config, $is_in_contest;
 		if ($ban_in_contest) {
 			return '请耐心等待比赛结束后题目对所有人可见了再提交';
 		}
 		if (isset($problem_extra_config['cooldown_time'])) {
-			$submitter = ($is_in_contest && $rgroup ? $group['group_name'] : Auth::id());
-			$last_submission = DB::selectFirst("select submit_time from submissions where submitter = '{$submitter}' and problem_id = {$problem['id']} order by id desc limit 1");
+			$last_submission = DB::selectFirst("select submit_time from submissions where submitter = '{$agent}' and problem_id = {$problem['id']} order by id desc limit 1");
 			if (!$last_submission) return '';
 			$last_submission_time = (new DateTime($last_submission['submit_time']))->getTimestamp();
 			$time_remain = (int)$problem_extra_config['cooldown_time'] - (UOJTime::$time_now->getTimestamp() - $last_submission_time);
@@ -276,7 +259,7 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php } ?>
 <?php
 	if ($contest) {
-		if (isProblemVisibleToUser($problem, Auth::user())) {
+		if ($is_visible) {
 ?>
 	<li><a href="/problem/<?= $problem['id'] ?>" role="tab"><?= UOJLocale::get('problems::back to list') ?></a></li>
 <?php } ?>

@@ -11,7 +11,7 @@
 				become404Page();
 			}
 
-			$visible = isProblemVisibleToUser($problem, $myUser);
+			$visible = isProblemVisible(Auth::user(), $problem);
 			if (!$visible) {
 				$result = DB::select("select contest_id from contests_problems where problem_id = {$_GET['id']}");
 				while (list($contest_id) = DB::fetch($result, MYSQL_NUM)) {
@@ -63,7 +63,7 @@
 			$permission = hasProblemPermission($myUser, $problem);
 			if (!$permission) {
 				$config = getProblemExtraConfig($problem);
-				if (isProblemVisibleToUser($problem, $myUser) && $config['data_download']) {
+				if ($config['data_download'] && isProblemVisible(Auth::user(), $problem)) {
 					$permission = true;
 				}
 			}

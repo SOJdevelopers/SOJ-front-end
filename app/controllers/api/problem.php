@@ -5,7 +5,7 @@
 
     if (!isset($_GET['id'])) fail('id: Field should not be empty');
     if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) fail("id: Problem with id '{$_GET['id']}' not found");
-    if (!isProblemVisibleToUser($problem, $curUser)) fail("id: You have no permission to view problem #{$_GET['id']}");
+    if (!isProblemVisible($curUser, $problem)) fail("id: You have no permission to view problem #{$_GET['id']}");
     $problem_content = queryProblemContent($problem['id']);
     $ret = array(
         'id' => (int)$problem['id'],
