@@ -257,7 +257,7 @@ function echoSubmission($submission, $config, $user) {
 	if (isOurSubmission(Auth::user(), $submission)) {
 		$limitLevel = $codeLimit | $scoreLimit;
 	} else {
-		if (isProblemVisibleToUser($problem, Auth::user())) {
+		if (isProblemVisible(Auth::user(), $problem)) {
 			$limitLevel = $codeLimit | $scoreLimit;
 		}
 		if (isset($config['only_myself'])) {
@@ -882,7 +882,7 @@ function echoHackDetails($hack_details, $name) {
 
 function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
-	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
+	$hasProblemPermission = isProblemVisible(Auth::user(), $problem);
 
 	$hack_id_str = "<a href=\"/hack/{$hack['id']}\">#{$hack['id']}</a>";
 	$submission_id_str = "<a href=\"/submission/{$hack['submission_id']}\">#{$hack['submission_id']}</a>";
