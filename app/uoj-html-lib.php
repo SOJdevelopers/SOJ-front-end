@@ -251,9 +251,10 @@ function getSubmissionStatusDetails($submission) {
 
 function echoSubmission($submission, $config, $user) {
 	$problem = queryProblemBrief($submission['problem_id']);
+	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
 	$submitterLink = getUserOrGroupLink($submission['submitter']);
 
-	if ($submission['score'] == null) {
+	if ($submission['score'] == null || $hasProblemPermission === false) {
 		$used_time_str = '/';
 		$used_memory_str = '/';
 	} else {
@@ -274,18 +275,26 @@ function echoSubmission($submission, $config, $user) {
 		echo '<td><a href="/submission/', $submission['id'], '">#', $submission['id'], '</a></td>';
 	}
 	if (!isset($config['problem_hidden'])) {
-		if ($submission['contest_id']) {
+		if ($hasProblemPermission === False) {
+			echo '<td>/</td>';
+		} else if ($submission['contest_id']) {
 			echo '<td>', getContestProblemLink($problem, $submission['contest_id'], '!id_and_title'), '</td>';
 		} else {
 			echo '<td>', getProblemLink($problem, '!id_and_title'), '</td>';
 		}
 	}
 	if (!isset($config['submitter_hidden'])) {
-		echo '<td>', $submitterLink, '</td>';
+		if ($hasProblemPermission === False) {
+			echo '<td>/</td>';
+		} else {
+			echo '<td>', $submitterLink, '</td>';
+		}
 	}
 	if (!isset($config['result_hidden'])) {
 		echo '<td>';
-		if ($status == 'Judged') {
+		if ($hasProblemPermission === False) {
+			echo '/';
+		} else if ($status == 'Judged') {
 			if ($submission['score'] == null) {
 				echo '<a href="/submission/', $submission['id'], '" class="small">', $submission['result_error'], '</a>';
 			} else {
@@ -300,15 +309,22 @@ function echoSubmission($submission, $config, $user) {
 		echo '<td>', $used_time_str, '</td>';
 	if (!isset($config['used_memory_hidden']))
 		echo '<td>', $used_memory_str, '</td>';
-
-	echo '<td>', '<a href="/submission/', $submission['id'], '">', $submission['language'], '</a>', '</td>';
+	if ($hasProblemPermission === False) {
+		echo '<td>/</td>';
+	} else {
+		echo '<td>', '<a href="/submission/', $submission['id'], '">', $submission['language'], '</a>', '</td>';
+	}
 
 	if ($submission['tot_size'] < 1024) {
 		$size_str = $submission['tot_size'] . 'b';
 	} else {
 		$size_str = sprintf("%.1f", $submission['tot_size'] / 1024) . 'kb';
 	}
-	echo '<td>', $size_str, '</td>';
+	if ($hasProblemPermission === False) {
+		echo '<td>/</td>';
+	} else {
+		echo '<td>', $size_str, '</td>';
+	}
 
 	if (!isset($config['submit_time_hidden']))
 		echo '<td><small>', $submission['submit_time'], '</small></td>';
