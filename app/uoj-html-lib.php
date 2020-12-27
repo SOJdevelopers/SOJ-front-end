@@ -251,7 +251,8 @@ function getSubmissionStatusDetails($submission) {
 
 function echoSubmission($submission, $config, $user) {
 	$problem = queryProblemBrief($submission['problem_id']);
-	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
+	// Warning: self submission invisible
+	$hasProblemPermission = isOurSubmission(Auth::user(), $submission) || isProblemVisibleToUser($problem, Auth::user());
 	$status = explode(', ', $submission['status'])[0];
 	$show_status_details = isOurSubmission(Auth::user(), $submission) && $status !== 'Judged';
 
@@ -857,6 +858,7 @@ function echoHackDetails($hack_details, $name) {
 
 function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
+	// Warning: self submission invisible
 	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
 
 	$hack_id_str = "<a href=\"/hack/{$hack['id']}\">#{$hack['id']}</a>";
