@@ -252,84 +252,76 @@ function getSubmissionStatusDetails($submission) {
 function echoSubmission($submission, $config, $user) {
 	$problem = queryProblemBrief($submission['problem_id']);
 	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
-	$submitterLink = getUserOrGroupLink($submission['submitter']);
+	$status = explode(', ', $submission['status'])[0];
+	$show_status_details = isOurSubmission(Auth::user(), $submission) && $status !== 'Judged';
 
-	if ($submission['score'] == null || $hasProblemPermission === false) {
-		$used_time_str = '/';
-		$used_memory_str = '/';
-	} else {
-		$used_time_str = $submission['used_time'] . 'ms';
-		$used_memory_str = $submission['used_memory'] . 'kb';
+	$submission_id_str = "<a href=\"/submission/{$submission['id']}\">#{$submission['id']}</a>";
+	$problem_link_str = '/';
+	$submitter_link_str = '/';
+	$problem_score_str = '/';
+	$used_time_str = '/';
+	$used_memory_str = '/';
+	$language_str = '/';
+	$size_str = '/';
+	
+	if ($hasProblemPermission === true) {
+		if ($submission['contest_id']) {
+			$problem_link_str = getContestProblemLink($problem, $submission['contest_id'], '!id_and_title');
+		} else {
+			$problem_link_str = getProblemLink($problem, '!id_and_title');
+		}
+
+		$submitter_link_str = getUserOrGroupLink($submission['submitter']);
+
+		if ($status == 'Judged') {
+			if ($submission['score'] == null) {
+				$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">{$submission['result_error']}</a>";
+			} else {
+				$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"uoj-score\">{$submission['score']}</a>";
+			}
+		} else {
+			$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">$status</a>";
+		}
+
+		if ($submission['score'] != null) {
+			$used_time_str = $submission['used_time'] . 'ms';
+			$used_memory_str = $submission['used_memory'] . 'kb';
+		}
+
+		$language_str = "<a href=\"/submission/{$submission['id']}\">{$submission['language']}</a>";
+
+		if ($submission['tot_size'] < 1024) {
+			$size_str = $submission['tot_size'] . 'b';
+		} else {
+			$size_str = sprintf("%.1f", $submission['tot_size'] / 1024) . 'kb';
+		}
 	}
 	
-	$status = explode(', ', $submission['status'])[0];
-	
-	$show_status_details = isOurSubmission(Auth::user(), $submission) && $status !== 'Judged';
 	
 	if (!$show_status_details) {
 		echo '<tr>';
 	} else {
 		echo '<tr class="warning">';
 	}
-	if (!isset($config['id_hidden'])) {
-		echo '<td><a href="/submission/', $submission['id'], '">#', $submission['id'], '</a></td>';
-	}
-	if (!isset($config['problem_hidden'])) {
-		if ($hasProblemPermission === False) {
-			echo '<td>/</td>';
-		} else if ($submission['contest_id']) {
-			echo '<td>', getContestProblemLink($problem, $submission['contest_id'], '!id_and_title'), '</td>';
-		} else {
-			echo '<td>', getProblemLink($problem, '!id_and_title'), '</td>';
-		}
-	}
-	if (!isset($config['submitter_hidden'])) {
-		if ($hasProblemPermission === False) {
-			echo '<td>/</td>';
-		} else {
-			echo '<td>', $submitterLink, '</td>';
-		}
-	}
-	if (!isset($config['result_hidden'])) {
-		echo '<td>';
-		if ($hasProblemPermission === False) {
-			echo '/';
-		} else if ($status == 'Judged') {
-			if ($submission['score'] == null) {
-				echo '<a href="/submission/', $submission['id'], '" class="small">', $submission['result_error'], '</a>';
-			} else {
-				echo '<a href="/submission/', $submission['id'], '" class="uoj-score">', $submission['score'], '</a>';
-			}
-		} else {
-			echo '<a href="/submission/', $submission['id'], '" class="small">', $status, '</a>';
-		}
-		echo '</td>';
-	}
+	if (!isset($config['id_hidden']))
+		echo '<td>', $submission_id_str, '</td>';
+	if (!isset($config['problem_hidden']))
+		echo '<td>', $problem_link_str, '</td>';
+	if (!isset($config['submitter_hidden']))
+		echo '<td>', $submitter_link_str, '</td>';
+	if (!isset($config['result_hidden']))
+		echo '<td>', $problem_score_str, '</td>';
 	if (!isset($config['used_time_hidden']))
 		echo '<td>', $used_time_str, '</td>';
 	if (!isset($config['used_memory_hidden']))
 		echo '<td>', $used_memory_str, '</td>';
-	if ($hasProblemPermission === False) {
-		echo '<td>/</td>';
-	} else {
-		echo '<td>', '<a href="/submission/', $submission['id'], '">', $submission['language'], '</a>', '</td>';
-	}
-
-	if ($submission['tot_size'] < 1024) {
-		$size_str = $submission['tot_size'] . 'b';
-	} else {
-		$size_str = sprintf("%.1f", $submission['tot_size'] / 1024) . 'kb';
-	}
-	if ($hasProblemPermission === False) {
-		echo '<td>/</td>';
-	} else {
-		echo '<td>', $size_str, '</td>';
-	}
-
+	echo '<td>', $language_str, '</td>';
+	echo '<td>', $size_str, '</td>';
 	if (!isset($config['submit_time_hidden']))
 		echo '<td><small>', $submission['submit_time'], '</small></td>';
 	if (!isset($config['judge_time_hidden']))
 		echo '<td><small>', $submission['judge_time'], '</small></td>';
+
 	echo '</tr>';
 	if ($show_status_details) {
 		echo '<tr id="', "status_details_{$submission['id']}", '" class="info">';
