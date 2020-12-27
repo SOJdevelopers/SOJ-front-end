@@ -11,25 +11,17 @@
 
 	genMoreContestInfo($contest);
 	$rgroup = isset($contest['extra_config']['is_group_contest']);
+	$agent = Auth::id();
 
 	if (!hasContestPermission(Auth::user(), $contest)) {
-		if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
+		if ($contest['cur_progress'] === CONTEST_NOT_STARTED) {
 			redirectTo("/contest/{$contest['id']}/register");
-		} elseif ($contest['cur_progress'] == CONTEST_IN_PROGRESS) {
+		} elseif ($contest['cur_progress'] === CONTEST_IN_PROGRESS) {
 			if ($rgroup) {
-				$gs = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')");
-				$group = DB::fetch($gs);
-				if (!$group) {
-					becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。比赛结束后再来看吧～</p>');
-				}
-				if (DB::fetch($gs)) {
-					becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的组中有多于一个报名比赛，已违反比赛规则。比赛结束后再来看吧～</p>');
-				}
-				$group = queryGroup($group['username']);
+				$group = queryRegisteredGroup(Auth::user(), $contest);
+				$agent = $group['group_name'];
 			} else {
-				if (!hasRegistered(Auth::user(), $contest)) {
-					becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。如果比赛尚未结束，你可以<a href="/contest/' . $contest['id'] . '/register">报名</a>。</p>');
-				}
+				queryRegisteredUser(Auth::user(), $contest);
 			}
 		}
 	}
@@ -346,10 +338,9 @@ EOD;
 	}
 
 	function echoDashboard() {
-		global $contest, $post_question, $rgroup, $group, $myUser;
+		global $contest, $post_question, $rgroup, $agent, $myUser;
 
-		$submitter = ($contest['cur_progress'] == CONTEST_IN_PROGRESS && $rgroup ? $group['group_name'] : Auth::id());
-		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$submitter}' where contest_id = {$contest['id']} order by contests_problems.problem_id asc");
+		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$agent}' where contest_id = {$contest['id']} order by contests_problems.problem_id asc");
 
 		for ($i = 0; $i < count($contest_problems); $i++) {
 			$contest_problems[$i]['problem'] = queryProblemBrief($contest_problems[$i]['problem_id']);
@@ -418,7 +409,7 @@ EOD;
 	}
 	
 	function echoMySubmissions() {
-		global $contest, $myUser, $rgroup, $group;
+		global $contest, $myUser, $rgroup, $agent;
 
 		$show_all_submissions_status = Cookie::get('show_all_submissions') !== null ? 'checked="checked" ' : '';
 		$show_all_submissions = UOJLocale::get('contests::show all submissions');
@@ -440,11 +431,10 @@ EOD;
 		if (Cookie::get('show_all_submissions') !== null) {
 			echoSubmissionsList("contest_id = {$contest['id']}", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 		} else { 
-			if ($rgroup and $contest['cur_progress'] > CONTEST_IN_PROGRESS) {
+			if ($rgroup and $contest['cur_progress'] !== CONTEST_IN_PROGRESS) {
 				echoSubmissionsList("contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = submissions.submitter and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 			} else {
-				$submitter = ($rgroup ? $group['group_name'] : Auth::id());
-				echoSubmissionsList("contest_id = {$contest['id']} and submitter = '$submitter'", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
+				echoSubmissionsList("contest_id = {$contest['id']} and submitter = '{$agent}'", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 			}
 		}
 	}

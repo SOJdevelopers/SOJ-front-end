@@ -35,15 +35,15 @@
 	}
 	
 	class SvnSyncProblemDataHandler {
-		private $problem, $user, $sync_config;
+		private $problem, $permission_level, $sync_config;
 		private $svn_data_dir, $data_dir, $prepare_dir;
 		private $requirement, $problem_extra_config;
 		private $problem_conf, $final_problem_conf;
 		private $allow_files;
 
-		public function __construct($problem, $user, $config = array()) {
+		public function __construct($problem, $permission_level, $config = array()) {
 			$this->problem = $problem;
-			$this->user = $user;
+			$this->permission_level = $permission_level;
 			$this->sync_config = $config;
 		}
 
@@ -296,7 +296,7 @@
 						$this->requirement[] = array('name' => 'answer', 'type' => 'source code', 'file_name' => 'answer.code', 'std_language' => 'C++11');
 					}
 				} else {
-					if ($this->user !== 'system' && !isProblemManager($this->user)) {
+					if ($this->permission_level !== true) {
 						throw new UOJProblemConfException("use_builtin_judger must be on.");
 					} else {
 						foreach ($this->allow_files as $file_name => $file_num) {
@@ -337,12 +337,12 @@
 		}
 	}
 	
-	function svnSyncProblemData($problem, $user = null) {
-		return (new SvnSyncProblemDataHandler($problem, $user, array()))->handle();
+	function svnSyncProblemData($problem, $permission_level) {
+		return (new SvnSyncProblemDataHandler($problem, $permission_level, array()))->handle();
 	}
 
-	function svnFastSyncProblemData($problem, $user = null) {
-		return (new SvnSyncProblemDataHandler($problem, $user, array('no_compile' => '')))->handle();
+	function svnFastSyncProblemData($problem, $permission_level) {
+		return (new SvnSyncProblemDataHandler($problem, $permission_level, array('no_compile' => '')))->handle();
 	}
 
 	function svnAddExtraTest($problem, $input_file_name, $output_file_name) {
@@ -375,7 +375,7 @@ svn commit -m "add new extra test." --username $svnusr --password $svnpwd
 EOD
 		);
 
-		if (svnSyncProblemData($problem, 'system') === '') {
+		if (svnSyncProblemData($problem, true) === '') {
 			rejudgeProblemAC($problem);
 		} else {
 			error_log('hack successfully but sync failed.');

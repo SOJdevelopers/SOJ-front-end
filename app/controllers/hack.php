@@ -14,6 +14,10 @@
 	$problem_extra_config = getProblemExtraConfig($problem);
 	$has_permission = hasProblemPermission(Auth::user(), $problem);
 
+	if (!checkGroup(Auth::user(), $problem)) {
+		become404Page();
+	}
+
 	if ($submission['contest_id']) {
 		$contest = queryContest($submission['contest_id']);
 		genMoreContestInfo($contest);
@@ -21,10 +25,8 @@
 		$contest = null;
 	}
 
-	if ($hack['is_hidden'] or !checkGroup($problem, Auth::user())) {
-		if (!isProblemVisibleToUser($problem, Auth::user())) {
-			become403Page();
-		}
+	if (!$contest && !isProblemVisible(Auth::user(), $problem)) {
+		become403Page();
 	}
 
 	if ($has_permission) {
@@ -41,18 +43,14 @@
 		$delete_form->runAtServer();
 	}
 	
-	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], $myUser, $problem, $submission);
-	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], $myUser, $problem, $submission);
-	$should_show_details = hasViewPermission($problem_extra_config['view_details_type'], $myUser, $problem, $submission);
-	$should_show_details_to_me = $has_permission;
-	if ($hack['success'] === null) {
-		$should_show_all_details = false;
+	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], Auth::user(), $problem, $submission);
+	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], Auth::user(), $problem, $submission);
+	$should_show_details = hasViewPermission($problem_extra_config['view_details_type'], Auth::user(), $problem, $submission);
+
+	if ($has_permission) {
+		$should_show_content = $should_show_all_details = $should_show_details_to_me = true;
 	}
-	if (!isSubmissionFullVisibleToUser($submission, $contest, $problem, $myUser)
-		|| !isHackFullVisibleToUser($hack, $contest, $problem, $myUser)) {
-		$should_show_content = $should_show_all_details = false;
-	}
-	
+
 	if ($should_show_all_details) {
 		$styler = new HackDetailsStyler();
 		if (!$should_show_details) {
@@ -67,28 +65,31 @@
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
 <?php echoHackListOnlyOne($hack, array(), $myUser) ?>
-<?php if ($should_show_all_details): ?>
+<?php if ($should_show_all_details) { ?>
 	<div class="panel panel-info">
 		<div class="panel-heading">
 			<h4 class="panel-title"><?= UOJLocale::get('details') ?></h4>
 		</div>
 		<div class="panel-body">
 			<?php echoJudgementDetails($hack['details'], $styler, 'details') ?>
-			<?php if ($should_show_details_to_me): ?>
-				<?php if ($styler->fade_all_details): ?>
+			<?php if ($should_show_details_to_me) { ?>
+				<?php if (!$should_show_details) { ?>
 					<hr />
 					<?php echoHackDetails($hack['details'], 'final_details') ?>
-				<?php endif ?>
-			<?php endif ?>
+				<?php } ?>
+			<?php } ?>
 		</div>
 	</div>
-<?php endif ?>
-<?php echoSubmissionsListOnlyOne($submission, array(), $myUser) ?>
-<?php if ($should_show_content): ?>
-	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>
-<?php endif ?>
+<?php } ?>
+<?php
+	echoSubmissionsListOnlyOne($submission, array(), $myUser);
 
-<?php if (isset($delete_form)): ?>
-	<?php $delete_form->printHTML() ?>
-<?php endif ?>
+	if ($should_show_content) {
+		echoSubmissionContent($submission, getProblemSubmissionRequirement($problem));
+	}
+
+	if (isset($delete_form)) {
+		$delete_form->printHTML();
+	}
+?>
 <?php echoUOJPageFooter() ?>

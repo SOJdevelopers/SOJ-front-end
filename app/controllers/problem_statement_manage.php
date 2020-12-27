@@ -5,8 +5,9 @@
 		become404Page();
 	}
 
-	$statement_maintainable = isStatementMaintainer(Auth::user()) && isProblemVisibleToUser($problem, Auth::user());
-	if (!hasProblemPermission(Auth::user(), $problem) and !$statement_maintainable) {
+	$is_visible = isProblemVisible(Auth::user(), $problem);
+	$statement_maintainable = $is_visible && isStatementMaintainer(Auth::user());
+	if (!$statement_maintainable and !hasProblemPermission(Auth::user(), $problem)) {
 		become403Page();
 	}
 

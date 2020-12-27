@@ -4,14 +4,10 @@ function hasProblemPermission($user, $problem) {
 	return $user != null && (isProblemManager($user) || DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}"));
 }
 
-function hasViewPermission($str, $user, $problem, $submission) {
-	if ($str === 'ALL')
-		return true;
-	if ($str === 'ALL_AFTER_AC')
-		return hasAC($user, $problem);
-	if ($str === 'SELF')
-		return $submission['submitter'] === $user['username'];
-	return false;
+function hasViewPermission($type, $user, $problem, $submission) {
+	return $type === 'ALL'
+		or $submission['submitter'] === $user['username']
+		or ($type === 'ALL_AFTER_AC' and hasAC($user, $problem));
 }
 
 function hasContestPermission($user, $contest) {
@@ -20,6 +16,11 @@ function hasContestPermission($user, $contest) {
 
 function hasRegistered($user, $contest) {
 	return DB::selectFirst("select * from contests_registrants where username = '{$user['username']}' and contest_id = {$contest['id']}");
+}
+
+function hasOverRegistered($user, $contest) {
+	$groups = DB::select("select 1 from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+	return DB::fetch($groups) and DB::fetch($groups);
 }
 
 function hasAC($user, $problem) {
@@ -103,60 +104,50 @@ function queryBlogComment($id) {
 	return DB::selectFirst("select * from blogs_comments where id = '$id'", MYSQL_ASSOC);
 }
 
-function checkGroup($problem, $user) {
-	return DB::selectFirst("select * from problems_visibility where problem_id = {$problem['id']} and exists (select 1 from group_members where group_members.group_name = problems_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
-}
-
-function isProblemVisibleToUser($problem, $user) {
-	return (!$problem['is_hidden'] && checkGroup($problem, $user)) || hasProblemPermission($user, $problem);
-}
-
-function isContestProblemVisibleToUser($problem, $contest, $user) {
-	if (isProblemVisibleToUser($problem, $user)) {
-		return true;
-	}
-	if ($contest['cur_progress'] >= CONTEST_PENDING_FINAL_TEST) {
-		return checkGroup($problem, $user);
-	}
-	if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
-		return false;
-	}
-	return hasRegistered($user, $contest);
-}
-
-function isSubmissionFullVisibleToUser($submission, $contest, $problem, $user) {
-	if (isProblemManager($user)) {
-		return true;
-	} elseif (!$contest) {
-		return true;
-	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
-		return true;
-	} elseif ($submission['submitter'] === $user['username']) {
-		return true;
-	} elseif ($group = queryGroup($submission['submitter']) and isGroupMember($user, $group)) {
-		return true;
-	} else {
-		return hasProblemPermission($user, $problem);
-	}
-}
-
-function isHackFullVisibleToUser($hack, $contest, $problem, $user) {
-	if (isProblemManager($user)) {
-		return true;
-	} elseif (!$contest) {
-		return true;
-	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
-		return true;
-	} elseif ($hack['hacker'] === $user['username']) {
-		return true;
-	} else {
-		return hasProblemPermission($user, $problem);
-	}
+function checkGroup($user, $problem) {
+	return isProblemManager($user) or DB::selectFirst("select * from problems_visibility where problem_id = {$problem['id']} and exists (select 1 from group_members where group_members.group_name = problems_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
 }
 
 function isOurSubmission($user, $submission) {
 	if ($submission['submitter'] === $user['username']) return true;
 	return $group = queryGroup($submission['submitter']) and isGroupMember($user, $group);
+}
+
+function isProblemVisible($user, $problem, $contest = null) {
+	if (hasProblemPermission($user, $problem)) {
+		return true;
+	} elseif (!checkGroup($user, $problem)) {
+		return false;
+	} elseif (!$problem['is_hidden']) {
+		return true;
+	} elseif (!$contest) {
+		return false;
+	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
+		return true;
+	} elseif (hasContestPermission($user, $contest)) {
+		return true;
+	} else {
+		return $contest['cur_progress'] === CONTEST_IN_PROGRESS and hasRegistered($user, $contest);
+	}
+}
+
+function queryRegisteredUser($user, $contest) {
+	if (!hasRegistered($user, $contest)) {
+		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您尚未报名。如果比赛尚未结束，你可以<a href="/contest/' . $contest['id'] . '/register">报名</a>。</p>');
+	}
+	return $user;
+}
+
+function queryRegisteredGroup($user, $contest) {
+	$groups = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+	$group = DB::fetch($groups);
+	if (!$group) {
+		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。比赛结束后再来看吧～</p>');
+	}
+	if (DB::fetch($groups)) {
+		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的组中有多于一个报名比赛，已违反比赛规则。比赛结束后再来看吧～</p>');
+	}
+	return queryGroup($group['username']);
 }
 
 function deleteBlog($id) {

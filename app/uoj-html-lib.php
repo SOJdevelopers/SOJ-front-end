@@ -768,6 +768,9 @@ class JudgementDetailsPrinter {
 
 function echoJudgementDetails($raw_details, $styler, $name) {
 	try {
+		if (!$raw_details) {
+			return;
+		}
 		$printer = new JudgementDetailsPrinter($raw_details, $styler, $name);
 		$printer->printHTML();
 	} catch (Exception $e) {

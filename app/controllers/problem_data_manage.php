@@ -456,9 +456,9 @@ EOD
 	if (!$problem['data_locked']) {
 		$data_form = new UOJForm('data');
 		$data_form->handle = function() {
-			global $problem, $myUser;
+			global $problem;
 			set_time_limit(600);
-			$ret = svnSyncProblemData($problem, $myUser);
+			$ret = svnSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
@@ -471,9 +471,9 @@ EOD
 	if (!$problem['data_locked']) {
 		$fast_data_form = new UOJForm('fast_data');
 		$fast_data_form->handle = function() {
-			global $problem, $myUser;
+			global $problem;
 			set_time_limit(600);
-			$ret = svnFastSyncProblemData($problem, $myUser);
+			$ret = svnFastSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
