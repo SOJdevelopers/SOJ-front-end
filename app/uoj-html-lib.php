@@ -259,7 +259,8 @@ function echoSubmission($submission, $config, $user) {
 	} else {
 		if (isProblemVisibleToUser($problem, Auth::user())) {
 			$limitLevel = $codeLimit | $scoreLimit;
-		} else if (isset($config['only_myself'])) {
+		}
+		if (isset($config['only_myself'])) {
 			$contest_id = $submission['contest_id'];
 			if (isset($config['only_myself'][$contest_id])) {
 				$limit = $config['only_myself'][$contest_id];
