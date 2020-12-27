@@ -258,12 +258,14 @@ function echoSubmission($submission, $config, $user) {
 	$submission_id_str = "<a href=\"/submission/{$submission['id']}\">#{$submission['id']}</a>";
 	$problem_link_str = '/';
 	$submitter_link_str = '/';
-	$problem_score_str = '/';
+	$submission_status_str = '/';
 	$used_time_str = '/';
 	$used_memory_str = '/';
 	$language_str = '/';
 	$size_str = '/';
-	
+	$submit_time_str = "<small>{$submission['submit_time']}</small>";
+	$judge_time_str = "<small>{$submission['judge_time']}</small>";
+
 	if ($hasProblemPermission === true) {
 		if ($submission['contest_id']) {
 			$problem_link_str = getContestProblemLink($problem, $submission['contest_id'], '!id_and_title');
@@ -275,12 +277,12 @@ function echoSubmission($submission, $config, $user) {
 
 		if ($status == 'Judged') {
 			if ($submission['score'] == null) {
-				$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">{$submission['result_error']}</a>";
+				$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">{$submission['result_error']}</a>";
 			} else {
-				$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"uoj-score\">{$submission['score']}</a>";
+				$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"uoj-score\">{$submission['score']}</a>";
 			}
 		} else {
-			$problem_score_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">$status</a>";
+			$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">$status</a>";
 		}
 
 		if ($submission['score'] != null) {
@@ -310,7 +312,7 @@ function echoSubmission($submission, $config, $user) {
 	if (!isset($config['submitter_hidden']))
 		echo '<td>', $submitter_link_str, '</td>';
 	if (!isset($config['result_hidden']))
-		echo '<td>', $problem_score_str, '</td>';
+		echo '<td>', $submission_status_str, '</td>';
 	if (!isset($config['used_time_hidden']))
 		echo '<td>', $used_time_str, '</td>';
 	if (!isset($config['used_memory_hidden']))
@@ -318,10 +320,9 @@ function echoSubmission($submission, $config, $user) {
 	echo '<td>', $language_str, '</td>';
 	echo '<td>', $size_str, '</td>';
 	if (!isset($config['submit_time_hidden']))
-		echo '<td><small>', $submission['submit_time'], '</small></td>';
+		echo '<td>', $submit_time_str, '</td>';
 	if (!isset($config['judge_time_hidden']))
-		echo '<td><small>', $submission['judge_time'], '</small></td>';
-
+		echo '<td>', $judge_time_str, '</td>';
 	echo '</tr>';
 	if ($show_status_details) {
 		echo '<tr id="', "status_details_{$submission['id']}", '" class="info">';
@@ -856,40 +857,54 @@ function echoHackDetails($hack_details, $name) {
 
 function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
+	$hasProblemPermission = isProblemVisibleToUser($problem, Auth::user());
+
+	$hack_id_str = "<a href=\"/hack/{$hack['id']}\">#{$hack['id']}</a>";
+	$submission_id_str = "<a href=\"/submission/{$hack['submission_id']}\">#{$hack['submission_id']}</a>";
+	$problem_link_str = '/';
+	$hacker_link_str = '/';
+	$owner_link_str = '/';
+	$hack_status_str = '/';
+	$submit_time_str = $hack['submit_time'];
+	$judge_time_str = $hack['judge_time'];
+
+	if ($hasProblemPermission === true) {
+		if ($hack['contest_id']) {
+			$problem_link_str = getContestProblemLink($problem, $hack['contest_id'], '!id_and_title');
+		} else {
+			$problem_link_str = getProblemLink($problem, '!id_and_title');
+		}
+
+		$hacker_link_str = getUserLink($hack['hacker']);
+		$owner_link_str = getUserOrGroupLink($hack['owner']);
+
+		if($hack['judge_time'] == null) {
+			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Waiting</a>";
+		} elseif ($hack['success'] == null) {
+			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Judging</a>";
+		} elseif ($hack['success']) {
+			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"1\"><strong>Success!</strong></a>";
+		} else {
+			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"0\"><strong>Failed.</strong></a></td>";
+		}
+	}
 	echo '<tr>';
 	if (!isset($config['id_hidden']))
-		echo '<td><a href="/hack/', $hack['id'], '">#', $hack['id'], '</a></td>';
+		echo '<td>', $hack_id_str, '</td>';
 	if (!isset($config['submission_hidden']))
-		echo '<td><a href="/submission/', $hack['submission_id'], '">#', $hack['submission_id'], '</a></td>';
-	if (!isset($config['problem_hidden'])) {
-		if ($hack['contest_id']) {
-			echo '<td>', getContestProblemLink($problem, $hack['contest_id'], '!id_and_title'), '</td>';
-		} else {
-			echo '<td>', getProblemLink($problem, '!id_and_title'), '</td>';
-		}
-	}
+		echo '<td>', $submission_id_str, '</td>';
+	if (!isset($config['problem_hidden']))
+		echo '<td>', $problem_link_str, '</td>';
 	if (!isset($config['hacker_hidden']))
-		echo '<td>', getUserLink($hack['hacker']), '</td>';
+		echo '<td>', $hacker_link_str, '</td>';
 	if (!isset($config['owner_hidden']))
-		echo '<td>', getUserOrGroupLink($hack['owner']), '</td>';
+		echo '<td>', $owner_link_str, '</td>';
 	if (!isset($config['result_hidden']))
-	{
-		if($hack['judge_time'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Waiting</a></td>';
-		} elseif ($hack['success'] == null) {
-			echo '<td><a href="/hack/', $hack['id'], '">Judging</a></td>';
-		} elseif ($hack['success']) {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="1"><strong>Success!</strong></a></td>';
-		} else {
-			echo '<td><a href="/hack/', $hack['id'], '" class="uoj-status" data-success="0"><strong>Failed.</strong></a></td>';
-		}
-	}
-	else
-		echo '<td>Hidden</td>';
+		echo '<td>', $hack_status_str, '</td>';	
 	if (!isset($config['submit_time_hidden']))
-		echo '<td>', $hack['submit_time'], '</td>';
+		echo '<td>', $submit_time_str, '</td>';
 	if (!isset($config['judge_time_hidden']))
-		echo '<td>', $hack['judge_time'], '</td>';
+		echo '<td>', $judge_time_str, '</td>';
 	echo '</tr>';
 }
 function echoHackListOnlyOne($hack, $config, $user) {
