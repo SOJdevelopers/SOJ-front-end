@@ -71,7 +71,7 @@ class Auth {
 		
 		Auth::initMyUser();
 		if ($myUser) {
-			if (isBannedUser($myUser) or isNewUser($myUser))
+			if (isBannedUser($myUser))
 				$myUser = null;
 		}
 		if ($myUser) {

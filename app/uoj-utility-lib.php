@@ -143,10 +143,6 @@ function blog_name_decode($name) {
 	return $name;
 }
 
-function isNewUser($user) {
-	return !DB::selectFirst("select * from group_members where username = '{$user['username']}'");
-}
-
 function getProblemExtraConfig($problem) {
 	$extra_config = json_decode($problem['extra_config'], true);
 	
