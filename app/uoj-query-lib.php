@@ -1,4 +1,7 @@
 <?php
+define('SUBMISSION_STATUS_LIMIT', 1);
+define('SUBMISSION_CODE_LIMIT', 2);
+define('SUBMISSION_ALL_LIMIT', SUBMISSION_STATUS_LIMIT | SUBMISSION_CODE_LIMIT);
 
 function hasProblemPermission($user, $problem) {
 	return $user != null && (isProblemManager($user) || DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}"));
@@ -129,6 +132,37 @@ function isProblemVisible($user, $problem, $contest = null) {
 	} else {
 		return $contest['cur_progress'] === CONTEST_IN_PROGRESS and hasRegistered($user, $contest);
 	}
+}
+
+function querySubmissionDetailPermission($user, $submission) {
+	$limitLevel = 0;
+	if (isOurSubmission(Auth::user(), $submission)) {
+		$limitLevel = SUBMISSION_ALL_LIMIT;
+	} else {
+		$problem = queryProblemBrief($submission['problem_id']);
+		if (isProblemVisible(Auth::user(), $problem)) {
+			$limitLevel = SUBMISSION_ALL_LIMIT;
+		} else if ($submission['contest_id']) {
+			$contest = queryContest($submission['contest_id']);
+			genMoreContestInfo($contest);
+			$limit = false;
+			if ($contest['cur_progress'] === CONTEST_IN_PROGRESS) {
+				if (!hasContestPermission($user, $contest)) {
+					if (isset($contest['extra_config']['only_myself']))
+						$limit = $contest['extra_config']['only_myself'];
+				}
+			}
+			if ($limit === false) $limitLevel = SUBMISSION_ALL_LIMIT;
+			else if ($limit === true) $limitLevel = 0;
+			else if (is_string($limit)) {
+				$limit = strtolower($limit);
+				if ($limit === 'full') $limitLevel = 0;
+				if ($limit === 'partial') $limitLevel = SUBMISSION_STATUS_LIMIT;
+				if ($limit === 'none') $limitLevel = SUBMISSION_ALL_LIMIT;
+			}
+		}
+	}
+	return $limitLevel;
 }
 
 function queryRegisteredUser($user, $contest) {

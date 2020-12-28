@@ -15,7 +15,7 @@
 	$has_permission = hasProblemPermission(Auth::user(), $problem);
 
 	if (!checkGroup(Auth::user(), $problem)) {
-		become404Page();
+		become403Page();
 	}
 
 	if ($submission['contest_id']) {

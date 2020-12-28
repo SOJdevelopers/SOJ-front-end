@@ -250,34 +250,8 @@ function getSubmissionStatusDetails($submission) {
 }
 
 function echoSubmission($submission, $config, $user) {
+	$limitLevel = querySubmissionDetailPermission(Auth::user(), $submission);
 	$problem = queryProblemBrief($submission['problem_id']);
-	$codeLimit = 1;
-	$scoreLimit = 2;
-	$limitLevel = 0;
-	if (isOurSubmission(Auth::user(), $submission)) {
-		$limitLevel = $codeLimit | $scoreLimit;
-	} else {
-		if (isProblemVisible(Auth::user(), $problem)) {
-			$limitLevel = $codeLimit | $scoreLimit;
-		}
-		if (isset($config['only_myself'])) {
-			$contest_id = $submission['contest_id'];
-			if (isset($config['only_myself'][$contest_id])) {
-				$limit = $config['only_myself'][$contest_id];
-				if ($limit === false) $limitLevel = $codeLimit | $scoreLimit;
-				else if ($limit === true) $limitLevel = 0;
-				else if (is_string($limit)) {
-					$limit = strtolower($limit);
-					if ($limit === 'full') $limitLevel = 0;
-					if ($limit === 'partial') $limitLevel = $scoreLimit;
-					if ($limit === 'none') $limitLevel = $codeLimit | $scoreLimit;
-				}
-				// & 1 : code length, language, time used, memory used
-				// & 2 : problem link, submitter link, submission status
-			}
-		}
-	}
-
 	$status = explode(', ', $submission['status'])[0];
 	$show_status_details = isOurSubmission(Auth::user(), $submission) && $status !== 'Judged';
 
@@ -292,7 +266,8 @@ function echoSubmission($submission, $config, $user) {
 	$submit_time_str = "<small>{$submission['submit_time']}</small>";
 	$judge_time_str = "<small>{$submission['judge_time']}</small>";
 
-	if ($limitLevel & $scoreLimit) {
+	// SUBMISSION_STATUS_LIMIT : code length, language, time used, memory used
+	if ($limitLevel & SUBMISSION_STATUS_LIMIT) {
 		if ($submission['contest_id']) {
 			$problem_link_str = getContestProblemLink($problem, $submission['contest_id'], '!id_and_title');
 		} else {
@@ -311,7 +286,9 @@ function echoSubmission($submission, $config, $user) {
 			$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">$status</a>";
 		}
 	}
-	if ($limitLevel & $codeLimit) {
+
+	// SUBMISSION_CODE_LIMIT : problem link, submitter link, submission status
+	if ($limitLevel & SUBMISSION_CODE_LIMIT) {
 		if ($submission['score'] != null) {
 			$used_time_str = $submission['used_time'] . 'ms';
 			$used_memory_str = $submission['used_memory'] . 'kb';
@@ -442,20 +419,6 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 	if (!isProblemManager($user)) {
 		$permission_cond = "(submissions.is_hidden = false or (submissions.is_hidden = true and submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}')))";
 
-		$in_progress_contests = DB::selectAll("select id from contests where status = 'unfinished' and now() between start_time and date_add(start_time, interval last_min minute)");
-		$limit = array();
-		foreach ($in_progress_contests as $contest_id) {
-//			error_log($contest_id['id']);
-			$contest = queryContest($contest_id['id']);
-			genMoreContestInfo($contest);
-			if (!hasContestPermission(Auth::user(), $contest)) {
-				if (isset($contest['extra_config']['only_myself']))
-					$limit[$contest_id['id']] = $contest['extra_config']['only_myself'];
-				else
-					$limit[$contest_id['id']] = false;
-			}
-		}
-		$config['only_myself'] = $limit;
 		if ($cond !== '1') {
 			$cond = "($cond) and $permission_cond";
 		} else {
