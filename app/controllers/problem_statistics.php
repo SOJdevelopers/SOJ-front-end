@@ -16,7 +16,7 @@
 	}
 
 	if (!isProblemVisible(Auth::user(), $problem, $contest)) {
-		become404Page();
+		become403Page();
 	}
 
 	function scoreDistributionData() {

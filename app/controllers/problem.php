@@ -11,7 +11,7 @@
 	}
 
 	if (!checkGroup(Auth::user(), $problem)) {
-		become404Page();
+		become403Page();
 	}
 
 	$problem_content = queryProblemContent($problem['id']);

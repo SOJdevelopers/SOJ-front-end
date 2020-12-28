@@ -16,7 +16,7 @@
 	$has_permission = hasProblemPermission(Auth::user(), $problem);
 
 	if (!checkGroup(Auth::user(), $problem)) {
-		become404Page();
+		become403Page();
 	}
 
 	if ($submission['contest_id']) {
@@ -26,11 +26,7 @@
 		$contest = null;
 	}
 
-	if (!$contest && !isProblemVisible(Auth::user(), $problem)) {
-		become403Page();
-	}
-
-	if ($contest != null && isset($contest['extra_config']['only_myself']) && !isOurSubmission(Auth::user(), $problem)) {
+	if (querySubmissionDetailPermission(Auth::user(), $submission) === 0) {
 		become403Page();
 	}
 
