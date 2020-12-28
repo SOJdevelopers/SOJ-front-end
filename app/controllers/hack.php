@@ -24,7 +24,7 @@
 		}
 	}
 
-	if (querySubmissionDetailPermission(Auth::user(), $submission)) {
+	if (querySubmissionDetailPermission(Auth::user(), $submission) === 0) {
 		become403Page();
 	}
 
