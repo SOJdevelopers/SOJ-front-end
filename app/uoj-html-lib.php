@@ -415,45 +415,50 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 	$header_row .= '</tr>';
 	
 	$table_name = isset($config['table_name']) ? $config['table_name'] : 'submissions';
-	
+
 	if (!isProblemManager($user)) {
-		$permission_cond = <<<EOD
-case contest_id when 0 then
-	((exists (select 1 from problems where problems.id = submissions.problem_id and problems.is_hidden = 0)) or (submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}')))
-EOD;
+		DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '{$user['username']}' and member_state != 'W')");
+		DB::query("create temporary table contest_t (id int(10) primary key) engine = memory as (select distinct contest_id id from contests_visibility where group_name in (select group_name from group_t))");
+		DB::query("create temporary table problem_t (id int(10) primary key) engine = memory as (select distinct problem_id id from problems_visibility where group_name in (select group_name from group_t))");
+		DB::query("create temporary table problem_t1 (id int(10) primary key) engine = memory as (select id from problem_t where id in (select id from problems where problems.is_hidden = 0) or id in (select problem_id from problems_permissions where username = '{$user['username']}'))");
+
+		$contest_conds = array();
 
 		$in_progress_contests = DB::selectAll("select id from contests where status = 'unfinished' and now() <= date_add(start_time, interval last_min minute)");
+		$used_contests = array(0);
 		foreach ($in_progress_contests as $contest_id) {
 			$contest = queryContest($contest_id['id']);
 			genMoreContestInfo($contest);
 			if (isset($contest['extra_config']['is_group_contest'])) {
 				$agent = queryRegisteredGroup($user, $contest, true);
+				if ($agent !== false) $agent = $agent['group_name'];
 			} else {
 				$agent = $user['username'];
 			}
 			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
-				if ($agent === false) {
-					$permission_cond .= <<<EOD
-when {$contest_id['id']} then
-	(0)
-EOD;
-				} else {
-					$permission_cond .= <<<EOD
-when {$contest_id['id']} then
-	(submissions.submitter = {$agent})
+				if ($agent !== false) {
+					$contest_conds[] = <<<EOD
+((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
 EOD;
 				}
+				DB::delete("delete from contest_t where id = {$contest['id']}");
 			}
 		}
-				$permission_cond .= <<<EOD
-else
-	(1)
-end
+
+		$contest_conds[] = <<<EOD
+(contest_id in (select id from contest_t) and problem_id in (select id from problem_t))
 EOD;
+
+		$contest_conds[] = <<<EOD
+(contest_id = 0 and problem_id in (select id from problem_t1))
+EOD;
+
+		$permission_cond = implode(' or ', $contest_conds);
+
 		if ($cond !== '1') {
-			$cond = "($cond) and $permission_cond";
+			$cond = "($cond) and ($permission_cond)";
 		} else {
-			$cond = $permission_cond;
+			$cond = "($permission_cond)";
 		}
 	}
 	
@@ -995,14 +1000,48 @@ function echoHacksList($cond, $tail, $config, $user) {
 	$header_row .= '</tr>';
 
 	if (!isProblemManager($user)) {
-		$permission_cond = <<<EOD
-(exists (select 1 from problems where problems.id = hacks.problem_id and problems.is_hidden = 0)) or (hacks.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}'))
+		DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '{$user['username']}' and member_state != 'W')");
+		DB::query("create temporary table contest_t (id int(10) primary key) engine = memory as (select distinct contest_id id from contests_visibility where group_name in (select group_name from group_t))");
+		DB::query("create temporary table problem_t (id int(10) primary key) engine = memory as (select distinct problem_id id from problems_visibility where group_name in (select group_name from group_t))");
+		DB::query("create temporary table problem_t1 (id int(10) primary key) engine = memory as (select id from problem_t where id in (select id from problems where problems.is_hidden = 0) or id in (select problem_id from problems_permissions where username = '{$user['username']}'))");
+
+		$contest_conds = array();
+
+		$in_progress_contests = DB::selectAll("select id from contests where status = 'unfinished' and now() <= date_add(start_time, interval last_min minute)");
+		$used_contests = array(0);
+		foreach ($in_progress_contests as $contest_id) {
+			$contest = queryContest($contest_id['id']);
+			genMoreContestInfo($contest);
+			if (isset($contest['extra_config']['is_group_contest'])) {
+				$agent = queryRegisteredGroup($user, $contest, true);
+				if ($agent !== false) $agent = $agent['group_name'];
+			} else {
+				$agent = $user['username'];
+			}
+			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
+				if ($agent !== false) {
+					$contest_conds[] = <<<EOD
+((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
+EOD;
+				}
+				DB::delete("delete from contest_t where id = {$contest['id']}");
+			}
+		}
+
+		$contest_conds[] = <<<EOD
+(contest_id in (select id from contest_t) and problem_id in (select id from problem_t))
 EOD;
 
+		$contest_conds[] = <<<EOD
+(contest_id = 0 and problem_id in (select id from problem_t1))
+EOD;
+
+		$permission_cond = implode(' or ', $contest_conds);
+		
 		if ($cond !== '1') {
 			$cond = "($cond) and ($permission_cond)";
 		} else {
-			$cond = $permission_cond;
+			$cond = "($permission_cond)";
 		}
 	}
 

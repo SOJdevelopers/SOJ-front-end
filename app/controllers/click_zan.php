@@ -41,7 +41,7 @@
 	if ($cur != $delta) {
 		$row = DB::selectFirst("select zan from $table_name where id = $id");
 		if ($row == null) {
-			die('<div class="text-danger">failed</div>');
+			die('<div class="text-danger">Wow! hacker! T_T....</div>');
 		}
 		$cur += $delta;
 		if ($cur == 0) {
@@ -56,7 +56,7 @@
 	} else {
 		$row = DB::selectFirst("select zan from $table_name where id = $id");
 		if ($row == null) {
-			die('<div class="text-danger">failed</div>');
+			die('<div class="text-danger">Wow! hacker! T_T....</div>');
 		}
 		$cnt = $row['zan'];
 	}

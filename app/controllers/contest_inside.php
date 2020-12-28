@@ -9,6 +9,10 @@
 		redirectToLogin();
 	}
 
+	if (!checkContestGroup(Auth::user(), $contest)) {
+		become403Page();
+	}
+
 	genMoreContestInfo($contest);
 	$rgroup = isset($contest['extra_config']['is_group_contest']);
 	$agent = Auth::id();

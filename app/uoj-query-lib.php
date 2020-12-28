@@ -112,6 +112,10 @@ function checkGroup($user, $problem) {
 	return isProblemManager($user) or DB::selectFirst("select * from problems_visibility where problem_id = {$problem['id']} and exists (select 1 from group_members where group_members.group_name = problems_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
 }
 
+function checkContestGroup($user, $contest) {
+	return isSuperUser($user) or DB::selectFirst("select * from contests_visibility where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+}
+
 function isOurSubmission($user, $submission) {
 	if ($submission['submitter'] === $user['username']) return true;
 	return $group = queryGroup($submission['submitter']) and isGroupMember($user, $group);
@@ -153,21 +157,25 @@ function queryOnlymyselfLimit($contest) {
 }
 
 function querySubmissionDetailPermission($user, $submission) {
-	if (isOurSubmission(Auth::user(), $submission)) {
+	// For some reason, this function always returns non-zero value.
+	if (isProblemVisible($user, queryProblemBrief($submission['problem_id']))) {
 		return SUBMISSION_ALL_LIMIT;
-	} else {
-		if (isProblemVisible(Auth::user(), array('id' => $submission['problem_id']))) {
-			return SUBMISSION_ALL_LIMIT;
-		} else if ($submission['contest_id']) {
-			$contest = queryContest($submission['contest_id']);
-			genMoreContestInfo($contest);
-			if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS and !hasContestPermission($user, $contest)) {
+	} else if ($submission['contest_id']) {
+		$contest = queryContest($submission['contest_id']);
+		genMoreContestInfo($contest);
+		if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
+			if (hasContestPermission($user, $contest)) {
+				return SUBMISSION_ALL_LIMIT;
+			} else if (isOurSubmission($user, $submission) && !hasOverRegistered($user, $contest)) {
+				return SUBMISSION_ALL_LIMIT;
+			} else {
 				return queryOnlymyselfLimit($contest);
 			}
+		} else {
 			return SUBMISSION_ALL_LIMIT;
 		}
-		return SUBMISSION_NONE_LIMIT;
 	}
+	return SUBMISSION_NONE_LIMIT;
 }
 
 function queryRegisteredUser($user, $contest) {

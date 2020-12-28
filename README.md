@@ -44,4 +44,20 @@ drop index is_hidden on submissions;
 drop index is_hidden on hacks;
 alter table submissions add index contest_id (contest_id, problem_id);
 alter table hacks add index contest_id (contest_id, problem_id);
+alter table submissions drop column is_hidden;
+alter table hacks drop column is_hidden;
+```
+
+### update Dec 28 14:29
+```sql
+CREATE TABLE `contests_visibility` (
+  `contest_id` int(11) NOT NULL,
+  `group_name` varchar(20) NOT NULL,
+  PRIMARY KEY (`contest_id`,`group_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+### update Dec 28 18:44
+```sql
+insert ignore into contests_visibility select id contest_id, 'zhjc' group_name from contests;
 ```

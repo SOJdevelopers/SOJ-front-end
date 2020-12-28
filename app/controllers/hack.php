@@ -19,13 +19,12 @@
 	}
 
 	if ($submission['contest_id']) {
-		$contest = queryContest($submission['contest_id']);
-		genMoreContestInfo($contest);
-	} else {
-		$contest = null;
+		if (!checkContestGroup(Auth::user(), array('id' => $submission['contest_id']))) {
+			become403Page();
+		}
 	}
 
-	if (!$contest && !isProblemVisible(Auth::user(), $problem)) {
+	if (querySubmissionDetailPermission(Auth::user(), $submission) === 0) {
 		become403Page();
 	}
 

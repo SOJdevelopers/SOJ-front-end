@@ -66,6 +66,13 @@ EOD;
 <?php echoUOJPageHeader(UOJLocale::get('contests')) ?>
 <h4><?= UOJLocale::get('contests::current or upcoming contests') ?></h4>
 <?php
+	$user = Auth::user();
+	$excond = '1';
+	if (!isSuperUser($user)) {
+		DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '{$user['username']}' and member_state != 'W')");
+		DB::query("create temporary table contest_t (id int(10) primary key) engine = memory as (select distinct contest_id id from contests_visibility where group_name in (select group_name from group_t))");
+		$excond = "id in (select id from contest_t)";
+	}
 	$table_header = '';
 	$table_header .= '<tr>';
 	$table_header .= '<th>' . UOJLocale::get('contests::contest name') . '</th>';
@@ -74,8 +81,8 @@ EOD;
 	$table_header .= '<th style="width: 100px">' . UOJLocale::get('contests::the number of registrants') . '</th>';
 	$table_header .= '<th style="width: 180px">' . UOJLocale::get('appraisal') . '</th>';
 	$table_header .= '</tr>';
-	echoLongTable(array('*'), 'contests', "status != 'finished'", 'order by start_time desc', $table_header,
-		echoContest,
+	echoLongTable(array('*'), 'contests', "status != 'finished' and {$excond}", 'order by start_time desc', $table_header,
+		'echoContest',
 		array('page_len' => 100)
 	);
 
@@ -98,8 +105,8 @@ EOD;
 
 <h4><?= UOJLocale::get('contests::ended contests') ?></h4>
 <?php
-	echoLongTable(array('*'), 'contests', "status = 'finished'", 'order by start_time desc', $table_header,
-		echoContest,
+	echoLongTable(array('*'), 'contests', "status = 'finished' and {$excond}", 'order by start_time desc', $table_header,
+		'echoContest',
 		array('page_len' => 100,
 			'print_after_table' => function() {
 				if (isSuperUser(Auth::user())) {
