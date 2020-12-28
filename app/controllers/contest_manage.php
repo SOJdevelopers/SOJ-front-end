@@ -109,6 +109,23 @@
 		);
 	}
 
+	$visibility_form = newAddDelCmdForm('visibility',
+		function($groupname) {
+			if (!queryGroup($groupname)) {
+				return "不存在名为 {$groupname} 的组";
+			}
+			return '';
+		},
+		function($type, $groupname) {
+			global $contest;
+			if ($type === '+') {
+				DB::insert("insert into contests_visibility (contest_id, group_name) values ({$contest['id']}, '$groupname')");
+			} else if ($type === '-') {
+				DB::delete("delete from contests_visibility where contest_id = {$contest['id']} and group_name = '$groupname'");
+			}
+		}
+	);
+
 	$problems_form = newAddDelCmdForm('problems',
 		function($cmd) {
 			if (!preg_match('/^(\d+)\s*(\[\S+\])?$/', $cmd, $matches)) {
@@ -189,6 +206,7 @@ EOD
 	$time_form->runAtServer();
 	$managers_form->runAtServer();
 	if (isset($registrants_form)) $registrants_form->runAtServer();
+	$visibility_form->runAtServer();
 	$problems_form->runAtServer();
 	$raw_form->runAtServer();
 ?>
@@ -200,6 +218,7 @@ EOD
 <?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) { ?>
 	<li><a href="#tab-registrants" role="tab" data-toggle="tab">参赛者</a></li>
 <?php } ?>
+	<li><a href="#tab-visibility" role="tab" data-toggle="tab">可见组</a></li>
 	<li><a href="#tab-problems" role="tab" data-toggle="tab">试题</a></li>
 	<li><a href="#tab-raw" role="tab" data-toggle="tab">原始配置</a></li>
 	<li><a href="/contest/<?= $contest['id'] ?>" role="tab">返回</a></li>
@@ -249,7 +268,25 @@ EOD
 		<?php $registrants_form->printHTML(); ?>
 	</div>
 <?php } ?>
-
+	<div class="tab-pane" id="tab-visibility">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>组名</rh>
+				</tr>
+			</thead>
+			<tbody>
+<?php
+	$result = DB::select("select group_name from contests_visibility where contest_id = {$contest['id']}");
+	for ($row_id = 1; $row = DB::fetch($result); ++$row_id)
+		echo '<tr>', '<td>', $row_id, '</td>', '<td>', getGroupLink($row['group_name']), '</td>', '</tr>';
+?>
+			</tbody>
+		</table>
+		<p class="text-center">命令格式：命令一行一个，+zhjc 表示把 zhjc 加入可见组，-zhjc 表示把 zhjc 从可见组中移除</p>
+		<?php $visibility_form->printHTML(); ?>
+	</div>
 	<div class="tab-pane" id="tab-problems">
 		<table class="table table-hover">
 			<thead>

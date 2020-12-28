@@ -9,6 +9,10 @@
 		redirectToLogin();
 	}
 
+	if (!checkContestGroup(Auth::user(), $contest)) {
+		become403Page();
+	}
+
 	genMoreContestInfo($contest);
 
 	$has_contest_permission = hasContestPermission($myUser, $contest);

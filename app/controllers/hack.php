@@ -14,6 +14,16 @@
 	$problem_extra_config = getProblemExtraConfig($problem);
 	$has_permission = hasProblemPermission(Auth::user(), $problem);
 
+	if (!checkGroup(Auth::user(), $problem)) {
+		become403Page();
+	}
+
+	if ($submission['contest_id']) {
+		if (!checkContestGroup(Auth::user(), array('id' => $submission['contest_id']))) {
+			become403Page();
+		}
+	}
+
 	if (querySubmissionDetailPermission(Auth::user(), $submission)) {
 		become403Page();
 	}
