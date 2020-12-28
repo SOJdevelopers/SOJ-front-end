@@ -25,6 +25,9 @@
 	$esc_description = HTML::escape($group['description']);
 
 	if (isset($_POST['toggle'])) {
+		if ($group['group_name'] === UOJConfig::$data['profile']['default-group']) {
+			die('管理员已经将这个写死在代码里了，你是退不出的 O(∩_∩)O哈哈哈~');
+		}
 		if (!$in_group and $is_verify) {
 			DB::delete("delete from group_members where group_name = '{$group['group_name']}' and username = '{$myUser['username']}'");
 			die('ok');
@@ -86,13 +89,14 @@
 			<?php if ($in_group || isSuperUser(Auth::user())) { ?>
 			<a type="button" class="btn btn-info btn-sm" href="/group/<?= $group['group_name'] ?>/edit"><span class="glyphicon glyphicon-pencil"></span> <?= UOJLocale::get('edit group') ?></a>
 			<?php } ?>
-
-			<?php if ($in_group) { ?>
-			<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-log-out"></span> <?= UOJLocale::get('exit this group', $group['group_name']) ?></a>
-			<?php } elseif ($is_verify) { ?>
-			<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-time"></span> <?= UOJLocale::get('pending verifying') ?></a>
-			<?php } else { ?>
-			<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-log-in"></span> <?= UOJLocale::get('join this group', $group['group_name']) ?></a>
+			<?php if ($group['group_name'] !== UOJConfig::$data['profile']['default-group']) { ?>
+				<?php if ($in_group) { ?>
+				<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-log-out"></span> <?= UOJLocale::get('exit this group', $group['group_name']) ?></a>
+				<?php } elseif ($is_verify) { ?>
+				<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-time"></span> <?= UOJLocale::get('pending verifying') ?></a>
+				<?php } else { ?>
+				<a type="button" class="btn btn-success btn-sm" id="toggle-group" href=""><span class="glyphicon glyphicon-log-in"></span> <?= UOJLocale::get('join this group', $group['group_name']) ?></a>
+				<?php } ?>
 			<?php } ?>
 
 			<div class="top-buffer-lg"></div>
