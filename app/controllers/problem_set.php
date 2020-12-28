@@ -13,7 +13,7 @@
 			DB::insert("insert into problems (title, is_hidden, submission_requirement) values ('New Problem', 1, '{}')");
 			$id = DB::insert_id();
 			DB::insert("insert into problems_contents (id, statement, statement_md) values ({$id}, '', '')");
-			DB::insert("insert into problems_visibility (problem_id, group_name) values ({$id}, '" . UOJConfig::$data['profile']['default-group'] . "')");
+			DB::insert("insert into problems_visibility (problem_id, group_name) values ({$id}, '" . UOJConfig::$data['profile']['common-group'] . "')");
 			svnNewProblem($id);
 		};
 		$new_problem_form->submit_button_config['align'] = 'right';

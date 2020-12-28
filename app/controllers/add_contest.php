@@ -47,7 +47,7 @@
 
 		DB::insert("insert into contests (name, start_time, last_min, status) values ('$esc_name', '$start_time_str', {$_POST['last_min']}, 'unfinished')");
 		$id = DB::insert_id();
-		DB::insert("insert into contests_visibility (contest_id, group_name) values ({$id}, '" . UOJConfig::$data['profile']['default-group'] . "')");
+		DB::insert("insert into contests_visibility (contest_id, group_name) values ({$id}, '" . UOJConfig::$data['profile']['common-group'] . "')");
 	};
 	$time_form->succ_href = '/contests';
 	$time_form->runAtServer();
