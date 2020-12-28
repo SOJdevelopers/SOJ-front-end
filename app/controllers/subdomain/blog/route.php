@@ -27,6 +27,7 @@ call_user_func(function() { // to prevent variable scope leak
 			Route::any("$prefix/blog/(?:{id}|new)/write", '/subdomain/blog/blog_write.php');
 			Route::any("$prefix/slide/(?:{id}|new)/write", '/subdomain/blog/slide_write.php');
 			Route::any("$prefix/blog/{id}/delete", '/subdomain/blog/blog_delete.php');
+			Route::any("$prefix/blog/{id}/visibility", '/subdomain/blog/blog_visibility.php');
 		}
 	);
 

@@ -48,6 +48,9 @@
 			<li><a href="<?= HTML::blog_url(UOJContext::userid(), '/'. $blog_type . '/' . $blog['id'] . '/write')?>"><?= UOJLocale::get('edit') ?></a></li>
 			<li><a href="<?=HTML::blog_url(UOJContext::userid(), '/blog/' . $blog['id'] . '/delete')?>"><?= UOJLocale::get('delete') ?></a></li>
 			<?php endif ?>
+			<?php if (isSuperUser(Auth::user())) { ?>
+				<li><a href="<?=HTML::blog_url(UOJContext::userid(), '/blog/' . $blog['id'] . '/visibility')?>">更改可视权限</a></li>
+			<?php } ?>
   			<li><?= getClickZanBlock('B', $blog['id'], $blog['zan']) ?></li>
 		</ul>
 	</div>
