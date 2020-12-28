@@ -116,6 +116,10 @@ function checkContestGroup($user, $contest) {
 	return isSuperUser($user) or DB::selectFirst("select * from contests_visibility where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
 }
 
+function checkBlogGroup($user, $blog) {
+	return isSuperUser($user) or DB::selectFirst("select * from blogs_visibility where blog_id = {$blog['id']} and exists (select 1 from group_members where group_members.group_name = blogs_visibility.group_name and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+}
+
 function isOurSubmission($user, $submission) {
 	if ($submission['submitter'] === $user['username']) return true;
 	return $group = queryGroup($submission['submitter']) and isGroupMember($user, $group);

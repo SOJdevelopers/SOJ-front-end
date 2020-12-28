@@ -32,5 +32,12 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('announcements')) ?>
 <h3><?= UOJLocale::get('announcements') ?></h3>
-<?php echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', 'is_hidden = 0 and important_blogs.blog_id = blogs.id', 'order by level desc, blogs.post_time desc', $header, 'echoBlogCell', $config); ?>
+<?php
+	$cond = 'is_hidden = 0 and important_blogs.blog_id = blogs.id';
+	if (!isSuperUser(Auth::user())) {
+		initBlogEnvironment(Auth::user());
+		$cond .= " and id in (select id from blog_t)";
+	}
+	echoLongTable(array('blogs.id', 'poster', 'title', 'post_time', 'zan', 'level'), 'important_blogs, blogs', $cond, 'order by level desc, blogs.post_time desc', $header, 'echoBlogCell', $config);
+?>
 <?php echoUOJPageFooter() ?>

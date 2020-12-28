@@ -53,7 +53,7 @@ class DB {
 	}
 	
 	public static function checkTableExists($name) {
-		return DB::query("select 1 from $name") !== false;
+		return DB::query("select 1 from $name limit 1") !== false;
 	}
 	
 	public static function num_rows() {

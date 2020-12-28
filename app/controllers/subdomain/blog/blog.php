@@ -13,6 +13,10 @@
 		become403Page();
 	}
 
+	if (!checkBlogGroup(Auth::user(), $blog)) {
+		become403Page();
+	}
+
 	if (isset($_POST['delete'])) {
 		if (!isset($_POST['id']) || !validateUInt($_POST['id'])) {
 			die('');

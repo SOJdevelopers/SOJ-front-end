@@ -7,7 +7,9 @@
 
 	$blogs_cond = "poster = '".UOJContext::userid()."' and is_draft = false";
 	if (!UOJContext::hasBlogPermission()) {
+		initBlogEnvironment(Auth::user());
 		$blogs_cond .= " and is_hidden = false";
+		$blogs_cond .= " and id in (select id from blog_t)";
 	}
 
 	$display_blogs_cond = $blogs_cond;

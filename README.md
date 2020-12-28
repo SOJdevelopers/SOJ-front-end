@@ -70,3 +70,16 @@ please create group "default"
 ```sql
 update group_info set group_type='S' where group_name='default';
 ```
+
+### update DEC 28 19:46
+```sql
+CREATE TABLE `blogs_visibility` (
+  `blog_id` int(11) NOT NULL,
+  `group_name` varchar(20) NOT NULL,
+  PRIMARY KEY (`blog_id`,`group_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+```sql
+insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from blogs;
+```

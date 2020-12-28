@@ -105,3 +105,14 @@ function getGroupScripts($path) {
 	}
 	return $ret;
 }
+
+function initGroupEnvironment($user) {
+	if (DB::checkTableExists('group_t')) return ;
+	DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '{$user['username']}' and member_state != 'W')");
+}
+
+function initBlogEnvironment($user) {
+	if (DB::checkTableExists('blog_t')) return ;
+	initGroupEnvironment($user);
+	DB::query("create temporary table blog_t (id int(10) primary key) engine = memory as (select distinct blog_id id from blogs_visibility where group_name in (select group_name from group_t))");
+}
