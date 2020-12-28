@@ -451,7 +451,6 @@ else
 	(1)
 end
 EOD;
-		error_log($permission_cond);
 		if ($cond !== '1') {
 			$cond = "($cond) and $permission_cond";
 		} else {
