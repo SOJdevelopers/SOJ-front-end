@@ -156,7 +156,7 @@ function querySubmissionDetailPermission($user, $submission) {
 	if (isOurSubmission(Auth::user(), $submission)) {
 		return SUBMISSION_ALL_LIMIT;
 	} else {
-		if (isProblemVisible(Auth::user(), array('id' => $submission['problem_id']))) {
+		if (isProblemVisible(Auth::user(), queryProblemBrief($submission['problem_id']))) {
 			return SUBMISSION_ALL_LIMIT;
 		} else if ($submission['contest_id']) {
 			$contest = queryContest($submission['contest_id']);
