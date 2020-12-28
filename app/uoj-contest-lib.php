@@ -142,7 +142,10 @@ function queryContestData($contest, $config = array()) {
 	$full_scores = array();
 	$n_problems = 0;
 	$result = DB::query("select problem_id from contests_problems where contest_id = {$contest['id']} order by problem_id");
-	$need_only_myself = (isset($contest['extra_config']['only_myself']) and $contest['cur_progress'] < CONTEST_PENDING_FINAL_TEST and !hasContestPermission(Auth::user(), $contest));
+
+	$need_only_myself = (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT
+					 and $contest['cur_progress'] <= CONTEST_IN_PROGRESS
+					 and !hasContestPermission(Auth::user(), $contest));
 
 	while ($row = DB::fetch($result, MYSQL_NUM)) {
 		$problems[] = $p = (int)$row[0];
@@ -169,8 +172,16 @@ function queryContestData($contest, $config = array()) {
 			$data[] = $row;
 		}
 	} else {
-		$query_estimate = $contest['cur_progress'] >= CONTEST_PENDING_FINAL_TEST && $config['show_estimate_result'];
-		$query_only_myself = ($need_only_myself ? 'and submitter = \'' . Auth::id() . '\'' : '');
+		$query_estimate = $contest['cur_progress'] > CONTEST_IN_PROGRESS && $config['show_estimate_result'];
+		$query_only_myself = '';
+		if ($need_only_myself) {
+			if ($contest['extra_config']['is_group_contest']) {
+				$agent = queryRegisteredGroup($user, $contest, true);
+			} else {
+				$agent = Auth::id();
+			}
+			$query_only_myself = "and submitter = '{$agent}'";
+		}
 
 		if ($contest['cur_progress'] < CONTEST_FINISHED) {
 			$result = DB::query("select id, submit_time, submitter, problem_id, score, estimate, used_time, used_memory from submissions where contest_id = {$contest['id']} and score is not null {$query_only_myself} order by id");
