@@ -125,7 +125,7 @@ EOD;
 	$pag_config['table_name'] = "problems left join best_ac_submissions on best_ac_submissions.submitter = '{$myUser['username']}' and problems.id = best_ac_submissions.problem_id";
 	$pag_config['cond'] = $cond;
 	$pag_config['tail'] = 'order by id asc';
-	$pag_config['max_extend'] = 10;
+	$pag_config['max_extend'] = 5;
 	$pag = new Paginator($pag_config);
 
 	$div_classes = array('table-responsive');

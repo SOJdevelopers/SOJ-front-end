@@ -52,8 +52,10 @@
 	
 		DB::insert("insert into group_info (group_name, description, avatar, joinable, group_type) values ('{$_POST['name']}', '$dp', '$av', '{$_POST['joinable']}', 'N')");
 		DB::insert("insert into group_members (group_name, username, member_state) values ('{$_POST['name']}', '{$myUser['username']}', 'A')");
+
+		header("Location: /group/{$_POST['name']}");
 	};
-	$group_form->succ_href = '/groups';
+	$group_form->succ_href = 'none';
 	$group_form->runAtServer();
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('new group')) ?>

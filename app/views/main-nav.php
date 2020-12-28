@@ -11,7 +11,7 @@
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
 				<li><a href="/contests"><?= UOJLocale::get('contests') ?></a></li>
-				<li><a href="/problems"><?= UOJLocale::get('problems') ?></a></li>
+				<li><a href="/problems?page=1"><?= UOJLocale::get('problems') ?></a></li>
 				<li><a href="/submissions"><?= UOJLocale::get('submissions') ?></a></li>
 				<li><a href="/hacks"><?= UOJLocale::get('hacks') ?></a></li>
 				<li><a href="/blogs"><?= UOJLocale::get('blogs') ?></a></li>
