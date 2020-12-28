@@ -177,9 +177,6 @@ EOD
 			if ($extra_config === null) {
 				return '不是合法的 JSON';
 			}
-			if (isset($extra_config['is_group_contest']) and isset($extra_config['only_myself'])) {
-				return '选项 is_group_contest 和 only_myself 不可共存';
-			}
 			$vdata['extra_config'] = json_encode($extra_config);
 		},
 		null);

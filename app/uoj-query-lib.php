@@ -1,4 +1,5 @@
 <?php
+define('SUBMISSION_NONE_LIMIT', 0);
 define('SUBMISSION_STATUS_LIMIT', 1);
 define('SUBMISSION_CODE_LIMIT', 2);
 define('SUBMISSION_ALL_LIMIT', SUBMISSION_STATUS_LIMIT | SUBMISSION_CODE_LIMIT);
@@ -134,35 +135,39 @@ function isProblemVisible($user, $problem, $contest = null) {
 	}
 }
 
-function querySubmissionDetailPermission($user, $submission) {
-	$limitLevel = 0;
-	if (isOurSubmission(Auth::user(), $submission)) {
-		$limitLevel = SUBMISSION_ALL_LIMIT;
+function queryOnlymyselfLimit($contest) {
+	if (!isset($contest['extra_config']['only_myself'])) {
+		return SUBMISSION_ALL_LIMIT;
+	}
+	$limit = $contest['extra_config']['only_myself'];
+	if ($limit === true) {
+		return SUBMISSION_NONE_LIMIT;
+	} else if (is_string($limit)) {
+		$limit = strtolower($limit);
+		if ($limit === 'full') return SUBMISSION_NONE_LIMIT;
+		if ($limit === 'partial') return SUBMISSION_STATUS_LIMIT;
+		return SUBMISSION_ALL_LIMIT;
 	} else {
-		$problem = queryProblemBrief($submission['problem_id']);
-		if (isProblemVisible(Auth::user(), $problem)) {
-			$limitLevel = SUBMISSION_ALL_LIMIT;
+		return SUBMISSION_ALL_LIMIT;
+	}
+}
+
+function querySubmissionDetailPermission($user, $submission) {
+	if (isOurSubmission(Auth::user(), $submission)) {
+		return SUBMISSION_ALL_LIMIT;
+	} else {
+		if (isProblemVisible(Auth::user(), array('id' => $submission['problem_id']))) {
+			return SUBMISSION_ALL_LIMIT;
 		} else if ($submission['contest_id']) {
 			$contest = queryContest($submission['contest_id']);
 			genMoreContestInfo($contest);
-			$limit = false;
-			if ($contest['cur_progress'] === CONTEST_IN_PROGRESS) {
-				if (!hasContestPermission($user, $contest)) {
-					if (isset($contest['extra_config']['only_myself']))
-						$limit = $contest['extra_config']['only_myself'];
-				}
+			if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS and !hasContestPermission($user, $contest)) {
+				return queryOnlymyselfLimit($contest);
 			}
-			if ($limit === false) $limitLevel = SUBMISSION_ALL_LIMIT;
-			else if ($limit === true) $limitLevel = 0;
-			else if (is_string($limit)) {
-				$limit = strtolower($limit);
-				if ($limit === 'full') $limitLevel = 0;
-				if ($limit === 'partial') $limitLevel = SUBMISSION_STATUS_LIMIT;
-				if ($limit === 'none') $limitLevel = SUBMISSION_ALL_LIMIT;
-			}
+			return SUBMISSION_ALL_LIMIT;
 		}
+		return SUBMISSION_NONE_LIMIT;
 	}
-	return $limitLevel;
 }
 
 function queryRegisteredUser($user, $contest) {
@@ -172,13 +177,15 @@ function queryRegisteredUser($user, $contest) {
 	return $user;
 }
 
-function queryRegisteredGroup($user, $contest) {
-	$groups = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+function queryRegisteredGroup($user, $contest, $silent = false) {
+	$groups = DB::select("select username from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
 	$group = DB::fetch($groups);
 	if (!$group) {
+		if ($silent) return false;
 		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。比赛结束后再来看吧～</p>');
 	}
 	if (DB::fetch($groups)) {
+		if ($silent) return false;
 		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的组中有多于一个报名比赛，已违反比赛规则。比赛结束后再来看吧～</p>');
 	}
 	return queryGroup($group['username']);

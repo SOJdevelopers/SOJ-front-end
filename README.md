@@ -37,3 +37,11 @@ update blogs set latest_comment = post_time where latest_comment = 0 and is_draf
 ```sql
 alter table problems add data_locked tinyint(1);
 ```
+
+### update Dec 28
+```sql
+drop index is_hidden on submissions;
+drop index is_hidden on hacks;
+alter table submissions add index contest_id (contest_id, problem_id);
+alter table hacks add index contest_id (contest_id, problem_id);
+```

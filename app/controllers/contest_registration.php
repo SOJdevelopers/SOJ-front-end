@@ -77,9 +77,19 @@
 <?php } ?>
 <?php if ($rgroup) { ?>
 	<li style="color: red">本次比赛以组为单位报名。对于以组为单位参加的比赛，请确保您加入的所有组中<strong>恰有一个</strong>报名比赛，且该组在比赛结束前<strong>无法加入/删除</strong>成员。</li>
-<?php } elseif (isset($contest['extra_config']['only_myself'])) { ?>
+<?php } ?>
+<?php
+	$limit = queryOnlymyselfLimit($contest);
+	if ($limit === SUBMISSION_NONE_LIMIT) {
+?>
 	<li style="color: blue">本次比赛中，你只能看到自己的分数，不能看到其他选手的提交记录以及实时的排行榜。其他选手的提交记录会在<strong>等待评测</strong>时公布。</li>
-<?php } else { ?>
+<?php
+	} elseif ($limit === SUBMISSION_STATUS_LIMIT) {
+?>
+	<li style="color: fuchsia">本次比赛中，你能看到所有人的分数及实时的排行榜，但是没有代码长度等详细信息。你可以依据他人分数决定比赛策略，但是无法得到代码方面的提示。</li>
+<?php
+	} else {
+?>
 	<li>请遵守比赛规则，一位选手在一场比赛内不得报名多个账号，选手之间不能交流或者抄袭代码，如果被检测到将以 0 分处理或者封禁。</li>
 <?php } ?>
 </ul>

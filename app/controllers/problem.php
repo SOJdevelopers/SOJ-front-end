@@ -117,9 +117,9 @@
 		
 		if ($is_in_contest) {
 			Cookie::set("estimate_{$problem['id']}", $estimate, time() + 60 * 60 * 24 * 365, '/');
-			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$agent', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', 0, $estimate)");
+			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$agent', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', $estimate)");
 		} else {
-			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden) values ({$problem['id']}, now(), '{$myUser['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', {$problem['is_hidden']})");
+			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result) values ({$problem['id']}, now(), '{$myUser['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json')");
 		}
  	}
 

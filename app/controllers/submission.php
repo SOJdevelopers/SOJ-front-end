@@ -58,7 +58,7 @@
 				move_uploaded_file($_FILES['input_file']['tmp_name'], $fileFullName);
 			}
 			$input_type = isset($_POST['use_formatter']) ? 'USE_FORMATTER' : 'DONT_USE_FORMATTER';
-			DB::insert("insert into hacks (problem_id, submission_id, hacker, owner, input, input_type, submit_time, details, is_hidden) values ({$problem['id']}, {$submission['id']}, '{$myUser['username']}', '{$submission['submitter']}', '$fileName', '$input_type', now(), '', {$problem['is_hidden']})");
+			DB::insert("insert into hacks (problem_id, contest_id, submission_id, hacker, owner, input, input_type, submit_time, details) values ({$problem['id']}, {$contest['id']}, {$submission['id']}, '{$myUser['username']}', '{$submission['submitter']}', '$fileName', '$input_type', now(), '')");
 		};
 		$hack_form->succ_href = '/hacks';
 		$hack_form->runAtServer();
