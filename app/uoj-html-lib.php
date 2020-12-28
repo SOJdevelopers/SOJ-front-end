@@ -428,6 +428,7 @@ EOD;
 			genMoreContestInfo($contest);
 			if (isset($contest['extra_config']['is_group_contest'])) {
 				$agent = queryRegisteredGroup($user, $contest, true);
+				if ($agent !== false) $agent = $agent['group_name'];
 			} else {
 				$agent = $user['username'];
 			}
@@ -440,7 +441,7 @@ EOD;
 				} else {
 					$permission_cond .= <<<EOD
 when {$contest_id['id']} then
-	(submissions.submitter = {$agent})
+	(submissions.submitter = '{$agent}')
 EOD;
 				}
 			}
@@ -450,6 +451,7 @@ else
 	(1)
 end
 EOD;
+		error_log($permission_cond);
 		if ($cond !== '1') {
 			$cond = "($cond) and $permission_cond";
 		} else {
