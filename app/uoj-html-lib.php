@@ -417,12 +417,12 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 	$table_name = isset($config['table_name']) ? $config['table_name'] : 'submissions';
 	
 	if (!isProblemManager($user)) {
-		$permission_cond = <<<EOD
-case contest_id when 0 then
-	((exists (select 1 from problems where problems.id = submissions.problem_id and problems.is_hidden = 0)) or (submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}')))
+		$contest_conds = array();
+		$contest_conds[] = <<<EOD
+((contest_id = 0) and ((submissions.problem_id in (select problem_id from problems where problems.is_hidden = 0)) or (submissions.problem_id in (select problem_id from problems_permissions where username = '{$user['username']}'))))
 EOD;
-
 		$in_progress_contests = DB::selectAll("select id from contests where status = 'unfinished' and now() <= date_add(start_time, interval last_min minute)");
+		$used_contests = array(0);
 		foreach ($in_progress_contests as $contest_id) {
 			$contest = queryContest($contest_id['id']);
 			genMoreContestInfo($contest);
@@ -433,28 +433,21 @@ EOD;
 				$agent = $user['username'];
 			}
 			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
-				if ($agent === false) {
-					$permission_cond .= <<<EOD
-when {$contest_id['id']} then
-	(0)
-EOD;
-				} else {
-					$permission_cond .= <<<EOD
-when {$contest_id['id']} then
-	(submissions.submitter = '{$agent}')
+				if ($agent !== false) {
+					$contest_conds[] = <<<EOD
+((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
 EOD;
 				}
+				$used_contests[] = $contest_id['id'];
 			}
 		}
-				$permission_cond .= <<<EOD
-else
-	(1)
-end
-EOD;
+
+		$contest_conds[] = '(contest_id not in (' . implode(', ', $used_contests) . '))';
+		$permission_cond = implode(' or ', $contest_conds);
 		if ($cond !== '1') {
-			$cond = "($cond) and $permission_cond";
+			$cond = "($cond) and ($permission_cond)";
 		} else {
-			$cond = $permission_cond;
+			$cond = "($permission_cond)";
 		}
 	}
 	
