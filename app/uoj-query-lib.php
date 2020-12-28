@@ -153,21 +153,24 @@ function queryOnlymyselfLimit($contest) {
 }
 
 function querySubmissionDetailPermission($user, $submission) {
-	if (isOurSubmission(Auth::user(), $submission)) {
+	if (isProblemVisible($user, queryProblemBrief($submission['problem_id']))) {
 		return SUBMISSION_ALL_LIMIT;
-	} else {
-		if (isProblemVisible(Auth::user(), queryProblemBrief($submission['problem_id']))) {
-			return SUBMISSION_ALL_LIMIT;
-		} else if ($submission['contest_id']) {
-			$contest = queryContest($submission['contest_id']);
-			genMoreContestInfo($contest);
-			if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS and !hasContestPermission($user, $contest)) {
+	} else if ($submission['contest_id']) {
+		$contest = queryContest($submission['contest_id']);
+		genMoreContestInfo($contest);
+		if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS) {
+			if (hasContestPermission($user, $contest)) {
+				return SUBMISSION_ALL_LIMIT;
+			} else if (isOurSubmission($user, $submission) && !hasOverRegistered($user, $contest)) {
+				return SUBMISSION_ALL_LIMIT;
+			} else {
 				return queryOnlymyselfLimit($contest);
 			}
+		} else {
 			return SUBMISSION_ALL_LIMIT;
 		}
-		return SUBMISSION_NONE_LIMIT;
 	}
+	return SUBMISSION_NONE_LIMIT;
 }
 
 function queryRegisteredUser($user, $contest) {
