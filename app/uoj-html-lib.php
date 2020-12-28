@@ -446,11 +446,11 @@ EOD;
 		}
 
 		$contest_conds[] = <<<EOD
-(contest_id in (select id from contest_t) and problem_id in (select id from problem_t))
+(contest_id in (select id from contest_t) and submissions.problem_id in (select id from problem_t))
 EOD;
 
 		$contest_conds[] = <<<EOD
-(contest_id = 0 and problem_id in (select id from problem_t1))
+(contest_id = 0 and submissions.problem_id in (select id from problem_t1))
 EOD;
 
 		$permission_cond = implode(' or ', $contest_conds);
