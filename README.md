@@ -56,3 +56,8 @@ CREATE TABLE `contests_visibility` (
   PRIMARY KEY (`contest_id`,`group_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
+
+### update Dec 28 18:44
+```sql
+insert ignore into contests_visibility select id contest_id, 'zhjc' group_name from contests;
+```
