@@ -1,7 +1,7 @@
 <?php
 
-// score[username][problem_pos] = [hasAC, penalty, lastID, submit_times]
-// standings[rank] => [totalAC, raw_penalty, [name, user_rating], rank, wa_penalty]
+// score[username][problem_pos] = [score, penalty, lastID, submit_times]
+// standings[rank] => [score, raw_penalty, [name, user_rating], rank, wa_penalty]
 
 $score = array();
 $n_people = count($contest_data['people']);
@@ -15,11 +15,11 @@ foreach ($contest_data['people'] as $person) {
 foreach ($contest_data['data'] as $submission) {
 	$penalty = (new DateTime($submission[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
 	if (!isset($score[$submission[2]][$submission[3]])) {
-		$score[$submission[2]][$submission[3]] = array((int)($submission[4] == 100), $penalty, $submission[0], 0);
-	} else if ($score[$submission[2]][$submission[3]][0] == 0) {
-		$score[$submission[2]][$submission[3]] = array((int)($submission[4] == 100), $penalty, $submission[0], $score[$submission[2]][$submission[3]][3] + 1);
+		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], 0);
+	} else if ($submission[4] > $score[$submission[2]][$submission[3]][0]) {
+		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], $score[$submission[2]][$submission[3]][3]);
 	} else {
-		continue;
+		++$score[$submissions[2]][$submission[3]][3];
 	}
 	if ($update_contests_submissions) {
 		DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty, estimate) values ({$contest['id']}, '{$submission[2]}', {$contest_data['problems'][$submission[3]]}, {$submission[0]}, {$submission[4]}, {$penalty})");
@@ -33,7 +33,7 @@ foreach ($contest_data['people'] as $person) {
 		if (isset($score[$person[0]][$i])) {
 			$cur_row = $score[$person[0]][$i];
 			$cur[0] += $cur_row[0];
-			if ($cur_row[0] === 1) {
+			if ($cur_row[0] > 0) {
 				$cur[1] += $cur_row[1];
 				$cur[4] += $cur_row[3];
 			}
