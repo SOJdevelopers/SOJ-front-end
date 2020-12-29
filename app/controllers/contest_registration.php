@@ -46,8 +46,9 @@
 	
 		$register_form = new UOJForm('register');
 		$register_form->handle = function() {
-			global $myUser, $contest;
-			DB::insert("insert into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$myUser['username']}', {$myUser['rating']}, {$contest['id']}, 0)");
+			global $contest;
+			$user = Auth::user();
+			DB::insert("insert into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$user['username']}', {$user['rating']}, {$contest['id']}, 0)");
 			updateContestPlayerNum($contest);
 		};
 		$register_form->submit_button_config['class_str'] = 'btn btn-primary';
@@ -105,7 +106,8 @@
 		$header .= '<th>' . UOJLocale::get('your member type') . '</th>';
 		$header .= '<th>' . UOJLocale::get('contests::is registered') . '</th>';
 		$header .= '</tr>';
-		$cond = "username = '{$myUser['username']}' and member_state != 'W'";
+		$username = Auth::id();
+		$cond = "username = '{$username}' and member_state != 'W'";
 
 		echoLongTable(array('group_name', 'member_state'), 'group_members', $cond, 'order by group_name', $header, function($row) {
 			global $contest;

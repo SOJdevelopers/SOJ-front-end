@@ -17,15 +17,15 @@
 				while (list($contest_id) = DB::fetch($result, MYSQL_NUM)) {
 					$contest = queryContest($contest_id);
 					genMoreContestInfo($contest);
-					if (isset($contest['extra_config']['is_group_contest'])) {
-						$gs = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')");
-						$group = DB::fetch($gs);
-						if ($group and !DB::fetch($gs)) {
-							$visible = true;
-						}
-					} else {
-						if ($contest['cur_progress'] != CONTEST_NOT_STARTED && hasRegistered(Auth::user(), $contest)) {
-							$visible = true;
+					if ($contest['cur_progress'] != CONTEST_NOT_STARTED) {
+						if (isset($contest['extra_config']['is_group_contest'])) {
+							if (queryRegisteredGroup(Auth::user(), $contest, true)) {
+								$visible = true;
+							}
+						} else {
+							if (hasRegistered(Auth::user(), $contest)) {
+								$visible = true;
+							}
 						}
 					}
 				}
@@ -60,7 +60,7 @@
 				become404Page();
 			}
 
-			$permission = hasProblemPermission($myUser, $problem);
+			$permission = hasProblemPermission(Auth::user(), $problem);
 			if (!$permission) {
 				$config = getProblemExtraConfig($problem);
 				if ($config['data_download'] && isProblemVisible(Auth::user(), $problem)) {

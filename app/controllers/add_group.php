@@ -46,12 +46,12 @@
 		'joinable', array('A' => UOJLocale::get('join A'), 'C' => UOJLocale::get('join C'), 'N' => UOJLocale::get('join N')), UOJLocale::get('joinable'), 'C'
 	);
 	$group_form->handle = function() {
-		global $myUser;
 		$dp = DB::escape($_POST['description']);
 		$av = DB::escape($_POST['avatar']);
 	
+		$username = Auth::id();
 		DB::insert("insert into group_info (group_name, description, avatar, joinable, group_type) values ('{$_POST['name']}', '$dp', '$av', '{$_POST['joinable']}', 'N')");
-		DB::insert("insert into group_members (group_name, username, member_state) values ('{$_POST['name']}', '{$myUser['username']}', 'A')");
+		DB::insert("insert into group_members (group_name, username, member_state) values ('{$_POST['name']}', '{$username}', 'A')");
 
 		header("Location: /group/{$_POST['name']}");
 	};

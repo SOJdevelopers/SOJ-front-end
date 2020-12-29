@@ -398,7 +398,7 @@ function showSubmissions() {
 	<div>
 		<h4>测评失败的提交记录</h4>
 		<?php
-			echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), $myUser);
+			echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), Auth::user());
 		?>
 	</div>
 	<?php
