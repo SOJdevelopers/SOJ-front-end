@@ -9,7 +9,7 @@
 	$upcoming_contest_href = null;
 	$rest_second = 1000000;
 	function echoContest($contest) {
-		global $myUser, $upcoming_contest_name, $upcoming_contest_href, $rest_second;
+		global $upcoming_contest_name, $upcoming_contest_href, $rest_second;
 		
 		$contest_name_link = <<<EOD
 <a href="/contest/{$contest['id']}">{$contest['name']}</a>
@@ -25,7 +25,8 @@ EOD;
 				$rest_second = $cur_rest_second;
 			}
 			if ($rgroup) {
-				$gs = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')");
+				$username = Auth::id();
+				$gs = DB::select("select * from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$username}' and group_members.member_state != 'W')");
 				$group = DB::fetch($gs);
 				if (!$group) {
 					$contest_name_link .= '<sup><a style="color: red" href="/contest/' . $contest['id'] . '/register">' . UOJLocale::get('contests::register') . '</a></sup>';

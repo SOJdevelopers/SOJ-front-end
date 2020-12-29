@@ -4,20 +4,20 @@
 	}
 
 	if (isset($_POST['regenerate_apipassword'])) {
-		global $myUser;
+		$username = Auth::id();
 		$passwd = uojRandString(10);
-		DB::update("update user_info set svn_password='$passwd' where username='{$myUser['username']}'");
+		DB::update("update user_info set svn_password='$passwd' where username='{$username}'");
 		die('ok');
 	}
 
 	function handlePost() {
-		global $myUser;
+		$username = Auth::id();
 		if (!isset($_POST['old_password']))
 		{
 			return '无效表单';
 		}
 		$old_password = $_POST['old_password'];
-		if (!validatePassword($old_password) || !checkPassword($myUser, $old_password))
+		if (!validatePassword($old_password) || !checkPassword(Auth::user(), $old_password))
 		{
 			return '失败：密码错误。';
 		}
@@ -28,8 +28,8 @@
 			{
 				return '失败：无效密码。';
 			}
-			$password = getPasswordToStore($password, $myUser['username']);
-			DB::update("update user_info set password = '$password' where username = '{$myUser['username']}'");
+			$password = getPasswordToStore($password, $username);
+			DB::update("update user_info set password = '$password' where username = '{$username}'");
 		}
 
 		$email = $_POST['email'];
@@ -38,38 +38,38 @@
 			return '失败：无效电子邮箱。';
 		}
 		$esc_email = DB::escape($email);
-		DB::update("update user_info set email = '$esc_email' where username = '{$myUser['username']}'");
+		DB::update("update user_info set email = '$esc_email' where username = '{$username}'");
 
 		if ($_POST['Qtag'])
 		{
 			$qq = $_POST['qq'];
 			if (!validateQQ($qq)) return "失败：无效 QQ。";
-			DB::update("update user_info set qq = '$qq' where username = '{$myUser['username']}'");
+			DB::update("update user_info set qq = '$qq' where username = '{$username}'");
 		}
 		else
-			DB::update("update user_info set QQ = NULL where username = '{$myUser['username']}'");
+			DB::update("update user_info set QQ = NULL where username = '{$username}'");
 		if ($_POST['sex'] == 'U' || $_POST['sex'] == 'M' || $_POST['sex'] == 'F')
 		{
 			$sex = $_POST['sex'];
-			DB::update("update user_info set sex = '$sex' where username = '{$myUser['username']}'");
+			DB::update("update user_info set sex = '$sex' where username = '{$username}'");
 		}
 
 		if (validateMotto($_POST['motto'])) {
 			$esc_motto = DB::escape($_POST['motto']);
-			DB::update("update user_info set motto = '$esc_motto' where username = '{$myUser['username']}'");
+			DB::update("update user_info set motto = '$esc_motto' where username = '{$username}'");
 		}
 
 		if (validateUInt($_POST['about_me'])) {
 			$about_me = $_POST['about_me'];
 			$blog_id = (int)$about_me;
 			if ($blog_id) {
-				if (!DB::selectFirst("select poster from blogs where id = '$blog_id' and poster = '{$myUser['username']}'")) return "失败：非本人博客";
+				if (!DB::selectFirst("select poster from blogs where id = '$blog_id' and poster = '{$username}'")) return "失败：非本人博客";
 			}
-			DB::update("update user_info set about_me = '$blog_id' where username = '{$myUser['username']}'");
+			DB::update("update user_info set about_me = '$blog_id' where username = '{$username}'");
 		}
 		if (validateRealname($_POST['real_name'])) {
 			$esc_name = DB::escape($_POST['real_name']);
-			DB::update("update user_info set real_name = '$esc_name' where username = '{$myUser['username']}'");
+			DB::update("update user_info set real_name = '$esc_name' where username = '{$username}'");
 		}
 		return 'ok';
 	}
@@ -103,14 +103,14 @@
 	<div id="div-email" class="form-group">
 		<label for="input-email" class="col-sm-2 control-label"><?= UOJLocale::get('email') ?></label>
 		<div class="col-sm-3">
-			<input type="email" class="form-control" name="email" id="input-email" value="<?= $myUser['email'] ?>" placeholder="<?= UOJLocale::get('enter your email') ?>" maxlength="50" />
+			<input type="email" class="form-control" name="email" id="input-email" value="<?= Auth::user()['email'] ?>" placeholder="<?= UOJLocale::get('enter your email') ?>" maxlength="50" />
 			<span class="help-block" id="help-email"></span>
 		</div>
 	</div>
 	<div id="div-qq" class="form-group">
 		<label for="input-qq" class="col-sm-2 control-label"><?= UOJLocale::get('QQ') ?></label>
 		<div class="col-sm-3">
-			<input type="text" class="form-control" name="qq" id="input-qq" value="<?= $myUser['qq'] != 0 ? $myUser['qq'] : '' ?>" placeholder="<?= UOJLocale::get('enter your QQ') ?>" maxlength="50" />
+			<input type="text" class="form-control" name="qq" id="input-qq" value="<?= Auth::user()['qq'] != 0 ? Auth::user()['qq'] : '' ?>" placeholder="<?= UOJLocale::get('enter your QQ') ?>" maxlength="50" />
 			<span class="help-block" id="help-qq"></span>
 		</div>
 	</div>
@@ -127,21 +127,21 @@
 	<div id="div-motto" class="form-group">
 		<label for="input-motto" class="col-sm-2 control-label"><?= UOJLocale::get('motto') ?></label>
 		<div class="col-sm-3">
-			<textarea class="form-control" id="input-motto" name="motto"><?= HTML::escape($myUser['motto']) ?></textarea>
+			<textarea class="form-control" id="input-motto" name="motto"><?= HTML::escape(Auth::user()['motto']) ?></textarea>
 			<span class="help-block" id="help-motto"></span>
 		</div>
 	</div>
 	<div id="div-about-me" class="form-group">
 		<label for="input-about-me" class="col-sm-2 control-label"><?= UOJLocale::get('about me blog') ?></label>
 		<div class="col-sm-3">
-			<input type="text" class="form-control" name="about-me" id="input-about-me" value="<?= $myUser['about_me'] ?>" placeholder="<?= UOJLocale::get('enter about me') ?>" maxlength="50" />
+			<input type="text" class="form-control" name="about-me" id="input-about-me" value="<?= Auth::user()['about_me'] ?>" placeholder="<?= UOJLocale::get('enter about me') ?>" maxlength="50" />
 			<span class="help-block" id="help-about-me"><?= UOJLocale::get('fill 0 if you dont want to show') ?></span>
 		</div>
 	</div>
 	<div id="div-real-name" class="form-group">
 		<label for="input-real-name" class="col-sm-2 control-label"><?= UOJLocale::get('realname') ?></label>
 		<div class="col-sm-3">
-			<input type="text" class="form-control" name="real-name" id="input-real-name" value="<?= $myUser['real_name'] ?>" placeholder="<?= UOJLocale::get('enter your realname') ?>" maxlength="50" />
+			<input type="text" class="form-control" name="real-name" id="input-real-name" value="<?= Auth::user()['real_name'] ?>" placeholder="<?= UOJLocale::get('enter your realname') ?>" maxlength="50" />
 			<span class="help-block" id="help-real-name"></span>
 		</div>
 	</div>
