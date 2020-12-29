@@ -1448,7 +1448,7 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 			for (var i = 0; i < problems.length; i++) {
 				var col = score[row[2][0]][i];
 				if (col !== null) {
-					if (best[i][2] === col[i][2] && col[0] > 0)
+					if (best[i][2] === col[2] && col[0] > 0)
 						col_tr += '<td class="' + (col[0] === full_scores[i] ? 'success' : 'info') + '">';
 					else
 						col_tr += '<td>';
