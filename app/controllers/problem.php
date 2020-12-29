@@ -23,6 +23,8 @@
 		$agent = Auth::id();
 		if ($problem_rank = queryContestProblemRank($contest, $problem)) {
 			$problem_letter = chr(64 + $problem_rank);
+		} else {
+			become404Page();
 		}
 	}
 
