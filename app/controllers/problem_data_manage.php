@@ -599,9 +599,8 @@ EOD
 		 	$result = array();
 		 	$result['status'] = 'Waiting';
 		 	$result_json = json_encode($result);
-			$is_hidden = $problem['is_hidden'] ? 1 : 0;
 			
-			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result, is_hidden) values ({$problem['id']}, now(), '{$user_std['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', $is_hidden)");
+			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result) values ({$problem['id']}, now(), '{$user_std['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json')");
 		};
 		$test_std_form->succ_href = "/submissions?problem_id={$problem['id']}";
 		$test_std_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
