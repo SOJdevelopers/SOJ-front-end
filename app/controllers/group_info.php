@@ -24,12 +24,13 @@
 	assert($in_group or !$is_verify or $group['joinable'] === 'C');
 	$esc_description = HTML::escape($group['description']);
 
+	$username = Auth::id();
 	if (isset($_POST['toggle'])) {
 		if ($group['group_name'] === UOJConfig::$data['profile']['default-group']) {
 			die('管理员已经将这个写死在代码里了，你是退不出的 O(∩_∩)O哈哈哈~');
 		}
 		if (!$in_group and $is_verify) {
-			DB::delete("delete from group_members where group_name = '{$group['group_name']}' and username = '{$myUser['username']}'");
+			DB::delete("delete from group_members where group_name = '{$group['group_name']}' and username = '{$username}'");
 			die('ok');
 		}
 		if (DB::selectFirst("select * from contests_registrants where username = '{$group['group_name']}' and exists (select 1 from contests where contests.id = contests_registrants.contest_id and contests.status != 'finished')")) {
@@ -40,15 +41,15 @@
 			if ($n_members == 1 and isGroupManager(Auth::user(), $group)) {
 				die('该组只剩下 1 个管理员，不可退出该组。若要退出，请先转让管理员。');
 			} else {
-				DB::delete("delete from group_members where group_name = '{$group['group_name']}' and username = '{$myUser['username']}'");
+				DB::delete("delete from group_members where group_name = '{$group['group_name']}' and username = '{$username}'");
 				die('ok');
 			}
 		} else {
 			if ($group['joinable'] === 'A') {
-				DB::insert("insert into group_members (group_name, username, member_state) values ('{$group['group_name']}', '{$myUser['username']}', 'U')");
+				DB::insert("insert into group_members (group_name, username, member_state) values ('{$group['group_name']}', '{$username}', 'U')");
 				die('ok');
 			} elseif ($group['joinable'] === 'C') {
-				DB::insert("insert into group_members (group_name, username, member_state) values ('{$group['group_name']}', '{$myUser['username']}', 'W')");	
+				DB::insert("insert into group_members (group_name, username, member_state) values ('{$group['group_name']}', '{$username}', 'W')");	
 				die('ok');
 			} else {
 				die('此组不可加入！');

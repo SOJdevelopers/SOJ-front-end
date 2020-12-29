@@ -4,7 +4,6 @@
 	}
 
 	function handleMsgPost() {
-			global $myUser;
 			if (!isset($_POST['receiver'])) {
 				return 'fail';
 			}
@@ -16,7 +15,7 @@
 			}
 			$receiver = $_POST['receiver'];
 			$esc_message = DB::escape($_POST['message']);
-			$sender = $myUser['username'];
+			$sender = Auth::id();
 
 			if (!validateUsername($receiver) || !queryUser($receiver)) {
 				return 'fail';
@@ -27,8 +26,7 @@
 	}
 
 	function getConversations() {
-			global $myUser;
-			$username = $myUser['username'];
+			$username = Auth::id();
 			$result = DB::select("select * from user_msg where sender = '{$username}' or receiver = '{$username}' order by send_time desc" );
 			$ret = array();
 			while ($msg = DB::fetch($result)) {
@@ -52,8 +50,7 @@
 	}
 
 	function getHistory() {
-		global $myUser;
-		$username = $myUser['username'];
+		$username = Auth::id();
 		if (!isset($_GET['conversationName']) || !validateUsername($_GET['conversationName'])) {
 			return '[]';
 		}

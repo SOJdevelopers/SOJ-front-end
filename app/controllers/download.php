@@ -31,7 +31,7 @@
 				}
 			}
 			if (!$visible) {
-				become404Page();
+				become403Page();
 			}
 
 			$id = $_GET['id'];

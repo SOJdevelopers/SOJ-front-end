@@ -55,14 +55,15 @@
 		null
 	);
 	$comment_form->handle = function() {
-		global $myUser, $blog, $comment_form;
+		global $blog, $comment_form;
 		$comment = HTML::escape($_POST['comment']);
 		
 		list($comment, $referrers) = uojHandleSign($comment);
 		
+		$username = Auth::id();
 		$esc_comment = DB::escape($comment);
-		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', {$blog['id']}, '{$esc_comment}', 0, now(), 0)");
-		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$myUser['username']}' where id = {$blog['id']}");
+		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$username}', {$blog['id']}, '{$esc_comment}', 0, now(), 0)");
+		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 		$comment_id = DB::insert_id();
 
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$comment_id}");
@@ -75,7 +76,7 @@
 			sendSystemMsg($referrer, '有人提到你', $content);
 		}
 		
-		if ($blog['poster'] !== $myUser['username']) {
+		if ($blog['poster'] !== $username) {
 			$content = '有人回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
 			sendSystemMsg($blog['poster'], '博客新回复通知', $content);
 		}
@@ -115,7 +116,7 @@
 		null
 	);
 	$reply_form->handle = function(&$vdata) {
-		global $myUser, $blog, $reply_form;
+		global $blog, $reply_form;
 		$comment = HTML::escape($_POST['reply_comment']);
 		
 		list($comment, $referrers) = uojHandleSign($comment);
@@ -123,8 +124,10 @@
 		$reply_id = $_POST['reply_id'];
 		
 		$esc_comment = DB::escape($comment);
-		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$myUser['username']}', {$blog['id']}, '{$esc_comment}', {$reply_id}, now(), 0)");
-		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$myUser['username']}' where id = {$blog['id']}");
+
+		$username = Auth::id();
+		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$username}', {$blog['id']}, '{$esc_comment}', {$reply_id}, now(), 0)");
+		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 		$comment_id = DB::insert_id();
 		
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$reply_id}");
@@ -139,12 +142,12 @@
 		
 		$parent = $vdata['parent'];
 		$notified = array();
-		if ($parent['poster'] !== $myUser['username']) {
+		if ($parent['poster'] !== $username) {
 			$notified[] = $parent['poster'];
 			$content = '有人回复了您在博客 ' . $blog['title'] . ' 下的评论 ：<a href="' . $uri . '">点击此处查看</a>';
 			sendSystemMsg($parent['poster'], '评论新回复通知', $content);
 		}
-		if ($blog['poster'] !== $myUser['username'] && !in_array($blog['poster'], $notified)) {
+		if ($blog['poster'] !== $username && !in_array($blog['poster'], $notified)) {
 			$notified[] = $blog['poster'];
 			$content = '有人回复了您的博客 ' . $blog['title'] . ' ：<a href="' . $uri . '">点击此处查看</a>';
 			sendSystemMsg($blog['poster'], '博客新回复通知', $content);
