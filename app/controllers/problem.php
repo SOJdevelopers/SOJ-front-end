@@ -15,12 +15,12 @@
 	}
 
 	$problem_content = queryProblemContent($problem['id']);
+	$agent = Auth::id();
 
 	$contest = validateUInt($_GET['contest_id']) ? queryContest($_GET['contest_id']) : null;
 	if ($contest != null) {
 		genMoreContestInfo($contest);
 		$rgroup = isset($contest['extra_config']['is_group_contest']);
-		$agent = Auth::id();
 		if ($problem_rank = queryContestProblemRank($contest, $problem)) {
 			$problem_letter = chr(64 + $problem_rank);
 		} else {
