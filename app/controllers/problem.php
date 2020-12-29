@@ -152,7 +152,7 @@
  	}
 
 	function checkCoolDown() {
-		global $ban_in_contest, $problem, $problem_extra_config, $is_in_contest;
+		global $ban_in_contest, $problem, $problem_extra_config, $is_in_contest, $agent;
 		if ($ban_in_contest) {
 			return '请耐心等待比赛结束后题目对所有人可见了再提交';
 		}
