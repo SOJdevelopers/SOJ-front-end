@@ -1284,10 +1284,10 @@ function showStandings(getLink, doNotShowLinks) {
 			col_tr += '<td><div>';
 			if (row[4] != undefined) {
 				col_tr += '<sup>[';
-				col_tr += '<span class="uoj-score" data-max="' + full_score + '" style="color: ' + getColOfScore(row[4] / problems.length) + '">' + row[4] + '</span>';
+				col_tr += '<span class="uoj-score" data-max="' + full_score + '" style="color: ' + getColOfScore(row[4] / full_score * 100) + '">' + row[4] + '</span>';
 				col_tr += ']</sup>';
 			}
-			col_tr += '<span class="uoj-score" data-max="' + full_score + '" style="color: ' + getColOfScore(row[0] / problems.length) + '">' + row[0] + '</span>';
+			col_tr += '<span class="uoj-score" data-max="' + full_score + '" style="color: ' + getColOfScore(row[0] / full_score * 100) + '">' + row[0] + '</span>';
 			if (row[4] != undefined) {
 				col_tr += getUpDown(row[0], row[4]);
 			}
@@ -1295,8 +1295,8 @@ function showStandings(getLink, doNotShowLinks) {
 			for (var i = 0; i < problems.length; i++) {
 				var col = score[row[2][0]][i];
 				if (col !== null) {
-					if (best[i][2] === col[2] && col[1] != undefined)
-						col_tr += '<td class="' + (col[0] === 100 ? 'success' : 'info') + '">';
+					if (best[i][2] === col[2] && col[0] > 0)
+						col_tr += '<td class="' + (col[0] === full_scores[i] ? 'success' : 'info') + '">';
 					else
 						col_tr += '<td>';
 					col_tr += '<div>';
@@ -1387,6 +1387,81 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 					else
 						col_tr += '<a class="uoj-score">';
 					col_tr += (col[0] === 1 ? '+' : '-') + (col[0] === 1 && col[3] === 0 ? '' : col[3] + 1) + '</a>';
+					col_tr += '</div>';
+					if (col[1] != undefined) col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
+				} else
+					col_tr += '<td>';
+				col_tr += '</td>';
+			}
+			col_tr += '</tr>';
+			return col_tr;
+		}, {
+			table_classes: ['table', 'table-bordered', 'table-striped', 'table-text-center', 'table-vertical-middle', 'table-condensed'],
+			page_len: 100,
+			print_after_table: function() {
+				return '<div class="text-right text-muted">' + uojLocale("contests::n participants", standings.length) + '</div>';
+			}
+		}
+	).uoj_highlight();
+}
+
+// standings = [[score, raw_penalty, [name, rating], rank, wa_penalty]...]
+// score = {name: [[score, penalty, lastID, submit_times], ...], name2: ..., ...}
+function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
+	var best = [], cur, col, full_score = 0;
+	if (wa_penalty === undefined) {
+		wa_penalty = 1200;
+	}
+	if (getLink === undefined) {
+		getLink = getUserLink;
+	}
+	for (var i = 0; i < problems.length; ++i) {
+		full_score += full_scores[i];
+	}
+	for (var i in standings) {
+		for (var j = 0; j < problems.length; ++j) {
+			cur = standings[i][2][0], col = score[cur][j];
+			if (resultBetter(col, best[j])) best[j] = col;
+		}
+	}
+	$("#standings").long_table(
+		standings,
+		1,
+		'<tr>' +
+			'<th style="width: 5em">#</th>' +
+			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
+			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
+			problems.map(function(col, idx) {
+				if (doNotShowLinks === undefined)
+					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
+				else
+					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
+			}).join('') +
+		'</tr>',
+		function(row) {
+			var col_tr = '<tr>';
+			col_tr += '<td>' + row[3] + '</td>';
+			col_tr += '<td>' + getLink(row[2][0], row[2][1]) + '</td>';
+			col_tr += '<td><div>';
+			col_tr += '<span class="uoj-score" data-max="' + full_score + '" style="color: ' + getColOfScore(row[0] / full_score * 100) + '">' + row[0] + '</span>';
+			col_tr += '</div><div>' + getPenaltyTimeStr(row[1]) + '/' + getPenaltyTimeStr(row[1] + row[4] * wa_penalty) + '</div></td>';
+			for (var i = 0; i < problems.length; i++) {
+				var col = score[row[2][0]][i];
+				if (col !== null) {
+					if (best[i][2] === col[i][2] && col[0] > 0)
+						col_tr += '<td class="' + (col[0] === full_scores[i] ? 'success' : 'info') + '">';
+					else
+						col_tr += '<td>';
+					col_tr += '<div>';
+					if (doNotShowLinks === undefined)
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
+					else
+						col_tr += '<a class="uoj-score"';
+					if (full_scores[i] !== 100) {
+						col_tr += 'data-max="' + full_scores[i] + '"';
+					}
+					col_tr += '>' + col[0] + '</a>';
+					col_tr += ' (+' + col[3] + ')';
 					col_tr += '</div>';
 					if (col[1] != undefined) col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
 				} else
