@@ -7,7 +7,7 @@
 		redirectToLogin();
 	}
 
-	if (isProblemManager($myUser)) {
+	if (isProblemManager(Auth::user())) {
 		$new_problem_form = new UOJForm('new_problem');
 		$new_problem_form->handle = function() {
 			DB::insert("insert into problems (title, is_hidden, submission_requirement) values ('New Problem', 1, '{}')");
@@ -122,7 +122,8 @@ EOD;
 
 	$pag_config = array('page_len' => 100);
 	$pag_config['col_names'] = array('*');
-	$pag_config['table_name'] = "problems left join best_ac_submissions on best_ac_submissions.submitter = '{$myUser['username']}' and problems.id = best_ac_submissions.problem_id";
+	$username = Auth::id();
+	$pag_config['table_name'] = "problems left join best_ac_submissions on best_ac_submissions.submitter = '{$username}' and problems.id = best_ac_submissions.problem_id";
 	$pag_config['cond'] = $cond;
 	$pag_config['tail'] = 'order by id asc';
 	$pag_config['max_extend'] = 5;
@@ -155,7 +156,7 @@ EOD;
 	</div>
 </div>
 <?php
-	if (isProblemManager($myUser)) {
+	if (isProblemManager(Auth::user())) {
 		$new_problem_form->printHTML();
 	}
 ?>

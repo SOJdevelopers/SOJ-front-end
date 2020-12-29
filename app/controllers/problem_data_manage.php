@@ -437,10 +437,10 @@ EOD
 	if (!$problem['data_locked']) {
 		$hackable_form = new UOJForm('hackable');
 		$hackable_form->handle = function() {
-			global $problem, $myUser;
+			global $problem;
 			$problem['hackable'] = !$problem['hackable'];
 			set_time_limit(600);
-			$ret = svnSyncProblemData($problem, $myUser);
+			$ret = svnSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
@@ -558,7 +558,7 @@ EOD
 	if (!$problem['data_locked'] && $problem['hackable']) {
 		$test_std_form = new UOJForm('test_std');
 		$test_std_form->handle = function() {
-			global $myUser, $problem;
+			global $problem;
 			
 			$user_std = queryUser('std');
 			if (!$user_std) {
@@ -611,7 +611,7 @@ EOD
 	
 	$problem_lock_form = new UOJForm('problem_lock');
 	$problem_lock_form->handle = function() {
-		global $problem, $myUser;
+		global $problem;
 		$problem['data_locked'] = !$problem['data_locked'];
 		$hackable = $problem['data_locked'] ? 1 : 0;
 		DB::update("update problems set data_locked = $hackable where id = {$problem['id']}");

@@ -63,7 +63,7 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
-<?php echoHackListOnlyOne($hack, array(), $myUser) ?>
+<?php echoHackListOnlyOne($hack, array(), Auth::user()) ?>
 <?php if ($should_show_all_details) { ?>
 	<div class="panel panel-info">
 		<div class="panel-heading">
@@ -81,7 +81,7 @@
 	</div>
 <?php } ?>
 <?php
-	echoSubmissionsListOnlyOne($submission, array(), $myUser);
+	echoSubmissionsListOnlyOne($submission, array(), Auth::user());
 
 	if ($should_show_content) {
 		echoSubmissionContent($submission, getProblemSubmissionRequirement($problem));

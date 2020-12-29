@@ -92,7 +92,7 @@
 	}
 	
 	function handleUpload($zip_file_name, $content, $tot_size, $estimate) {
-		global $problem, $contest, $myUser, $agent, $is_in_contest;
+		global $problem, $contest, $agent, $is_in_contest;
 		
 		$content['config'][] = array('problem_id', $problem['id']);
 		if ($is_in_contest && !isset($contest['extra_config']["problem_{$problem['id']}"])) {
@@ -121,12 +121,13 @@
 			Cookie::set("estimate_{$problem['id']}", $estimate, time() + 60 * 60 * 24 * 365, '/');
 			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$agent', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', $estimate)");
 		} else {
-			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result) values ({$problem['id']}, now(), '{$myUser['username']}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json')");
+			$username = Auth::id();
+			DB::insert("insert into submissions (problem_id, submit_time, submitter, content, language, tot_size, status, result) values ({$problem['id']}, now(), '{$username}', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json')");
 		}
  	}
 
 	function handleCustomTestUpload($zip_file_name, $content, $tot_size, $estimate) {
-		global $problem, $contest, $myUser;
+		global $problem, $contest;
 		
 		$content['config'][] = array('problem_id', $problem['id']);
 		$content['config'][] = array('custom_test', 'on');
@@ -148,7 +149,8 @@
 		$result['status'] = 'Waiting';
 		$result_json = json_encode($result);
 		
-		DB::insert("insert into custom_test_submissions (problem_id, submit_time, submitter, content, status, result) values ({$problem['id']}, now(), '{$myUser['username']}', '$esc_content', '{$result['status']}', '$result_json')");
+		$username = Auth::id();
+		DB::insert("insert into custom_test_submissions (problem_id, submit_time, submitter, content, status, result) values ({$problem['id']}, now(), '{$username}', '$esc_content', '{$result['status']}', '$result_json')");
  	}
 
 	function checkCoolDown() {
