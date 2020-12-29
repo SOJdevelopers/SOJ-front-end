@@ -1461,7 +1461,9 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 						col_tr += 'data-max="' + full_scores[i] + '"';
 					}
 					col_tr += '>' + col[0] + '</a>';
-					col_tr += ' (+' + col[3] + ')';
+					if (col[3] > 0) {
+						col_tr += ' <span class="text-muted">(+' + col[3] + ')</span>';
+					}
 					col_tr += '</div>';
 					if (col[1] != undefined) col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
 				} else
