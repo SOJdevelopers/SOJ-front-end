@@ -595,6 +595,9 @@ EOD;
 		<?php } elseif ($contest['extra_config']['standings_version'] == 5) { ?>
 		<p>此次比赛为 ACM 赛制 (单次错误提交罚时 1200 秒)。</p>	
 		<p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
+		<?php } elseif ($contest['extra_config']['standings_version'] == 6) { ?>
+		<p>此次比赛为 SPC 赛制 (单次错误提交罚时 1200 秒)。</p>
+		<p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
 		<?php } else { ?>
 		<p>此次比赛为随机赛制，请联系管理员。</p>
 		<?php } ?>
