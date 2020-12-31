@@ -5,6 +5,10 @@
 		redirectToLogin();
 	}
 
+	if (!isGroupMember(Auth::user(), UOJConfig::$data['profile']['common-group'])) {
+		become403Page();
+	}
+
 	$allow_rootdir = array(
 		'uploads' => '',
 		'utility' => '',
