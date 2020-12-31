@@ -5,7 +5,11 @@
     if (!isset($_GET['lhs'])) {
         become404Page();
     }
-    if ($_GET['lhs'] !== '181') {
+    if (!is_string($_GET['lhs'])) {
+        fail("What are you doing ???!!!");
+    }
+    $str = strtolower($_GET['lhs']);
+    if ($str !== 'wawakalaaagayiga') {
         fail("What are you doing ???!!!");
     } else {
         die_json(json_encode(array(
