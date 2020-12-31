@@ -5,7 +5,7 @@
 		redirectToLogin();
 	}
 
-	if (!isGroupMember(Auth::user(), UOJConfig::$data['profile']['common-group'])) {
+	if (!isCommonUser(Auth::user())) {
 		become403Page();
 	}
 

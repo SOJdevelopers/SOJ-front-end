@@ -29,6 +29,10 @@ function isBannedUser($user) {
 	return isGroupAssociated($user, array('group_name' => 'banned'))['member_state'] === 'U';
 }
 
+function isCommonUser($user) {
+	return isSuperUser($user) or isGroupMember($user, array('group_name' => UOJConfig::$data['profile']['common-group']));
+}
+
 function selectUsersByScript($selector = 'default', $args) {
 	$script = 'selector_' . $selector;
 	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';
