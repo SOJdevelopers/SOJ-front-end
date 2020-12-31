@@ -31,10 +31,6 @@
 			return 'banned';
 		}
 
-		if (isNewUser($user)) {
-			return 'waited';
-		}
-
 		Auth::login($user['username']);
 		return 'ok';
 	}

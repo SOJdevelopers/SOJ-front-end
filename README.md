@@ -5,6 +5,7 @@ update group_info set group_type='N';
 update group_info set group_type='S' where group_name='outdated';
 update group_info set group_type='S' where group_name='site_manager';
 update group_info set group_type='S' where group_name='statement_maintainer';
+update group_info set group_type='S' where group_name='problem_manager';
 update group_info set group_type='S' where group_name='zhzx';
 update group_info set group_type='S' where group_name='zhjc';
 update group_info set group_type='S' where group_name='banned';
@@ -60,4 +61,25 @@ CREATE TABLE `contests_visibility` (
 ### update Dec 28 18:44
 ```sql
 insert ignore into contests_visibility select id contest_id, 'zhjc' group_name from contests;
+```
+
+### update DEC 28 19:19
+please remove "default-group" in .config.php
+
+please create group "default"
+```sql
+update group_info set group_type='S' where group_name='default';
+```
+
+### update DEC 28 19:46
+```sql
+CREATE TABLE `blogs_visibility` (
+  `blog_id` int(11) NOT NULL,
+  `group_name` varchar(20) NOT NULL,
+  PRIMARY KEY (`blog_id`,`group_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+```sql
+insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from blogs;
 ```

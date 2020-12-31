@@ -15,18 +15,19 @@
 
 	genMoreContestInfo($contest);
 
-	$has_contest_permission = hasContestPermission($myUser, $contest);
+	$has_contest_permission = hasContestPermission(Auth::user(), $contest);
 	$rgroup = isset($contest['extra_config']['is_group_contest']);
 	$show_ip = $has_contest_permission;
 
 	if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
-		$iHasRegistered = hasRegistered($myUser, $contest);
+		$iHasRegistered = hasRegistered(Auth::user(), $contest);
 	
 		if ($iHasRegistered) {
 			$unregister_form = new UOJForm('unregister');
 			$unregister_form->handle = function() {
-				global $myUser, $contest;
-				DB::delete("delete from contests_registrants where username = '{$myUser['username']}' and contest_id = {$contest['id']}");
+				global $contest;
+				$username = Auth::id();
+				DB::delete("delete from contests_registrants where username = '{$username}' and contest_id = {$contest['id']}");
 				updateContestPlayerNum($contest);
 			};
 			$unregister_form->submit_button_config['class_str'] = 'btn btn-danger btn-xs';
@@ -65,7 +66,8 @@
 <?php
 	if ($contest['cur_progress'] == CONTEST_NOT_STARTED) {
 		if ($rgroup) {
-			$cnt = DB::selectCount("select count(*) from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')");
+			$username = Auth::id();
+			$cnt = DB::selectCount("select count(*) from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$username}' and group_members.member_state != 'W')");
 			echo '<div>您所在的组中有 <strong style="color: red">', $cnt, '</strong> 个报名比赛，要顺利参加比赛，请务必保证该数为 1。<a style="color: red" href="/contest/', $contest['id'], '/register">点此</a>更改报名组。</div>';
 		} else {
 			if ($iHasRegistered) {
@@ -103,7 +105,7 @@
 	echoLongTable(array('*'), 'contests_registrants', "contest_id = {$contest['id']}", 'order by user_rating desc, username asc',
 		$header_row,
 		function($contest, $num) {
-			global $myUser, $show_ip, $ip_owner, $rgroup;
+			global $show_ip, $ip_owner, $rgroup;
 
 			if ($rgroup) {
 				$group = queryGroup($contest['username']);

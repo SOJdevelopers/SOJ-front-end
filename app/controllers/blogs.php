@@ -32,7 +32,14 @@
 	<a href="<?= HTML::blog_url(Auth::id(), '/blog/new/write')?>" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-edit"></span> <?= UOJLocale::get('write new blog') ?></a>
 </div>
 <h3><?= UOJLocale::get('blog overview') ?></h3>
-<?php echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'latest_comment', 'latest_commenter'), 'blogs', 'is_hidden = 0', isset($_COOKIE['blogs_sortby']) ? 'order by latest_comment desc' : 'order by post_time desc', $header, 'echoBlogCell', $config); ?>
+<?php
+	$cond = 'is_hidden = 0';
+	if (!isSuperUser(Auth::user())) {
+		initBlogEnvironment(Auth::user());
+		$cond .= " and id in (select id from blog_t)";
+	}
+	echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'latest_comment', 'latest_commenter'), 'blogs', $cond, isset($_COOKIE['blogs_sortby']) ? 'order by latest_comment desc' : 'order by post_time desc', $header, 'echoBlogCell', $config);
+?>
 <script type="text/javascript">
 	$('#input-sortby-post').click(function() {
 		$.removeCookie('blogs_sortby', {path: '/blogs'});

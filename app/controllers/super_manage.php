@@ -190,7 +190,6 @@ EOD;
 	$userlist_header_row .= '<th title="题面管理员">T</th>';
 	$userlist_header_row .= '<th title="封禁">B</th>';
 	$userlist_header_row .= '<th title="Unrated">O</th>';
-	$userlist_header_row .= '<th title="待审核">N</th></tr>';
 
 	$userlist_print_row = function($row) {
 		echo '<tr>';
@@ -205,7 +204,6 @@ EOD;
 		echo isStatementMaintainer($row) ? '<td class="success">T</td>' : '<td></td>';
 		echo isBannedUser($row) ? '<td class="success">B</td>' : '<td></td>';
 		echo isGroupAssociated($row, array('group_name' => 'outdated'))['member_state'] === 'U' ? '<td class="success">O</td>' : '<td></td>';
-		echo isNewUser($row) ? '<td class="success">N</td>' : '<td></td>';
 		echo '</tr>';
 	};
 
@@ -400,7 +398,7 @@ function showSubmissions() {
 	<div>
 		<h4>测评失败的提交记录</h4>
 		<?php
-			echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), $myUser);
+			echoSubmissionsList("result_error = 'Judgement Failed'", 'order by id desc', array(), Auth::user());
 		?>
 	</div>
 	<?php

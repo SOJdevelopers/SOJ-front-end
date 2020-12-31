@@ -44,12 +44,13 @@
 			die('<div class="text-danger">Wow! hacker! T_T....</div>');
 		}
 		$cur += $delta;
+		$username = Auth::id();
 		if ($cur == 0) {
-			DB::delete("delete from click_zans where username = '{$myUser['username']}' and type = '$type' and target_id = $id");
+			DB::delete("delete from click_zans where username = '{$username}' and type = '$type' and target_id = $id");
 		} else if ($cur != $delta) {
-			DB::update("update click_zans set val = '$cur' where username = '{$myUser['username']}' and type = '$type' and target_id = $id");
+			DB::update("update click_zans set val = '$cur' where username = '{$username}' and type = '$type' and target_id = $id");
 		} else {
-			DB::insert("insert into click_zans (username, type, target_id, val) values ('{$myUser['username']}', '$type', $id, $cur)");
+			DB::insert("insert into click_zans (username, type, target_id, val) values ('{$username}', '$type', $id, $cur)");
 		}
 		$cnt = $row['zan'] + $delta;
 		DB::update("update $table_name set zan = $cnt where id = $id");

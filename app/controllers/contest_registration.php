@@ -46,8 +46,9 @@
 	
 		$register_form = new UOJForm('register');
 		$register_form->handle = function() {
-			global $myUser, $contest;
-			DB::insert("insert into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$myUser['username']}', {$myUser['rating']}, {$contest['id']}, 0)");
+			global $contest;
+			$user = Auth::user();
+			DB::insert("insert into contests_registrants (username, user_rating, contest_id, has_participated) values ('{$user['username']}', {$user['rating']}, {$contest['id']}, 0)");
 			updateContestPlayerNum($contest);
 		};
 		$register_form->submit_button_config['class_str'] = 'btn btn-primary';
@@ -66,12 +67,12 @@
 	<li>比赛中途提交后，可以看到<strong>最终</strong>的结果和实时榜单。</li>
 	<li>每道题的罚时定义为完成该题所花的时间，加上第一次 AC 前的非 CE 提交次数的 1200 倍 (单位：秒)，若该题未 AC 则不计入罚时。</li>
 	<li>比赛排名按 AC 题数为第一关键字，所有题目的罚时之和为第二关键字进行。</li>
-<?php } elseif ($contest['extra_config']['standings_version'] === 4) { ?>
+<?php } elseif ($contest['extra_config']['standings_version'] === 6) { ?>
 	<li>比赛报名后不算正式参赛，报名后进了比赛页面也不算参赛，<strong>看了题目才算正式参赛</strong>。如果未正式参赛则不算 rating。</li>
-	<li>比赛中途可以提交，若同一题有多次提交按<strong>最后一次不是 Compile Error 的提交</strong>算成绩。(其实 SOJ 会自动无视你所有 Compile Error 的提交当作没看见)</li>
-	<li>比赛中途提交后，可以看到<strong>测样例</strong>的结果。(若为提交答案题则对于每个测试点，该测试点有分则该测试点为满分)</li>
-	<li>比赛结束后会进行最终测试，最终测试后的排名为最终排名。</li>
-	<li>比赛排名按分数为第一关键字，完成题目的总时间为第二关键字。完成题目的总时间等于完成每道题所花时间的最大值 (无视掉爆零的题目)。</li>
+	<li>比赛中途可以提交，若同一题有多次提交按<strong>得分最高的</strong>算成绩。</li>
+	<li>比赛中途提交后，可以看到<strong>最终</strong>的结果和实时榜单。</li>
+	<li>每道题以第一次拿到这道题最高分数的提交为基准，题目的罚时定义为完成这发提交所花的时间，加上该提交之前的得分非前缀最大值且非 CE 的提交次数的 1200 倍 (单位：秒)，若该题未得分则不计入罚时。（注：一次提交被称为“前缀最大值”，如果它的得分大于 0 且严格大于之前的所有提交的得分）</li>
+	<li>比赛排名按分数为第一关键字，所有题目的罚时之和为第二关键字。</li>
 <?php } else { ?>
 	<li>比赛报名后不算正式参赛，报名后进了比赛页面也不算参赛，<strong>看了题目才算正式参赛</strong>。如果未正式参赛则不算 rating。</li>
 	<li>比赛中途可以提交，若同一题有多次提交按<strong>最后一次不是 Compile Error 的提交</strong>算成绩。(其实 SOJ 会自动无视你所有 Compile Error 的提交当作没看见)</li>
@@ -105,7 +106,8 @@
 		$header .= '<th>' . UOJLocale::get('your member type') . '</th>';
 		$header .= '<th>' . UOJLocale::get('contests::is registered') . '</th>';
 		$header .= '</tr>';
-		$cond = "username = '{$myUser['username']}' and member_state != 'W'";
+		$username = Auth::id();
+		$cond = "username = '{$username}' and member_state != 'W'";
 
 		echoLongTable(array('group_name', 'member_state'), 'group_members', $cond, 'order by group_name', $header, function($row) {
 			global $contest;

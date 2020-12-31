@@ -2,11 +2,16 @@
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
+	$blogs_cond = "poster = '".UOJContext::user()['username']."' and is_hidden = 0";
+	if (!UOJContext::hasBlogPermission()) {
+		initBlogEnvironment(Auth::user());
+		$blogs_cond .= " and id in (select id from blog_t)";
+	}
 
 	$blogs_pag = new Paginator(array(
 		'col_names' => array('*'),
 		'table_name' => 'blogs',
-		'cond' => "poster = '".UOJContext::user()['username']."' and is_hidden = 0",
+		'cond' => $blogs_cond,
 		'tail' => 'order by post_time desc limit 5',
 		'echo_full' => true
 	));

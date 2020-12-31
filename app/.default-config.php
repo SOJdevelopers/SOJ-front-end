@@ -7,7 +7,9 @@ return [
 		'administrator' => 'root',
 		'admin-email' => 'root@uoj',
 		'qq-group' => '1145141919810',
-		'ICP-license' => ''
+		'ICP-license' => '',
+		'default-group' => 'default',
+		'common-group' => 'zhjc',
 	],
 	'database' => [
 		'database'  => 'uoj',

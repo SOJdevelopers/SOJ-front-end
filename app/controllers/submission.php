@@ -44,7 +44,7 @@
 		$hack_form->addTextFileInput('input', UOJLocale::get('input data'));
 		$hack_form->addCheckBox('use_formatter', UOJLocale::get('tidy up whitespaces'), true);
 		$hack_form->handle = function(&$vdata) {
-			global $myUser, $problem, $submission;
+			global $problem, $submission;
 
 			if ($_POST['input_upload_type'] == 'file') {
 				$tmp_name = UOJForm::uploadedFileTmpName('input_file');
@@ -60,8 +60,10 @@
 			} else {
 				move_uploaded_file($_FILES['input_file']['tmp_name'], $fileFullName);
 			}
+
+			$username = Auth::id();
 			$input_type = isset($_POST['use_formatter']) ? 'USE_FORMATTER' : 'DONT_USE_FORMATTER';
-			DB::insert("insert into hacks (problem_id, contest_id, submission_id, hacker, owner, input, input_type, submit_time, details) values ({$problem['id']}, {$submission['contest_id']}, {$submission['id']}, '{$myUser['username']}', '{$submission['submitter']}', '$fileName', '$input_type', now(), '')");
+			DB::insert("insert into hacks (problem_id, contest_id, submission_id, hacker, owner, input, input_type, submit_time, details) values ({$problem['id']}, {$submission['contest_id']}, {$submission['id']}, '{$username}', '{$submission['submitter']}', '$fileName', '$input_type', now(), '')");
 		};
 		$hack_form->succ_href = '/hacks';
 		$hack_form->runAtServer();

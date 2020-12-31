@@ -80,6 +80,6 @@
 	<div class="top-buffer-sm"></div>
 </div>
 <?php
-	echoSubmissionsList($cond, 'order by id desc', array('judge_time_hidden' => ''), $myUser);
+	echoSubmissionsList($cond, 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 ?>
 <?php echoUOJPageFooter() ?>

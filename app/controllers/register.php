@@ -39,6 +39,7 @@
 		$svn_pw = uojRandString(10);
 		DB::insert("insert into user_info (username, email, password, svn_password, register_time, latest_login, remote_addr, http_x_forwarded_for) values ('$username', '$esc_email', '$password', '$svn_pw', now(), now(), '" . DB::escape($_SERVER['REMOTE_ADDR']) . "', '" . DB::escape($_SERVER['HTTP_X_FORWARDED_FOR']) . "')");
 
+		DB::insert("insert into group_members (group_name, username, member_state) values ('" . UOJConfig::$data['profile']['default-group'] . "', '{$username}', 'U')");
 		return "欢迎你！{$username}，你已成功注册。";
 	}
 	

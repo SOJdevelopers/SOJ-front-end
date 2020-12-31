@@ -3,7 +3,13 @@
 		redirectToLogin();
 	}
 
-	$blogs = DB::selectAll('select blogs.id, title, poster, post_time from important_blogs, blogs where is_hidden = 0 and important_blogs.blog_id = blogs.id order by level desc, blogs.post_time desc limit 5');
+	$cond = 'is_hidden = 0 and important_blogs.blog_id = blogs.id';
+	if (!isSuperUser(Auth::user())) {
+		initBlogEnvironment(Auth::user());
+		$cond .= " and id in (select id from blog_t)";
+	}
+
+	$blogs = DB::selectAll("select blogs.id, title, poster, post_time from important_blogs, blogs where {$cond} order by level desc, blogs.post_time desc limit 5");
 
 	$links = DB::selectAll('select name, url from links order by name asc limit 5');
 ?>

@@ -74,8 +74,8 @@
 			}
 		} catch (Exception $e) {
 		}
-		global $myUser;
-		$result = DB::select("select * from contests_asks where contest_id = '{$contest['id']}' and username = '{$myUser['username']}' order by reply_time desc limit 10");
+		$username = Auth::id();
+		$result = DB::select("select * from contests_asks where contest_id = '{$contest['id']}' and username = '{$username}' order by reply_time desc limit 10");
 		try {
 			while ($row = DB::fetch($result)) {
 				if (new DateTime($row['reply_time']) > new DateTime($_POST['last_time'])) {
@@ -342,7 +342,9 @@ EOD;
 	}
 
 	function echoDashboard() {
-		global $contest, $post_question, $rgroup, $agent, $myUser;
+		global $contest, $post_question, $agent;
+
+		$username = Auth::id();
 
 		$contest_problems = DB::selectAll("select contests_problems.problem_id, best_ac_submissions.submission_id from contests_problems left join best_ac_submissions on contests_problems.problem_id = best_ac_submissions.problem_id and submitter = '{$agent}' where contest_id = {$contest['id']} order by contests_problems.problem_id asc");
 
@@ -355,7 +357,7 @@ EOD;
 		$my_questions_pag = new Paginator([
 			'col_names' => array('*'),
 			'table_name' => 'contests_asks',
-			'cond' => "contest_id = {$contest['id']} and username = '{$myUser['username']}'",
+			'cond' => "contest_id = {$contest['id']} and username = '{$username}'",
 			'tail' => 'order by reply_time desc',
 			'page_len' => 10
 		]);
@@ -363,7 +365,7 @@ EOD;
 		$others_questions_pag = new Paginator([
 			'col_names' => array('*'),
 			'table_name' => 'contests_asks',
-			'cond' => "contest_id = {$contest['id']} and username != '{$myUser['username']}' and is_hidden = 0",
+			'cond' => "contest_id = {$contest['id']} and username != '{$username}' and is_hidden = 0",
 			'tail' => 'order by reply_time desc',
 			'page_len' => 10
 		]);
@@ -413,7 +415,7 @@ EOD;
 	}
 	
 	function echoMySubmissions() {
-		global $contest, $myUser, $rgroup, $agent;
+		global $contest, $rgroup, $agent;
 
 		$show_all_submissions_status = Cookie::get('show_all_submissions') !== null ? 'checked="checked" ' : '';
 		$show_all_submissions = UOJLocale::get('contests::show all submissions');
@@ -434,9 +436,10 @@ EOD;
 EOD;
 		if (Cookie::get('show_all_submissions') !== null) {
 			echoSubmissionsList("contest_id = {$contest['id']}", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
-		} else { 
+		} else {
 			if ($rgroup and $contest['cur_progress'] !== CONTEST_IN_PROGRESS) {
-				echoSubmissionsList("contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = submissions.submitter and group_members.username = '{$myUser['username']}' and group_members.member_state != 'W')", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
+				$username = Auth::id();
+				echoSubmissionsList("contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = submissions.submitter and group_members.username = '{$username}' and group_members.member_state != 'W')", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 			} else {
 				echoSubmissionsList("contest_id = {$contest['id']} and submitter = '{$agent}'", 'order by id desc', array('judge_time_hidden' => ''), Auth::user());
 			}
@@ -591,6 +594,9 @@ EOD;
 		<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
 		<?php } elseif ($contest['extra_config']['standings_version'] == 5) { ?>
 		<p>此次比赛为 ACM 赛制 (单次错误提交罚时 1200 秒)。</p>	
+		<p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
+		<?php } elseif ($contest['extra_config']['standings_version'] == 6) { ?>
+		<p>此次比赛为 SPC 赛制 (单次错误提交罚时 1200 秒)。</p>
 		<p><strong>注意：比赛时显示的结果就是最终结果。</strong></p>
 		<?php } else { ?>
 		<p>此次比赛为随机赛制，请联系管理员。</p>
