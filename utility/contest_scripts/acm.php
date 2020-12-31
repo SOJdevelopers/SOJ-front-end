@@ -22,7 +22,7 @@ foreach ($contest_data['data'] as $submission) {
 		continue;
 	}
 	if ($update_contests_submissions) {
-		DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty, estimate) values ({$contest['id']}, '{$submission[2]}', {$contest_data['problems'][$submission[3]]}, {$submission[0]}, {$submission[4]}, {$penalty})");
+		DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty) values ({$contest['id']}, '{$submission[2]}', {$contest_data['problems'][$submission[3]]}, {$submission[0]}, {$submission[4]}, {$penalty})");
 	}
 }
 
