@@ -224,7 +224,7 @@
 			<?php if ($ShowPageHeader): ?>
 			<div>
 				<ul class="nav nav-pills pull-right" role="tablist">
-				<?php if (Auth::check()): ?>
+				<?php if (Auth::check()) { ?>
 					<li class="dropdown">
 						<a href="#" data-toggle="dropdown">
 							<span class="uoj-username" data-rating="<?= Auth::user()['rating'] ?>" data-link="0"><?= Auth::id() ?></span> <?= $new_msg_tot_html ?>
@@ -233,17 +233,19 @@
 							<li role="presentation"><a href="<?= HTML::url('/user/profile/' . Auth::id()) ?>"><?= UOJLocale::get('my profile') ?></a></li>
 							<li role="presentation"><a href="<?= HTML::url('/user/msg') ?>"><?= UOJLocale::get('private message') ?><?= $new_user_msg_num_html ?></a></li>
 							<li role="presentation"><a href="<?= HTML::url('/user/system-msg') ?>"><?= UOJLocale::get('system message') ?><?= $new_system_msg_num_html ?></a></li>
-							<li role="presentation"><a href="<?= HTML::url('/file-upload') ?>"><?= UOJLocale::get('file upload') ?></a></li>
+							<?php if (isCommonUser(Auth::user())) { ?>
+								<li role="presentation"><a href="<?= HTML::url('/file-upload') ?>"><?= UOJLocale::get('file upload') ?></a></li>
+							<?php } ?>
 							<?php if (isSuperUser(Auth::user())) { ?>
 								<li role="presentation"><a href="<?= HTML::url('/super-manage') ?>"><?= UOJLocale::get('system manage') ?></a></li>
 							<?php } ?>
 						</ul>
 					</li>
 					<li role="presentation"><a href="<?= HTML::url('/logout?_token=' . crsf_token()) ?>"><?= UOJLocale::get('logout') ?></a></li>
-				<?php else: ?>
+				<?php } else { ?>
 					<li role="presentation"><a href="<?= HTML::url('/login') ?>"><?= UOJLocale::get('login') ?></a></li>
 					<li role="presentation"><a href="<?= HTML::url('/register') ?>"><?= UOJLocale::get('register') ?></a></li>
-				<?php endif ?>
+				<?php } ?>
 				</ul>
 				<h1 class="hidden-xs"><a href="<?= HTML::url('/') ?>"><img src="<?= HTML::url('/pictures/SOJ_small.png') ?>" alt="SOJ Logo" class="img-rounded" style="width: 39px; height: 39px" /></a> <?= $PageMainTitle ?></h1>
 				<h1 class="visible-xs"><?= $PageMainTitleOnSmall ?></h1>
