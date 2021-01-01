@@ -1355,7 +1355,7 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
 			if (col && col[0] === 1) ++ac[j];
-			sub[j] += col[3] + 1;
+			if (col) sub[j] += col[3] + 1;
 		}
 	}
 	$("#standings").long_table(
@@ -1427,7 +1427,7 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
 			if (col && col[0] === full_scores[j]) ++ac[j];
-			sub[j] += col[4];
+			if (col) sub[j] += col[4];
 		}
 	}
 	$("#standings").long_table(
