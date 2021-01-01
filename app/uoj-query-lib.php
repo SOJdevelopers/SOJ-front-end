@@ -29,6 +29,11 @@ function hasRegistered($user, $contest) {
 	return DB::selectFirst("select * from contests_registrants where username = '{$user['username']}' and contest_id = {$contest['id']}");
 }
 
+function hasLeastOneRegistered($user, $contest) {
+	$groups = DB::select("select 1 from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
+	return DB::fetch($groups);
+}
+
 function hasOverRegistered($user, $contest) {
 	$groups = DB::select("select 1 from contests_registrants where contest_id = {$contest['id']} and exists (select 1 from group_members where group_members.group_name = contests_registrants.username and group_members.username = '{$user['username']}' and group_members.member_state != 'W')");
 	return DB::fetch($groups) and DB::fetch($groups);
@@ -201,7 +206,7 @@ function queryRegisteredGroup($user, $contest, $silent = false) {
 	$group = DB::fetch($groups);
 	if (!$group) {
 		if ($silent) return false;
-		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。比赛结束后再来看吧～</p>');
+		becomeMsgPage('<h1>比赛正在进行中</h1><p>很遗憾，您所在的所有组均未报名。如果比赛尚未结束，你可以<a href="/contest/' . $contest['id'] . '/register">报名</a>。</p>');
 	}
 	if (DB::fetch($groups)) {
 		if ($silent) return false;

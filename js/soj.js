@@ -1354,7 +1354,7 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 		for (var j = 0; j < problems.length; ++j) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
-			if (col[0] === full_score[j]) ++ac[j];
+			if (col && col[0] === 1) ++ac[j];
 			sub[j] += col[3] + 1;
 		}
 	}
@@ -1426,7 +1426,7 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 		for (var j = 0; j < problems.length; ++j) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
-			if (col[0] === full_score[j]) ++ac[j];
+			if (col && col[0] === full_scores[j]) ++ac[j];
 			sub[j] += col[4];
 		}
 	}
