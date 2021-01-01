@@ -8,10 +8,17 @@ function hasProblemPermission($user, $problem) {
 	return $user != null && (isProblemManager($user) || DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}"));
 }
 
+// 0 : not myself, not AC; 1 : myself, not AC; 2 : not myself, AC; 3 : myself, AC
 function hasViewPermission($type, $user, $problem, $submission) {
-	return $type === 'ALL'
-		or $submission['submitter'] === $user['username']
-		or ($type === 'ALL_AFTER_AC' and hasAC($user, $problem));
+	if ($type === 'ALL') $type = 15;
+	else if ($type === 'ALL_AFTER_AC') $type = 12;
+	else if ($type === 'SELF') $type = 10;
+	else if (!(is_int($type) and (0 <= $type) and ($type <= 15))) $type = 0;
+	if ($type === 0) return false;
+	if ($type === 5) return $submission['submitter'] !== $user['username'];
+	if ($type === 10) return $submission['submitter'] === $user['username'];
+	if ($type === 15) return true;
+	return (bool)($type >> ((int)($submission['submitter'] === $user['username']) | (hasAC($user, $problem) ? 2 : 0)) & 1);
 }
 
 function hasContestPermission($user, $contest) {
