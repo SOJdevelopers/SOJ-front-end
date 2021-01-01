@@ -17,7 +17,11 @@
 	$rgroup = isset($contest['extra_config']['is_group_contest']);
 	
 	if ($rgroup) {
-		if (hasContestPermission(Auth::user(), $contest) || $contest['cur_progress'] > CONTEST_NOT_STARTED) {
+		if (hasContestPermission(Auth::user(), $contest) || $contest['cur_progress'] > CONTEST_IN_PROGRESS) {
+			redirectTo('/contests');
+		}
+
+		if ($contest['cur_progress'] === CONTEST_IN_PROGRESS && hasLeastOneRegistered(Auth::user(), $contest)) {
 			redirectTo('/contests');
 		}
 
