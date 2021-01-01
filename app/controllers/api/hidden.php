@@ -1,5 +1,5 @@
 <?php
-    requirePHPLib("api");
+    requirePHPLib('api');
     
     $magic_text = '1978年12月，安徽省凤阳县小岗村农民自发实行包产到户。';
     if (!isset($_GET['lhs'])) {

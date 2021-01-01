@@ -1,7 +1,7 @@
 <?php
-    requirePHPLib("api");
+    requirePHPLib('api');
 
-    $curUser = validateAll()["user"];
+    $curUser = validateAll()['user'];
 
     if (!isset($_GET['id'])) fail('id: Field should not be empty');
     if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) fail("id: Problem with id '{$_GET['id']}' not found");
