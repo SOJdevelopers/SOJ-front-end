@@ -1369,8 +1369,8 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 				return '<th style="width: 8em"><div>'
 					 + (doNotShowLinks ? '<a>' : '<a href="/contest/' + contest_id + '/problem/' + col + '">')
 					 + String.fromCharCode(65 + idx) + '</a></div>'
-					 + '<div><small class="text-muted" style="font-weight: normal">'
-					 + ac[idx] + ' / ' + sub[idx]
+					 + '<div><small class="text-muted" style="font-weight: normal; white-space: nowrap">'
+					 + ac[idx] + '&thinsp;/&thinsp;' + sub[idx]
 					 + '</small></div></th>';
 			}).join('') +
 		'</tr>',
@@ -1441,8 +1441,8 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 				return '<th style="width: 8em"><div>'
 					 + (doNotShowLinks ? '<a>' : '<a href="/contest/' + contest_id + '/problem/' + col + '">')
 					 + String.fromCharCode(65 + idx) + '</a></div>'
-					 + '<div><small class="text-muted" style="font-weight: normal">'
-					 + ac[idx] + ' / ' + sub[idx]
+					 + '<div><small class="text-muted" style="font-weight: normal; white-space: nowrap">'
+					 + ac[idx] + '&thinsp;/&thinsp;' + sub[idx]
 					 + '</small></div></th>';
 			}).join('') +
 		'</tr>',
