@@ -1,7 +1,7 @@
 <?php
-	requirePHPLib('judger');
+	requirePHPLib('api');
 
-	validateAll();
+	$curUser = validateAll()['user'];
 	
 	if (!isset($_GET['name'])) fail('name: Field should not be empty');
 	if (is_array($_GET['name'])) {

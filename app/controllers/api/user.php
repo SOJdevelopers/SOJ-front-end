@@ -1,7 +1,7 @@
 <?php
-    requirePHPLib("api");
+    requirePHPLib('api');
 
-    validateAll();
+    $curUser = validateAll()['user'];
     
     if (!isset($_GET['id'])) fail('id: Field should not be empty');
     if (is_array($_GET['id'])) {

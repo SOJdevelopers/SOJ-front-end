@@ -1,10 +1,11 @@
 <?php
-    requirePHPLib("api");
+    requirePHPLib('api');
 
-    validateAll();
+    $curUser = validateAll()['user'];
     
     if (!isset($_GET['id'])) fail('id: Field should not be empty');
     if (!validateUInt($_GET['id']) || !($contest = queryContest($_GET['id']))) fail("id: Contest with id '{$_GET['id']}' not found");
+    if (!checkContestGroup($curUser, $contest)) fail("id: You have no permission to view contest #{$_GET['id']}");
     genMoreContestInfo($contest);
 
     $conf = array('show_estimate_result' => true);
