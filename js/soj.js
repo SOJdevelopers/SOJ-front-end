@@ -1271,10 +1271,10 @@ function showStandings(getLink, doNotShowLinks) {
 			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
 			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
 			problems.map(function(col, idx) {
-				if (doNotShowLinks === undefined)
-					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
-				else
+				if (doNotShowLinks)
 					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
+				else
+					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
 			}).join('') +
 		'</tr>',
 		function(row) {
@@ -1309,10 +1309,10 @@ function showStandings(getLink, doNotShowLinks) {
 						col_tr += '>' + col[3] + '</span>';
 						col_tr += ']</sup>';
 					}
-					if (doNotShowLinks === undefined)
-						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
-					else
+					if (doNotShowLinks)
 						col_tr += '<a class="uoj-score"';
+					else
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
 					if (full_scores[i] !== 100) {
 						col_tr += ' data-max="' + full_scores[i] + '"';
 					}
@@ -1343,7 +1343,7 @@ function showStandings(getLink, doNotShowLinks) {
 // standings = [[totalAC, raw_penalty, [name, rating], rank, wa_penalty]...]
 // score = {name: [[hasAC, penalty, lastID, submit_times], ...], name2: ..., ...}
 function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
-	var best = [], cur, col;
+	var best = [], cur, col, ac = Array(problems.length).fill(0), sub = Array(problems.length).fill(0);
 	if (wa_penalty === undefined) {
 		wa_penalty = 1200;
 	}
@@ -1354,6 +1354,8 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 		for (var j = 0; j < problems.length; ++j) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
+			if (col[0] === full_score[j]) ++ac[j];
+			sub[j] += col[3] + 1;
 		}
 	}
 	$("#standings").long_table(
@@ -1364,10 +1366,12 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
 			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
 			problems.map(function(col, idx) {
-				if (doNotShowLinks === undefined)
-					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
-				else
-					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
+				return '<th style="width: 8em"><div>'
+					 + (doNotShowLinks ? '<a>' : '<a href="/contest/' + contest_id + '/problem/' + col + '">')
+					 + String.fromCharCode(65 + idx) + '</a></div>'
+					 + '<div><small class="text-muted" style="font-weight: normal">'
+					 + ac[idx] + ' / ' + sub[idx]
+					 + '</small></div></th>';
 			}).join('') +
 		'</tr>',
 		function(row) {
@@ -1382,10 +1386,10 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 				if (col !== null) {
 					col_tr += col[0] === 1 && best[i][2] === col[2] ? '<td class="success">' : '<td>';
 					col_tr += '<div>';
-					if (doNotShowLinks === undefined)
-						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score">';
-					else
+					if (doNotShowLinks)
 						col_tr += '<a class="uoj-score">';
+					else
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score">';
 					col_tr += (col[0] === 1 ? '+' : '-') + (col[0] === 1 && col[3] === 0 ? '' : col[3] + 1) + '</a>';
 					col_tr += '</div>';
 					if (col[1] != undefined) col_tr += '<div>' + getPenaltyTimeStr(col[1]) + '</div>';
@@ -1408,7 +1412,7 @@ function showStandingsACM(wa_penalty, getLink, doNotShowLinks) {
 // standings = [[score, raw_penalty, [name, rating], rank, wa_penalty]...]
 // score = {name: [[score, penalty, lastID, submit_times], ...], name2: ..., ...}
 function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
-	var best = [], cur, col, full_score = 0;
+	var best = [], cur, col, full_score = 0, ac = Array(problems.length).fill(0), sub = Array(problems.length).fill(0);
 	if (wa_penalty === undefined) {
 		wa_penalty = 1200;
 	}
@@ -1422,6 +1426,8 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 		for (var j = 0; j < problems.length; ++j) {
 			cur = standings[i][2][0], col = score[cur][j];
 			if (resultBetter(col, best[j])) best[j] = col;
+			if (col[0] === full_score[j]) ++ac[j];
+			sub[j] += col[4];
 		}
 	}
 	$("#standings").long_table(
@@ -1432,10 +1438,12 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 			'<th style="width: 14em">' + uojLocale(getLink === getGroupLink ? 'groupname' : 'username') + '</th>' +
 			'<th style="width: 5em">' + uojLocale('contests::total score') + '</th>' +
 			problems.map(function(col, idx) {
-				if (doNotShowLinks === undefined)
-					return '<th style="width: 8em"><a href="/contest/' + contest_id + '/problem/' + col + '">' + String.fromCharCode(65 + idx) + '</a></th>';
-				else
-					return '<th style="width: 8em"><a>' + String.fromCharCode(65 + idx) + '</a></th>';
+				return '<th style="width: 8em"><div>'
+					 + (doNotShowLinks ? '<a>' : '<a href="/contest/' + contest_id + '/problem/' + col + '">')
+					 + String.fromCharCode(65 + idx) + '</a></div>'
+					 + '<div><small class="text-muted" style="font-weight: normal">'
+					 + ac[idx] + ' / ' + sub[idx]
+					 + '</small></div></th>';
 			}).join('') +
 		'</tr>',
 		function(row) {
@@ -1453,10 +1461,10 @@ function showStandingsSPC(wa_penalty, getLink, doNotShowLinks) {
 					else
 						col_tr += '<td>';
 					col_tr += '<div>';
-					if (doNotShowLinks === undefined)
-						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
-					else
+					if (doNotShowLinks)
 						col_tr += '<a class="uoj-score"';
+					else
+						col_tr += '<a href="/submission/' + col[2] + '" class="uoj-score"';
 					if (full_scores[i] !== 100) {
 						col_tr += 'data-max="' + full_scores[i] + '"';
 					}

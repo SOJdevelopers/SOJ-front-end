@@ -15,11 +15,12 @@ foreach ($contest_data['people'] as $person) {
 foreach ($contest_data['data'] as $submission) {
 	$penalty = (new DateTime($submission[1]))->getTimestamp() - $contest['start_time']->getTimestamp();
 	if (!isset($score[$submission[2]][$submission[3]])) {
-		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], 0, (int)($submission[4] == 0));
+		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], 0, 1, (int)($submission[4] == 0));
 	} else if ($submission[4] > $score[$submission[2]][$submission[3]][0]) {
-		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], $score[$submission[2]][$submission[3]][3] + $score[$submission[2]][$submission[3]][4], 0);
+		$score[$submission[2]][$submission[3]] = array($submission[4], $penalty, $submission[0], $score[$submission[2]][$submission[3]][3] + $score[$submission[2]][$submission[3]][5], $score[$submission[2]][$submission[3]][4] + 1, 0);
 	} else {
 		++$score[$submission[2]][$submission[3]][4];
+		++$score[$submission[2]][$submission[3]][5];
 	}
 	if ($update_contests_submissions) {
 		DB::insert("replace into contests_submissions (contest_id, submitter, problem_id, submission_id, score, penalty) values ({$contest['id']}, '{$submission[2]}', {$contest_data['problems'][$submission[3]]}, {$submission[0]}, {$submission[4]}, {$penalty})");
@@ -37,6 +38,7 @@ foreach ($contest_data['people'] as $person) {
 				$cur[1] += $cur_row[1];
 				$cur[4] += $cur_row[3];
 			}
+			unset($score[$person[0]][$i][5]);
 		}
 	}
 	$cur[5] = $cur[1] + $cur[4] * $wa_penalty;
