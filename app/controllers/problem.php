@@ -48,6 +48,8 @@
 			} else {
 				$ban_in_contest = !$is_visible;
 			}
+		} else {
+			$is_in_contest = false;
 		}
 	} elseif (!$is_visible) {
 		become404Page();

@@ -581,7 +581,7 @@ EOD;
 	<div class="col-sm-3">
 	<?php endif ?>
 		<?php if ($contest['extra_config']['standings_version'] == 1) { ?>
-		<p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>	
+		<p>此次比赛为 OI 赛制 (0 分计入罚时)。</p>
 		<p><strong>注意：比赛时只显示测样例的结果。</strong></p>
 		<?php } elseif ($contest['extra_config']['standings_version'] == 2) {?>
 		<p>此次比赛为 OI 赛制 (0 分不计罚时)。</p>	
