@@ -160,7 +160,6 @@ EOD;
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <?= HTML::tablist($tabs_info, $cur_tab) ?>
                         <div class="top-buffer-md">
                         <?php echoStandings(); ?>
                         </div>
