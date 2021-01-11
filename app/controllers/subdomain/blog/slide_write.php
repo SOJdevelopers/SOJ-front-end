@@ -48,7 +48,7 @@
 	}
 	function insertSlide($data) {
 		DB::insert("insert into blogs (type, title, content, content_md, poster, is_hidden, is_draft, post_time) values ('S', '".DB::escape($data['title'])."', '".DB::escape($data['content'])."', '".DB::escape($data['content_md'])."', '".Auth::id()."', {$data['is_hidden']}, {$data['is_draft']}, now())");
-		DB::insert("insert into blogs_visibility values (blog_id, group_name) (" . DB::insert_id() . ", " . UOJConfig::$data['profile']['common-group'] . ")");
+		DB::insert("insert into blogs_visibility (blog_id, group_name) values (" . DB::insert_id() . ", '" . UOJConfig::$data['profile']['common-group'] . "')");
 	}
 	
 	$blog_editor->save = function($data) {
