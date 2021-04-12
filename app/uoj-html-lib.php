@@ -1021,7 +1021,7 @@ function echoHacksList($cond, $tail, $config, $user) {
 			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
 				if ($agent !== false) {
 					$contest_conds[] = <<<EOD
-((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
+((contest_id = {$contest_id['id']}) and (hacks.owner = '{$agent}'))
 EOD;
 				}
 				DB::delete("delete from contest_t where id = {$contest['id']}");
