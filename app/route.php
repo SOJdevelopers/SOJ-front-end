@@ -51,6 +51,7 @@ Route::group([
 		Route::any('/acranklist', '/ranklist.php?type=ac');
 		Route::any('/acranklist/all', '/ranklist.php?type=ac&all=true');
 		Route::any('/groups', '/ranklist.php?type=group');
+		Route::any('/mygroups', '/ranklist.php?type=mygroup');
 
 		Route::any('/login', '/login.php');
 		Route::any('/logout', '/logout.php');

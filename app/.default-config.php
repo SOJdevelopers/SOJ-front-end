@@ -62,5 +62,6 @@ return [
 	'switch' => [
 		'web-analytics' => false,
 		'blog-use-subdomain' => false
-	]
+	],
+	'gravatar' => '//cn.gravatar.com/avatar/',
 ];

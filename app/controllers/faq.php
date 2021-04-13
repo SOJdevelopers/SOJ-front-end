@@ -55,7 +55,7 @@
 		<p>其中标绿表示你是成员，标蓝表示你是管理员，不标表示不在组内。</p>
 		<p>用户组是参加组队比赛用的组，<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的 ACM 赛制基于组功能。</p>
 		<p>系统组决定用户的权限，例如登录，看题，参加比赛，管理 OJ 等。</p>
-		<p>如果你<strong style="color: red">看不了题</strong>那是因为你被分到了未分类组，请联系管理员来获得权限。</p>
+		<p>如果你<strong style="color: red">看不了很多题目</strong>那是因为你没在组里，请<del>氪金</del>联系管理员来获得权限。</p>
 	</section>
 	<section>
 		<header>
@@ -84,11 +84,11 @@
 		<header>
 			<h4>10．联系方式</h4>
 		</header>
-		<p>如果你<strong style="color: red">想注册</strong>、想出题、想办比赛、发现了 BUG 或者对网站有什么建议，可以通过下面的方式联系我们：</p>
+		<p>如果你<strong style="color: red">想要权限号</strong>、想出题、想办比赛、发现了 BUG 或者对网站有什么建议，可以通过下面的方式联系我们：</p>
 		<ul>
 			<li>私信联系 <?= UOJConfig::$data['profile']['administrator'] ?>。</li>
-			<li>直接在机房里喊一声。</li>			
-			<li>你也可以进 QQ 群水水，群号是 <?= UOJConfig::$data['profile']['qq-group'] ?>，Stupid OJ <em>珂学</em>群。</li>
+			<li>直接在机房里喊一声。</li>
+			<li>你也可以进 QQ 群水水，群号是 <?= UOJConfig::$data['profile']['qq-group'] ?>，Stupid（OJ 粉）丝群。</li>
 		</ul>
 	</section>
 </article>

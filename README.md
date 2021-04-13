@@ -83,3 +83,27 @@ CREATE TABLE `blogs_visibility` (
 ```sql
 insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from blogs;
 ```
+
+# 2021
+### update APR 13 11:35
+```sql
+alter table user_info alter column extra_config varchar(1500);
+
+update user_info set extra_config=concat(
+'{',
+'"qq":', qq, ',',
+'"realname":"', real_name, '",',
+'"email":"', email, '",',
+'"motto":"', motto, '",',
+'"aboutme":', about_me, ',',
+'"real_name":"', real_name, '",',
+'"sex":"', sex, '"',
+'}');
+
+alter table user_info drop column qq;
+alter table user_info drop column email;
+alter table user_info drop column motto;
+alter table user_info drop column about_me;
+alter table user_info drop column real_name;
+alter table user_info drop column sex;
+```

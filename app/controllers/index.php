@@ -92,7 +92,11 @@
 </div>
 <div class="row">
 	<div class="col-sm-12">
-		<h3 class="text-center"><a href="/groups" class="uoj-index-ranklist"><?= UOJLocale::get('top rated groups') ?></a></h3>
+		<h3 class="text-center">
+		<a href="/groups" class="uoj-index-ranklist"><?= UOJLocale::get('top rated groups') ?></a>
+		|
+		<a href="/mygroups" class="uoj-index-ranklist"><?= UOJLocale::get('my groups') ?></a>
+		</h3>
 		<?php echoGrouplist(array('echo_full' => '', 'top10' => '')) ?>
 	</div>
 </div>

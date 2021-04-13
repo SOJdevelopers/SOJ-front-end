@@ -1,5 +1,6 @@
 /.htaccess
 /app/.config.php
+/app/.userinfo.php
 /utility/*
 /js/*
 /fonts/*

@@ -47,7 +47,9 @@ function queryUser($username) {
 	if (!validateUsername($username)) {
 		return null;
 	}
-	return DB::selectFirst("select * from user_info where username = '$username'", MYSQL_ASSOC);
+	$res = DB::selectFirst("select * from user_info where username = '$username'", MYSQL_ASSOC);
+	$res['extra_config'] = json_decode($res['extra_config'], true);
+	return $res;
 }
 
 function queryGroup($groupname) {

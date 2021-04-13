@@ -1126,13 +1126,13 @@ function echoRanklist($config = array()) {
 
 		echo '<td>', $user['rank'], '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape($user['motto']), '</td>';
+		echo '<td>', HTML::escape(json_decode($user['extra_config'], true)['motto']), '</td>';
 		echo '<td>', $user['rating'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'rating', 'motto');
+	$col_names = array('username', 'rating', 'extra_config');
 	$tail = 'order by rating desc, username asc';
 
 	if (isset($config['top10'])) {
@@ -1186,13 +1186,13 @@ function echoACRanklist($config = array()) {
 
 		echo '<td>', $user['rank'] . '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape($user['motto']), '</td>';
+		echo '<td>', HTML::escape(json_decode($user['extra_config'], true)['motto']), '</td>';
 		echo '<td>', $user['ac_num'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'ac_num', 'motto');
+	$col_names = array('username', 'ac_num', 'extra_config');
 	$tail = 'order by ac_num desc, username asc';
 
 	if (isset($config['top10'])) $tail .= ' limit 10';
@@ -1201,7 +1201,7 @@ function echoACRanklist($config = array()) {
 	echoLongTable($col_names, 'user_info', $banned_cond, $tail, $header_row, $print_row, $config);
 }
 
-function echoGrouplist($config = array()) {
+function echoGrouplist($config = array(), $mygroups = false) {
 	$header_row = '';
 	$header_row .= '<tr>';
 	$header_row .= '<th style="width: 5em;">#</th>';
@@ -1254,15 +1254,26 @@ function echoGrouplist($config = array()) {
 
 	$config['get_row_index'] = '';
 
+	if ($mygroups) {
+		DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '" . Auth::id() ."' and member_state != 'W')");
+	}
+
 	if (isset($config['more_details'])) {
 		$config['is_system_group'] = true;
 		echo "<h4>".UOJLocale::get('system groups')."</h4>";
-		echoLongTable($col_names, 'group_info', 'group_type = "S"', $tail, $header_row, $print_row, $config);
+		
+		$cond = 'group_type = "S"';
+		if ($mygroups) $cond .= " and group_name in (select group_name from group_t)";
+		echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 		
 	}
+
+	$gs = array();
 
 	$config['is_system_group'] = false;
 	if (!isset($config['top10']))
 		echo "<h4>".UOJLocale::get('user groups')."</h4>";
-	echoLongTable($col_names, 'group_info', 'group_type = "N"', $tail, $header_row, $print_row, $config);
+	$cond = 'group_type = "N"';
+	if ($mygroups) $cond .= " and group_name in (select group_name from group_t)";
+	echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 }

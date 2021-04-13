@@ -137,7 +137,7 @@
 				echo '<td>', $num, '</td>';
 				echo '<td>', $user_link, '</td>';
 				if ($show_ip) {
-					echo '<td>', $user['real_name'], '</td>';
+					echo '<td>', $user['extra_config']['realname'], '</td>';
 					echo '<td>', HTML::escape($user['remote_addr']), '</td>';
 					echo '<td>', HTML::escape($user['http_x_forwarded_for']), '</td>';
 				}
