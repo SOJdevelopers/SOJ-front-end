@@ -56,7 +56,13 @@
 			updateContestPlayerNum($contest);
 		};
 		$register_form->submit_button_config['class_str'] = 'btn btn-primary';
-		$register_form->submit_button_config['text'] = '报名比赛';
+	
+		$regtext = '报名比赛';
+		$isHugeChange = $contest['extra_config']['unrated'] !== true && $contest['extra_config']['rating_k'] >= 1000;
+		if ($isHugeChange) {
+			$regtext = '我自愿乘坐 ' . UOJConfig::$data['profile']['oj-name-short'] . ' 过山车';
+		}
+		$register_form->submit_button_config['text'] = $regtext;
 		$register_form->succ_href = '/contests';
 		
 		$register_form->runAtServer();
