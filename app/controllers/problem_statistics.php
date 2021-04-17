@@ -25,7 +25,7 @@
 		$is_res_empty = true;
 		$has_score_0 = false;
 		$has_score_100 = false;
-		while ($row = DB::fetch($result, MYSQL_NUM)) {
+		while ($row = DB::fetch($result, MYSQLI_NUM)) {
 			if ($row[0] == 0) {
 				$has_score_0 = true;
 			} else if ($row[0] == 100) {

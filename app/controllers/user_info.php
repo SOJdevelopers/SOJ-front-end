@@ -75,7 +75,7 @@
 						<?php if (Auth::id() === $user['username']) { ?>
 						<div class="list-group-item">
 							<h4 class="list-group-item-heading"><?= UOJLocale::get('api password') ?></h4>
-							<p class="list-group-item-text"><?= $user['svn_password'] ?></p>
+							<p class="list-group-item-text"><?= $user['api_password'] ?></p>
 						</div>
 						<?php } ?>
 					</div>

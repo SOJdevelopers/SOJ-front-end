@@ -6,7 +6,7 @@
 	if (isset($_POST['regenerate_apipassword'])) {
 		$username = Auth::id();
 		$passwd = uojRandString(10);
-		DB::update("update user_info set svn_password='$passwd' where username='{$username}'");
+		DB::update("update user_info set api_password='$passwd' where username='{$username}'");
 		die('ok');
 	}
 

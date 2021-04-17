@@ -47,8 +47,10 @@ function queryUser($username) {
 	if (!validateUsername($username)) {
 		return null;
 	}
-	$res = DB::selectFirst("select * from user_info where username = '$username'", MYSQL_ASSOC);
-	$res['extra_config'] = json_decode($res['extra_config'], true);
+	$res = DB::selectFirst("select * from user_info where username = '$username'", MYSQLI_ASSOC);
+	if ($res) {
+		$res['extra_config'] = json_decode($res['extra_config'], true);
+	}
 	return $res;
 }
 
@@ -56,20 +58,20 @@ function queryGroup($groupname) {
 	if (!validateUsername($groupname)) {
 		return null;
 	}
-	return DB::selectFirst("select * from group_info where group_name = '$groupname'", MYSQL_ASSOC);
+	return DB::selectFirst("select * from group_info where group_name = '$groupname'", MYSQLI_ASSOC);
 }
 
 function queryProblemContent($id) {
-	return DB::selectFirst("select * from problems_contents where id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from problems_contents where id = $id", MYSQLI_ASSOC);
 }
 
 function queryProblemBrief($id) {
-	return DB::selectFirst("select * from problems where id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from problems where id = $id", MYSQLI_ASSOC);
 }
 
 function queryProblemTags($id) {
 	$result = DB::select("select tag from problems_tags where problem_id = $id order by id");
-	for ($tags = array(); $row = DB::fetch($result, MYSQL_NUM); $tags[] = $row[0]);
+	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
 	return $tags;
 }
 
@@ -81,19 +83,19 @@ function queryContestProblemRank($contest, $problem) {
 }
 
 function querySubmission($id) {
-	return DB::selectFirst("select * from submissions where id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from submissions where id = $id", MYSQLI_ASSOC);
 }
 
 function queryHack($id) {
-	return DB::selectFirst("select * from hacks where id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from hacks where id = $id", MYSQLI_ASSOC);
 }
 
 function queryContest($id) {
-	return DB::selectFirst("select * from contests where id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from contests where id = $id", MYSQLI_ASSOC);
 }
 
 function queryContestProblem($id) {
-	return DB::selectFirst("select * from contest_problems where contest_id = $id", MYSQL_ASSOC);
+	return DB::selectFirst("select * from contest_problems where contest_id = $id", MYSQLI_ASSOC);
 }
 
 function queryZanVal($id, $type, $user) {
@@ -109,17 +111,17 @@ function queryZanVal($id, $type, $user) {
 }
 
 function queryBlog($id) {
-	return DB::selectFirst("select * from blogs where id = '$id'", MYSQL_ASSOC);
+	return DB::selectFirst("select * from blogs where id = '$id'", MYSQLI_ASSOC);
 }
 
 function queryBlogTags($id) {
 	$result = DB::select("select tag from blogs_tags where blog_id = $id order by id");
-	for ($tags = array(); $row = DB::fetch($result, MYSQL_NUM); $tags[] = $row[0]);
+	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
 	return $tags;
 }
 
 function queryBlogComment($id) {
-	return DB::selectFirst("select * from blogs_comments where id = '$id'", MYSQL_ASSOC);
+	return DB::selectFirst("select * from blogs_comments where id = '$id'", MYSQLI_ASSOC);
 }
 
 function checkGroup($user, $problem) {

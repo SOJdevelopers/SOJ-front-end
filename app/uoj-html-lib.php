@@ -47,7 +47,7 @@ function uojHandleSign($str) {
 }
 
 function uojFilePreview($file_name, $output_limit) {
-	return strOmit(file_get_contents($file_name, false, null, -1, $output_limit + 4), $output_limit);
+	return strOmit(file_get_contents($file_name, false, null, 0, $output_limit + 4), $output_limit);
 }
 
 function uojIncludeView($name, $view_params = array()) {
@@ -488,19 +488,22 @@ function echoSubmissionContent($submission, $requirement) {
 			$file_language = htmlspecialchars($config["{$req['name']}_language"]);
 			$footer_text = UOJLocale::get('problems::source code').', '.UOJLocale::get('problems::language').': '.$file_language;
 			switch ($file_language) {
-				case 'C++':
+				case 'C++98':
 				case 'C++11':
+				case 'C++14':
+				case 'C++17':
 					$sh_class = 'sh_cpp';
 					break;
-				case 'Python2.7':
+				case 'Python2':
 				case 'Python3':
 					$sh_class = 'sh_python';
 					break;
-				case 'Java7':
 				case 'Java8':
+				case 'Java11':
 					$sh_class = 'sh_java';
 					break;
-				case 'C':
+				case 'C99':
+				case 'C11':
 					$sh_class = 'sh_c';
 					break;
 				case 'Pascal':

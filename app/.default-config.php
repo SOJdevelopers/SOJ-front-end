@@ -53,12 +53,6 @@ return [
 			'password' => 'password233'
 		]
 	],
-	'svn' => [
-		'our-root' => [
-			'username' => 'our-root',
-			'password' => 'our-root'
-		]
-	],
 	'switch' => [
 		'web-analytics' => false,
 		'blog-use-subdomain' => false

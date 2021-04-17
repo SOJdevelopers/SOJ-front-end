@@ -97,7 +97,7 @@
 			$start_test_form->handle = function() {
 				global $contest;
 				$result = DB::select("select id, problem_id, content from submissions where contest_id = {$contest['id']}");
-				while ($submission = DB::fetch($result, MYSQL_ASSOC)) {
+				while ($submission = DB::fetch($result, MYSQLI_ASSOC)) {
 					$content = json_decode($submission['content'], true);
 					$need_rejudge = false;
 					if (isset($content['final_test_config'])) {

@@ -147,7 +147,7 @@ function queryContestData($contest, $config = array()) {
 					 and $contest['cur_progress'] <= CONTEST_IN_PROGRESS
 					 and !hasContestPermission(Auth::user(), $contest));
 
-	while ($row = DB::fetch($result, MYSQL_NUM)) {
+	while ($row = DB::fetch($result, MYSQLI_NUM)) {
 		$problems[] = $p = (int)$row[0];
 		$prob_pos[$p] = $n_problems++;
 		$full_scores[] = isset($contest['extra_config']["full_score_{$p}"]) ? $contest['extra_config']["full_score_{$p}"] : 100;
@@ -156,7 +156,7 @@ function queryContestData($contest, $config = array()) {
 	$data = array();
 	if ($config['pre_final']) {
 		$result = DB::query("select id, submit_time, submitter, problem_id, score, estimate, used_time, used_memory, result from submissions where contest_id = {$contest['id']} and score is not null order by id");
-		while ($row = DB::fetch($result, MYSQL_NUM)) {
+		while ($row = DB::fetch($result, MYSQLI_NUM)) {
 			$r = json_decode($row[8], true);
 			$row[0] = (int)$row[0];
 			$row[3] = $prob_pos[$row[3]];
@@ -188,7 +188,7 @@ function queryContestData($contest, $config = array()) {
 		} else {
 			$result = DB::query("select submission_id, date_add('{$contest['start_time_str']}', interval penalty second), submitter, problem_id, score, estimate, used_time, used_memory from contests_submissions where contest_id = {$contest['id']} order by submission_id");
 		}
-		while ($row = DB::fetch($result, MYSQL_NUM)) {
+		while ($row = DB::fetch($result, MYSQLI_NUM)) {
 			$row[0] = (int)$row[0];
 			$row[3] = $prob_pos[$row[3]];
 			$row[4] = (int)$row[4];
@@ -207,7 +207,7 @@ function queryContestData($contest, $config = array()) {
 				$filled[$row[0]] = '';
 			}
 			$result_d = DB::query("select id, submit_time, submitter, problem_id, score{$query_estimate} from submissions where contest_id = {$contest['id']} and score is not null order by id");
-			while ($row = DB::fetch($result_d, MYSQL_NUM)) {
+			while ($row = DB::fetch($result_d, MYSQLI_NUM)) {
 				$row[0] = (int)$row[0];
 				$row[3] = $prob_pos[$row[3]];
 				$row[4] = (int)$row[4];
@@ -225,7 +225,7 @@ function queryContestData($contest, $config = array()) {
 	$query_only_myself = ($need_only_myself ? 'and username = \'' . Auth::id() . '\'' : '');
 	$people = array();
 	$result = DB::query("select username, user_rating from contests_registrants where contest_id = {$contest['id']} {$query_only_myself} and has_participated = 1");
-	while ($row = DB::fetch($result, MYSQL_NUM)) {
+	while ($row = DB::fetch($result, MYSQLI_NUM)) {
 		$row[1] = (int)$row[1];
 		$people[] = $row;
 	}

@@ -107,3 +107,22 @@ alter table user_info drop column about_me;
 alter table user_info drop column real_name;
 alter table user_info drop column sex;
 ```
+
+### update APR 14 07:43
+```sql
+CREATE TABLE `judger_data_sync` (
+  `judger_name` varchar(50) NOT NULL,
+  `problem_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`judger_name`,`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+```sql
+alter table user_info change svn_password api_password char(10);
+```
+
+### update APR 16 09:53
+```sql
+update submissions set language="C++98" where language="C++";
+update submissions set language="C99" where language="C";
+```

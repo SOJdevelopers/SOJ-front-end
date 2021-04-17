@@ -52,8 +52,8 @@
 		
 		$password = getPasswordToStore($password, $username);
 		
-		$svn_pw = uojRandString(10);
-		DB::insert("insert into user_info (username, password, svn_password, register_time, latest_login, remote_addr, http_x_forwarded_for) values ('$username', '$password', '$svn_pw', now(), now(), '" . DB::escape($_SERVER['REMOTE_ADDR']) . "', '" . DB::escape($_SERVER['HTTP_X_FORWARDED_FOR']) . "')");
+		$api_pw = uojRandString(10);
+		DB::insert("insert into user_info (username, password, api_password, register_time, latest_login, remote_addr, http_x_forwarded_for) values ('$username', '$password', '$api_pw', now(), now(), '" . DB::escape($_SERVER['REMOTE_ADDR']) . "', '" . DB::escape($_SERVER['HTTP_X_FORWARDED_FOR']) . "')");
 		
 		DB::insert("insert into group_members (group_name, username, member_state) values ('" . UOJConfig::$data['profile']['default-group'] . "', '{$username}', 'U')");
 
