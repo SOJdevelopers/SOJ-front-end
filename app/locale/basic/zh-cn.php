@@ -4,6 +4,7 @@ return [
 	'register' => '注册',
 	'logout' => '登出',
 	'my profile' => '个人信息',
+	'my groups' => '我的组',
 	'private message' => '私信',
 	'system message' => '系统消息',
 	'system manage' => '系统管理',

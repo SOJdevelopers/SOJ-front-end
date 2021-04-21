@@ -14,7 +14,7 @@
 			$visible = isProblemVisible(Auth::user(), $problem);
 			if (!$visible) {
 				$result = DB::select("select contest_id from contests_problems where problem_id = {$_GET['id']}");
-				while (list($contest_id) = DB::fetch($result, MYSQL_NUM)) {
+				while (list($contest_id) = DB::fetch($result, MYSQLI_NUM)) {
 					$contest = queryContest($contest_id);
 					genMoreContestInfo($contest);
 					if ($contest['cur_progress'] != CONTEST_NOT_STARTED) {
@@ -40,19 +40,19 @@
 			$download_name = "problem_{$id}.zip";
 			break;
 		case 'testlib.h':
-			$file_name = '/home/local_main_judger/judge_client/uoj_judger/include/testlib.h';
+			$file_name = $uojMainJudgerWorkPath . '/include/testlib.h';
 			$download_name = 'testlib.h';
 			break;
 		case 'ex_testlib.h':
-			$file_name = '/home/local_main_judger/judge_client/uoj_judger/include/ex_testlib.h';
+			$file_name = $uojMainJudgerWorkPath . '/include/ex_testlib.h';
 			$download_name = 'ex_testlib.h';
 			break;
 		case 'uoj_judger.h':
-			$file_name = '/home/local_main_judger/judge_client/uoj_judger/include/uoj_judger.h';
+			$file_name = $uojMainJudgerWorkPath . '/include/uoj_judger.h';
 			$download_name = 'uoj_judger.h';
 			break;
 		case 'judger.cpp':
-			$file_name = '/home/local_main_judger/judge_client/uoj_judger/builtin/judger/judger.cpp';
+			$file_name = $uojMainJudgerWorkPath . '/builtin/judger/judger.cpp';
 			$download_name = 'judger.cpp';
 			break;
 		case 'data':

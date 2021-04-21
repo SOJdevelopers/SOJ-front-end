@@ -10,9 +10,7 @@
 <?php if (validateUsername($username) && ($user = queryUser($username))): ?>
 <?php echoUOJPageHeader($user['username'] . ' - ' . UOJLocale::get('user profile')) ?>
 	<?php
-		$esc_email = HTML::escape($user['email']);
-		$esc_qq = HTML::escape($user['qq'] != 0 ? $user['qq'] : 'Unfilled');
-		$esc_sex = HTML::escape($user['sex']);
+		$esc_sex = HTML::escape($user['extra_config']['sex']);
 		$col_sex = '';
 		if ($esc_sex == 'M') {
 			$esc_sex = '&#9794;';
@@ -24,7 +22,6 @@
 			$esc_sex = '';
 			$col_sex = 'color: black';
 		}
-		$esc_motto = HTML::escape($user['motto']);
 	?>
 	<div class="panel panel-info">
 		<div class="panel-heading">
@@ -42,23 +39,22 @@
 							<h4 class="list-group-item-heading"><?= UOJLocale::get('rating') ?></h4>
 							<p class="list-group-item-text"><strong style="color: red"><?= $user['rating'] ?></strong></p>
 						</div>
-						<div class="list-group-item">
-							<h4 class="list-group-item-heading"><?= UOJLocale::get('email') ?></h4>
-							<p class="list-group-item-text"><?= $esc_email ?></p>
-						</div>
-						<div class="list-group-item">
-							<h4 class="list-group-item-heading"><?= UOJLocale::get('QQ') ?></h4>
-							<p class="list-group-item-text"><?= $esc_qq ?></p>
-						</div>
-						<div class="list-group-item">
-							<h4 class="list-group-item-heading"><?= UOJLocale::get('motto') ?></h4>
-							<p class="list-group-item-text"><?= $esc_motto ?></p>
-						</div>
-						<?php if (isSuperUser(Auth::user())) { ?>
-						<div class="list-group-item">
-							<h4 class="list-group-item-heading"><?= UOJLocale::get('realname') ?></h4>
-							<p class="list-group-item-text"><?= $user['real_name'] ?></p>
-						</div>
+						<?php
+							$isAdmin = isSuperUser(Auth::user());
+							$locale = UOJLocale::locale();
+							foreach (UOJConfig::$user as $seg => $data) {
+								if ($data['hidden'] === true) continue;
+								if ($data['publish'] === true || $isAdmin) {
+						?>
+									<div class="list-group-item">
+										<h4 class="list-group-item-heading"><?= $data['locale'][$locale] ?></h4>
+										<p class="list-group-item-text"><?= HTML::escape($user['extra_config'][$seg]) ?></p>
+									</div>
+						<?php
+								}
+							}
+							if ($isAdmin) {
+						?>
 						<div class="list-group-item">
 							<h4 class="list-group-item-heading">register time</h4>
 							<p class="list-group-item-text"><?= $user['register_time'] ?></p>
@@ -79,7 +75,7 @@
 						<?php if (Auth::id() === $user['username']) { ?>
 						<div class="list-group-item">
 							<h4 class="list-group-item-heading"><?= UOJLocale::get('api password') ?></h4>
-							<p class="list-group-item-text"><?= $user['svn_password'] ?></p>
+							<p class="list-group-item-text"><?= $user['api_password'] ?></p>
 						</div>
 						<?php } ?>
 					</div>

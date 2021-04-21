@@ -2,7 +2,8 @@
 	$tabs_info = array(
 		'rating' => '',
 		'ac' => '',
-		'group' => ''
+		'group' => '',
+		'mygroup' => ''
 	);
 
 	if (isset($_GET['type']) and isset($tabs_info[$_GET['type']])) {
@@ -28,9 +29,14 @@
 	} elseif ($_GET['type'] === 'group') {
 		echoUOJPageHeader(UOJLocale::get('top rated groups'));
 		echoGrouplist($config);
+	} elseif ($_GET['type'] === 'mygroup') {
+		echoUOJPageHeader(UOJLocale::get('my groups'));
+		echoGrouplist($config, true);
 ?>
-<div class="text-right">
-<a href="/group/new" class="btn btn-primary"><?= UOJLocale::get('new group') ?></a>
-</div>
-<?php } ?>
-<?php echoUOJPageFooter() ?>
+		<div class="text-right">
+		<a href="/group/new" class="btn btn-primary"><?= UOJLocale::get('new group') ?></a>
+		</div>
+<?php
+	}
+	echoUOJPageFooter()
+?>

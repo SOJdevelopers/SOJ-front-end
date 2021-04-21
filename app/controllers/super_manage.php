@@ -18,6 +18,11 @@
 			'url' => '/super-manage/analytics',
 			'method' => 'showAnalytics'
 		),
+		'judgerinfo' => array(
+			'name' => '评测机信息',
+			'url' => '/super-manage/judgerinfo',
+			'method' => 'showJudgerInfo'
+		),
 		'users' => array(
 			'name' => '用户操作',
 			'url' => '/super-manage/users',
@@ -113,6 +118,29 @@ function showAnalytics() {
 	<?php
 }
 
+function showJudgerInfo() {
+	printHeader();
+	?>
+	<div class="table-responsive">
+		<table class="table table-bordered table-hover table-striped table-text-center">
+			<thead>
+				<tr>
+					<th>评测机</th>
+					<th>ip地址</th>
+					<th>上次在线时间</th>
+					<th>开启状态</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach (DB::selectAll("select * from judger_info") as $judger) { ?>
+					<tr><td><?= $judger["judger_name"] ?></td><td><?= $judger["ip"] ?></td><td><?= $judger["latest_login"] ?></td><td><?= $judger["enabled"] ?></td></tr>
+				<?php } ?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
+
 function showUserModification() {
 	/*
 	 * User modification
@@ -166,8 +194,11 @@ EOD;
 				deleteUser($username);
 				continue;
 			}
-
-			DB::update("update user_info set real_name = '{$real}' where username = '{$username}'");
+			
+			$conf = queryUser($username)['extra_config'];
+			$conf['realname'] = $real;
+			$conf_s = json_encode($conf);
+			DB::update("update user_info set extra_config='" . DB::escape($conf_s) . "' where username = '{$username}'");
 		}
 	};
 	$user_form->runAtServer();
@@ -176,11 +207,12 @@ EOD;
 	 * User info
 	 */
 
-	$userlist_cols = array('username', 'real_name', 'rating', 'ac_num', 'remote_addr', 'latest_login');
+	$userlist_cols = array('username', 'extra_config', 'rating', 'ac_num', 'remote_addr', 'latest_login');
 	$userlist_config = array('page_len' => 50);
 	$userlist_header_row = '<tr>';
 	$userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'username'))) . '">用户名</a></th>';
-	$userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'real_name'))) . '">真实姓名</a></th>';
+	// $userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'real_name'))) . '">真实姓名</a></th>';
+	$userlist_header_row .= '<th>真实姓名</th>';
 	$userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'rating'))) . '">Rating</a></th>';
 	$userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'ac_num'))) . '">AC 题数</a></th>';
 	$userlist_header_row .= '<th><a href="' . HTML::url(UOJContext::requestURI(), array('params' => array('sort' => 'remote_addr'))) . '">远程地址</a></th>';
@@ -194,7 +226,7 @@ EOD;
 	$userlist_print_row = function($row) {
 		echo '<tr>';
 		echo '<td>', getUserLink($row['username']), '</td>';
-		echo '<td>', $row['real_name'], '</td>';
+		echo '<td>', json_decode($row['extra_config'], true)['realname'], '</td>';
 		echo '<td>', $row['rating'], '</td>';
 		echo '<td>', $row['ac_num'], '</td>';
 		echo '<td>', $row['remote_addr'], '</td>';
@@ -209,9 +241,9 @@ EOD;
 
 	$userlist_tail = 'order by username asc';
 	if (isset($_GET['sort'])) {
-		if ($_GET['sort'] === 'real_name') {
+		/*if ($_GET['sort'] === 'real_name') {
 			$userlist_tail = 'order by real_name asc, username asc';
-		} elseif ($_GET['sort'] === 'rating') {
+		} else*/if ($_GET['sort'] === 'rating') {
 			$userlist_tail = 'order by rating desc, username asc';
 		} elseif ($_GET['sort'] === 'ac_num') {
 			$userlist_tail = 'order by ac_num desc, username asc';

@@ -54,7 +54,7 @@ function validateSign($curUser, $getTime) {
 		fail('signature: Parameter \'sign\' missing; onlyOnline: You have to be authenticated to use \'API\' methods');
 	}
 
-	$query_string = strtolower($curUser['username']) . '#' . $getTime . '#' . $curUser['svn_password'];
+	$query_string = strtolower($curUser['username']) . '#' . $getTime . '#' . $curUser['api_password'];
 
 	if (!is_string($_GET['sign']) or strcasecmp($_GET['sign'], md5($query_string))) {
 		fail('signature: Incorrect signature; onlyOnline: You have to be authenticated to use \'API\' methods');

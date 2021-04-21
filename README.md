@@ -83,3 +83,46 @@ CREATE TABLE `blogs_visibility` (
 ```sql
 insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from blogs;
 ```
+
+# 2021
+### update APR 13 11:35
+```sql
+alter table user_info alter column extra_config varchar(1500);
+
+update user_info set extra_config=concat(
+'{',
+'"qq":', qq, ',',
+'"realname":"', real_name, '",',
+'"email":"', email, '",',
+'"motto":"', motto, '",',
+'"aboutme":', about_me, ',',
+'"real_name":"', real_name, '",',
+'"sex":"', sex, '"',
+'}');
+
+alter table user_info drop column qq;
+alter table user_info drop column email;
+alter table user_info drop column motto;
+alter table user_info drop column about_me;
+alter table user_info drop column real_name;
+alter table user_info drop column sex;
+```
+
+### update APR 14 07:43
+```sql
+CREATE TABLE `judger_data_sync` (
+  `judger_name` varchar(50) NOT NULL,
+  `problem_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`judger_name`,`problem_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+```sql
+alter table user_info change svn_password api_password char(10);
+```
+
+### update APR 16 09:53
+```sql
+update submissions set language="C++98" where language="C++";
+update submissions set language="C99" where language="C";
+```

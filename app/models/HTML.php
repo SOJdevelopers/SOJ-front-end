@@ -8,7 +8,7 @@ class HTML {
 		return strip_tags($str);
 	}
 	public static function avatar_addr($user, $size) {
-		return '//gravatar.loli.net/avatar/' . md5(strtolower(trim($user['email']))) . "?d=mm&amp;s=$size";
+		return UOJConfig::$data['gravatar'] . md5(strtolower(trim($user['extra_config']['email']))) . "?d=mm&amp;s=$size";
 	}
 
 	public static function tablist($tabs_info, $cur, $type = 'nav-tabs') {
