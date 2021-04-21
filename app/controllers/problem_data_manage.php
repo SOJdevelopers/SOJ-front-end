@@ -272,7 +272,6 @@ EOD
 					echo '<td>', htmlspecialchars($judger["judger_name"]), '</td>';
 					echo '<td>', htmlspecialchars($judger["ip"]), '</td>';
 					$sync = queryJudgerDataNeedUpdate($_GET['id'], $judger["judger_name"]);
-					echo $sync;
 					echo '<td>', ($sync ? '<span class="glyphicon glyphicon-remove"></span>未同步' : '<span class="glyphicon glyphicon-ok"></span>已同步'), '</td>';
 					echo '</tr>';
 				}
