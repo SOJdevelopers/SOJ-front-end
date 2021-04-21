@@ -87,7 +87,7 @@ insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from bl
 # 2021
 ### update APR 13 11:35
 ```sql
-alter table user_info alter column extra_config varchar(1500);
+alter table user_info change extra_config extra_config varchar(1500);
 
 update user_info set extra_config=concat(
 '{',

@@ -2,5 +2,4 @@
 /app/.userinfo.php
 /js/mathjax
 /app/storage/*
-/app/tmp/*
 /uploads/*
