@@ -15,7 +15,7 @@
 					<li><?= UOJConfig::$data['profile']['oj-name'] ?></li>|<li>version: <?= UOJConfig::$data['profile']['oj-version'] ?></li>
 				</ul>
 
-				<p>Server time: <?= UOJTime::$time_now_str ?> | <a href="http://github.com/vfleaking/uoj"><?= UOJLocale::get('open source') ?></a></p>
+				<p>Server time: <?= UOJTime::$time_now_str ?> | <a href="https://github.com/SOJdevelopers"><?= UOJLocale::get('open source') ?></a></p>
 			</div>
 <?php endif ?>
 		</div>
