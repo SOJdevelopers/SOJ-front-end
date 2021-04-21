@@ -1,0 +1,5 @@
+php_flag engine off
+AddType text/plain .htm
+AddType text/plain .html
+AddType text/plain .stm
+AddType text/plain .shtml
