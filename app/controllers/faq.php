@@ -84,11 +84,10 @@
 		<header>
 			<h4>10．联系方式</h4>
 		</header>
-		<p>如果你<strong style="color: red">想要权限号</strong>、想出题、想办比赛、发现了 BUG 或者对网站有什么建议，可以通过下面的方式联系我们：</p>
+		<p>如果你想联系管理员：</p>
 		<ul>
 			<li>私信联系 <?= UOJConfig::$data['profile']['administrator'] ?>。</li>
-			<li>直接在机房里喊一声。</li>
-			<li>你也可以进 QQ 群水水，群号是 <?= UOJConfig::$data['profile']['qq-group'] ?>，Stupid（OJ 粉）丝群。</li>
+			<li>你也可以去SOJ<a href="https://github.com/SOJdevelopers">项目页面</a>看看</li>
 		</ul>
 	</section>
 </article>
