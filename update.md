@@ -27,9 +27,7 @@ alter table blogs add latest_comment datetime not null;
 alter table blogs add latest_commenter varchar(20) not null;
 
 # History
-update blogs left join (
-select * from (select id, blog_id, post_time, poster from blogs_comments order by id desc limit 1919810) tmp1 group by blog_id
-) tmp2 on blogs.id = tmp2.blog_id set blogs.latest_comment = tmp2.post_time, blogs.latest_commenter = tmp2.poster;
+update blogs left join ( select blog_id,any_value(post_time) as post_time,any_value(poster) as poster from (select id, blog_id, post_time, poster from blogs_comments order by id desc limit 1919810) tmp1 group by blog_id ) tmp2 on blogs.id = tmp2.blog_id set blogs.latest_comment = tmp2.post_time, blogs.latest_commenter = tmp2.poster;
 
 update blogs set latest_comment = post_time where latest_comment = 0 and is_draft = 0;
 ```

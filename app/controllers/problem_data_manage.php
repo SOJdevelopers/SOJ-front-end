@@ -600,7 +600,7 @@ EOD
 			$content['config'] = array();
 			foreach ($requirement as $req) {
 				if ($req['type'] == 'source code') {
-					$std_lang = isset($req['std_language']) ? $req['std_language'] : 'C++';
+					$std_lang = isset($req['std_language']) ? $req['std_language'] : 'C++11';
 					$content['config'][] = array("{$req['name']}_language", $std_lang);
 				}
 			}
