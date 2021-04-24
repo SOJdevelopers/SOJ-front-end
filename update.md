@@ -123,4 +123,5 @@ alter table user_info change svn_password api_password char(10);
 ```sql
 update submissions set language="C++98" where language="C++";
 update submissions set language="C99" where language="C";
+update submissions set language="Python2" where language="Python2.7";
 ```
