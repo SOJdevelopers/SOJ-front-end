@@ -693,6 +693,7 @@ function require_codemirror(config, callback) {
 
 function get_codemirror_mode(lang) {
 	switch (lang) {
+		case 'C++':
 		case 'C++98':
 		case 'C++11':
 		case 'C++14':
