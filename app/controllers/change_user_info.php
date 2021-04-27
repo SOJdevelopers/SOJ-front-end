@@ -130,6 +130,7 @@
 			change       : '',
 			password     : md5($('#input-password').val(), "<?= getPasswordClientSalt() ?>"),
 			old_password : md5($('#input-old_password').val(), "<?= getPasswordClientSalt() ?>"),
+			ptag         : $('#input-password').val().length,
 			<?php
 				foreach (UOJConfig::$user as $seg => $data) {
 					echo $seg . " : $('#input-" . $seg . "').val(),\n";
