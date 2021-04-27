@@ -199,7 +199,9 @@
 	$submission['id'] = (int)$submission['id'];
 	$submission['problem_id'] = (int)$submission['problem_id'];
 	$submission['update_data'] = queryJudgerDataNeedUpdate($submission['problem_id']);
-	$submission['content'] = json_decode($submission['content']);
+	$submission['content'] = json_decode($submission['content'], true);
+	$submitter = DB::selectFirst("select submitter from submissions where id=" . $submission['id'])['submitter'];
+	$submission['content']['config'][] = array('submitter', $submitter);
 	
 	if ($hack) {
 		$submission['is_hack'] = "";
