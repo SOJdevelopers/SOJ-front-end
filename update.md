@@ -125,3 +125,7 @@ update submissions set language="C++98" where language="C++";
 update submissions set language="C99" where language="C";
 update submissions set language="Python2" where language="Python2.7";
 ```
+### update APR 27 20"43
+```sql
+alter table problems change zan zan int(11) not null default 0;
+```
