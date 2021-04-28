@@ -9,7 +9,7 @@ class UOJMail {
 		$mailer->Host = UOJConfig::$data['mail']['noreply']['host'];
 		$mailer->Port = UOJConfig::$data['mail']['noreply']['port'];
 		$mailer->SMTPAuth = true;
-		$mailer->SMTPDebug = true;
+		$mailer->SMTPDebug = false;
 		$mailer->SMTPSecure = UOJConfig::$data['mail']['noreply']['secure'];
 		$mailer->Username = UOJConfig::$data['mail']['noreply']['username'];
 		$mailer->Password = UOJConfig::$data['mail']['noreply']['password'];
