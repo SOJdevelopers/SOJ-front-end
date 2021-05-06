@@ -1129,19 +1129,19 @@ function echoRanklist($config = array()) {
 
 		echo '<td>', $user['rank'], '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape(json_decode($user['extra_config'], true)['motto']), '</td>';
+		echo '<td>', HTML::escape(queryUserMotto($user['username'])), '</td>';
 		echo '<td>', $user['rating'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'rating', 'extra_config');
+	$col_names = array('username', 'rating');
 	$tail = 'order by rating desc, username asc';
 
 	if (isset($config['top10'])) {
 		$tail .= ' limit 10';
 	} else {
-		$config['custom_query'] = 'select * from (select ' . join($col_names, ',') . " from user_info where {$banned_cond} {$tail}) _1 union select * from (select " . join($col_names, ',') . " from user_info where {$second_cond} {$tail}) _2";
+		$config['custom_query'] = 'select * from (select ' . join($col_names, ',') . " from user_info where {$banned_cond}) _1 union select * from (select " . join($col_names, ',') . " from user_info where {$second_cond}) _2 {$tail}";
 		$config['custom_query_count'] = "select count(*) from user_info where ({$banned_cond}) or ({$second_cond})";
 	}
 
@@ -1189,13 +1189,13 @@ function echoACRanklist($config = array()) {
 
 		echo '<td>', $user['rank'] . '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape(json_decode($user['extra_config'], true)['motto']), '</td>';
+		echo '<td>', HTML::escape(queryUserMotto($user['username'])), '</td>';
 		echo '<td>', $user['ac_num'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'ac_num', 'extra_config');
+	$col_names = array('username', 'ac_num');
 	$tail = 'order by ac_num desc, username asc';
 
 	if (isset($config['top10'])) $tail .= ' limit 10';

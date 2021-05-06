@@ -54,6 +54,17 @@ function queryUser($username) {
 	return $res;
 }
 
+function queryUserMotto($username) {
+	if (!validateUsername($username)) {
+		return null;
+	}
+	$res = DB::selectFirst("select extra_config from user_info where username = '$username'", MYSQLI_ASSOC);
+	if ($res) {
+		return json_decode($res['extra_config'], true)['motto'];
+	}
+	return null;
+}
+
 function queryGroup($groupname) {
 	if (!validateUsername($groupname)) {
 		return null;
