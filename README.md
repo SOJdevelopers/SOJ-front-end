@@ -11,7 +11,7 @@ By Zhenhai High School's OI (Olympiad in Informatics) team.
 ### Assets
 ```
 git clone -b legacy-v2 https://github.com/mathjax/MathJax.git js/mathjax
-git clone https://github.com/daklqw/SOJ-fe-assets.git assets
+git clone https://github.com/SOJdevelopers/SOJ-fe-assets.git
 mv assets/* ./
 rm -rf assets
 ```
