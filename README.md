@@ -9,9 +9,13 @@ By Zhenhai High School's OI (Olympiad in Informatics) team.
 <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=PbP0VGHE7tquc6Ywg9ONN2zZXPRPivyB&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="Stupid（OJ 粉）丝群" title="Stupid（OJ 粉）丝群"></a>
 
 ### Assets
+Scripts, icons, emoticons.
 ```
 git clone -b legacy-v2 https://github.com/mathjax/MathJax.git js/mathjax
 git clone https://github.com/SOJdevelopers/SOJ-fe-assets.git
 mv assets/* ./
 rm -rf assets
 ```
+
+### Installation
+Documentation is not exists yet.
