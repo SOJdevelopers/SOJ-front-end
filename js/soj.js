@@ -652,7 +652,7 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 					if (config.prevent_focus_on_click) {
 						e.preventDefault();
 					}
-					$(table_div).long_table(data, p, header_row, get_row_str, config);
+					$(table_div).long_table(data, p, header_row, get_row_str, config).uoj_highlight();
 				})
 			);
 			return li;
