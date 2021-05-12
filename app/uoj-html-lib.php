@@ -1136,11 +1136,11 @@ function echoRanklist($config = array()) {
 		$users[] = $user;
 	};
 	$col_names = array('username', 'rating');
-	$tail = 'order by outdated asc, rating desc, username asc';
 
 	if (isset($config['top10'])) {
-		$tail .= ' limit 10';
+		$tail = 'order by rating desc, username asc limit 10';
 	} else {
+		$tail = 'order by outdated asc, rating desc, username asc';
 		$config['custom_query'] = 'select * from (select ' . join($col_names, ',') . ", 0 outdated from user_info where {$banned_cond}) _1 union select * from (select " . join($col_names, ',') . ", 1 outdated from user_info where {$second_cond}) _2 {$tail}";
 		$config['custom_query_count'] = "select count(*) from user_info where ({$banned_cond}) or ({$second_cond})";
 	}
