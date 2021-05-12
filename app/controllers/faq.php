@@ -87,7 +87,7 @@
 		<p>如果你想联系管理员：</p>
 		<ul>
 			<li>私信联系 <?= UOJConfig::$data['profile']['administrator'] ?>。</li>
-			<li>你也可以去SOJ<a href="https://github.com/SOJdevelopers">项目页面</a>看看</li>
+			<li>你也可以去 SOJ <a href="https://github.com/SOJdevelopers">项目页面</a>看看。</li>
 		</ul>
 	</section>
 </article>

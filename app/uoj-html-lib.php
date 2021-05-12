@@ -435,7 +435,7 @@ function echoSubmissionsList($cond, $tail, $config, $user) {
 			} else {
 				$agent = $user['username'];
 			}
-			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
+			if (!hasContestPermission($user, $contest) and queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
 				if ($agent !== false) {
 					$contest_conds[] = <<<EOD
 ((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
@@ -1021,7 +1021,7 @@ function echoHacksList($cond, $tail, $config, $user) {
 			} else {
 				$agent = $user['username'];
 			}
-			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
+			if (!hasContestPermission($user, $contest) and queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
 				if ($agent !== false) {
 					$contest_conds[] = <<<EOD
 ((contest_id = {$contest_id['id']}) and (hacks.owner = '{$agent}'))
