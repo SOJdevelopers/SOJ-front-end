@@ -47,7 +47,7 @@ function uojHandleSign($str) {
 }
 
 function uojFilePreview($file_name, $output_limit) {
-	return strOmit(file_get_contents($file_name, false, null, -1, $output_limit + 4), $output_limit);
+	return strOmit(file_get_contents($file_name, false, null, 0, $output_limit + 4), $output_limit);
 }
 
 function uojIncludeView($name, $view_params = array()) {
@@ -488,19 +488,22 @@ function echoSubmissionContent($submission, $requirement) {
 			$file_language = htmlspecialchars($config["{$req['name']}_language"]);
 			$footer_text = UOJLocale::get('problems::source code').', '.UOJLocale::get('problems::language').': '.$file_language;
 			switch ($file_language) {
-				case 'C++':
+				case 'C++98':
 				case 'C++11':
+				case 'C++14':
+				case 'C++17':
 					$sh_class = 'sh_cpp';
 					break;
-				case 'Python2.7':
+				case 'Python2':
 				case 'Python3':
 					$sh_class = 'sh_python';
 					break;
-				case 'Java7':
 				case 'Java8':
+				case 'Java11':
 					$sh_class = 'sh_java';
 					break;
-				case 'C':
+				case 'C99':
+				case 'C11':
 					$sh_class = 'sh_c';
 					break;
 				case 'Pascal':
@@ -1021,7 +1024,7 @@ function echoHacksList($cond, $tail, $config, $user) {
 			if (queryOnlymyselfLimit($contest) === SUBMISSION_NONE_LIMIT) {
 				if ($agent !== false) {
 					$contest_conds[] = <<<EOD
-((contest_id = {$contest_id['id']}) and (submissions.submitter = '{$agent}'))
+((contest_id = {$contest_id['id']}) and (hacks.owner = '{$agent}'))
 EOD;
 				}
 				DB::delete("delete from contest_t where id = {$contest['id']}");
@@ -1126,19 +1129,19 @@ function echoRanklist($config = array()) {
 
 		echo '<td>', $user['rank'], '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape($user['motto']), '</td>';
+		echo '<td>', HTML::escape(queryUserMotto($user['username'])), '</td>';
 		echo '<td>', $user['rating'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'rating', 'motto');
+	$col_names = array('username', 'rating');
 	$tail = 'order by rating desc, username asc';
 
 	if (isset($config['top10'])) {
 		$tail .= ' limit 10';
 	} else {
-		$config['custom_query'] = 'select * from (select ' . join($col_names, ',') . " from user_info where {$banned_cond} {$tail}) _1 union select * from (select " . join($col_names, ',') . " from user_info where {$second_cond} {$tail}) _2";
+		$config['custom_query'] = 'select * from (select ' . join($col_names, ',') . " from user_info where {$banned_cond}) _1 union select * from (select " . join($col_names, ',') . " from user_info where {$second_cond}) _2 {$tail}";
 		$config['custom_query_count'] = "select count(*) from user_info where ({$banned_cond}) or ({$second_cond})";
 	}
 
@@ -1186,13 +1189,13 @@ function echoACRanklist($config = array()) {
 
 		echo '<td>', $user['rank'] . '</td>';
 		echo '<td>', getUserLink($user['username']), '</td>';
-		echo '<td>', HTML::escape($user['motto']), '</td>';
+		echo '<td>', HTML::escape(queryUserMotto($user['username'])), '</td>';
 		echo '<td>', $user['ac_num'], '</td>';
 		echo '</tr>';
 
 		$users[] = $user;
 	};
-	$col_names = array('username', 'ac_num', 'motto');
+	$col_names = array('username', 'ac_num');
 	$tail = 'order by ac_num desc, username asc';
 
 	if (isset($config['top10'])) $tail .= ' limit 10';
@@ -1201,7 +1204,7 @@ function echoACRanklist($config = array()) {
 	echoLongTable($col_names, 'user_info', $banned_cond, $tail, $header_row, $print_row, $config);
 }
 
-function echoGrouplist($config = array()) {
+function echoGrouplist($config = array(), $mygroups = false) {
 	$header_row = '';
 	$header_row .= '<tr>';
 	$header_row .= '<th style="width: 5em;">#</th>';
@@ -1254,15 +1257,26 @@ function echoGrouplist($config = array()) {
 
 	$config['get_row_index'] = '';
 
+	if ($mygroups) {
+		DB::query("create temporary table group_t (group_name varchar(20) primary key) engine = memory default charset=utf8 as (select group_name from group_members where username = '" . Auth::id() ."' and member_state != 'W')");
+	}
+
 	if (isset($config['more_details'])) {
 		$config['is_system_group'] = true;
 		echo "<h4>".UOJLocale::get('system groups')."</h4>";
-		echoLongTable($col_names, 'group_info', 'group_type = "S"', $tail, $header_row, $print_row, $config);
+		
+		$cond = 'group_type = "S"';
+		if ($mygroups) $cond .= " and group_name in (select group_name from group_t)";
+		echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 		
 	}
+
+	$gs = array();
 
 	$config['is_system_group'] = false;
 	if (!isset($config['top10']))
 		echo "<h4>".UOJLocale::get('user groups')."</h4>";
-	echoLongTable($col_names, 'group_info', 'group_type = "N"', $tail, $header_row, $print_row, $config);
+	$cond = 'group_type = "N"';
+	if ($mygroups) $cond .= " and group_name in (select group_name from group_t)";
+	echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 }

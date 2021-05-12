@@ -39,7 +39,7 @@ pre {white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-
 EOD;
 		
 		$mailer = UOJMail::noreply();
-		$mailer->addAddress($user['email'], $user['username']);
+		$mailer->addAddress($user['extra_config']['email'], $user['username']);
 //		$mailer->addCC(UOJConfig::$data['mail']['noreply']['username'], 'Stupid Online Judge');
 //		$mailer->addAddress(UOJConfig::$data['mail']['noreply']['username'], 'Stupid Online Judge');
 		$mailer->Subject = $oj_name_short . ' 密码找回';

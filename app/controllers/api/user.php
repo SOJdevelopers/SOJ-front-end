@@ -16,16 +16,18 @@
         $hisUser = queryUser($id);
         $cur = array(
             'username' => $hisUser['username'],
-            'email' => $hisUser['email'],
             'rating' => (int)$hisUser['rating'],
-            'sex' => $hisUser['sex'],
             'ac_num' => (int)$hisUser['ac_num'],
-            'motto' => $hisUser['motto'],
             'avatar' => HTML::avatar_addr($hisUser, 256)
         );
-        if ($hisUser['qq'] != 0) $cur['qq'] = (int)$hisUser['qq'];
-        if (isSuperUser($curUser)) {
-            $cur['real_name'] = $hisUser['real_name'];
+        $isAdmin = isSuperUser($curUser);
+        $isSelf = $hisUser['username'] == $curUser['username'];
+        foreach (UOJConfig::$user as $seg => $data) {
+            if ($data['publish'] === true || $isSelf || $isAdmin) {
+                $cur[$seg] = $hisUser['extra_config'][$seg];
+            }
+        }
+        if ($isAdmin) {
             $cur['register_time'] = $hisUser['register_time'];
             $cur['remote_addr'] = $hisUser['remote_addr'];
             $cur['http_x_forwarded_for'] = $hisUser['http_x_forwarded_for'];

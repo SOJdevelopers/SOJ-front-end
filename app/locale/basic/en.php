@@ -4,6 +4,7 @@ return [
 	'register' => 'Register',
 	'logout' => 'Logout',
 	'my profile' => 'My Profile',
+	'my groups' => 'My Groups',
 	'private message' => 'Private Message',
 	'system message' => 'System Message',
 	'system manage' => 'System Manage',

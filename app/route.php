@@ -51,6 +51,7 @@ Route::group([
 		Route::any('/acranklist', '/ranklist.php?type=ac');
 		Route::any('/acranklist/all', '/ranklist.php?type=ac&all=true');
 		Route::any('/groups', '/ranklist.php?type=group');
+		Route::any('/mygroups', '/ranklist.php?type=mygroup');
 
 		Route::any('/login', '/login.php');
 		Route::any('/logout', '/logout.php');
@@ -79,3 +80,4 @@ Route::post('/judge/sync-judge-client', '/judge/sync_judge_client.php');
 Route::post('/judge/download/submission/{id}/{rand_str_id}', '/judge/download.php?type=submission');
 Route::post('/judge/download/tmp/{rand_str_id}', '/judge/download.php?type=tmp');
 Route::post('/judge/download/problem/{id}', '/judge/download.php?type=problem');
+Route::post('/judge/success/{id}', '/judge/success.php');

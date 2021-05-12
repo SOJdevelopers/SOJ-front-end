@@ -1,6 +1,6 @@
 <?php
 	requirePHPLib('form');
-	requirePHPLib('svn');
+	requirePHPLib('data');
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();

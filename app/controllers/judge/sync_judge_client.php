@@ -1,6 +1,6 @@
 <?php
 	requirePHPLib('judger');
-	requirePHPLib('svn');
+	requirePHPLib('data');
 	
 	if (!authenticateJudger()) {
 		become404Page();

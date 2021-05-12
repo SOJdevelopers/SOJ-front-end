@@ -1,7 +1,7 @@
 <?php
 	requirePHPLib('form');
 	requirePHPLib('judger');
-	requirePHPLib('svn');
+	requirePHPLib('data');
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
@@ -57,18 +57,18 @@
 				move_uploaded_file($_FILES['problem_data_file']['tmp_name'], $up_filename . '.zip');
 				$zip = new ZipArchive();
 				if ($zip->open($up_filename . '.zip') === true) {
-					$svn_data_dir = "/var/svn/problem/{$problem['id']}/cur/{$problem['id']}/1";
-					is_dir($svn_data_dir) or mkdir($svn_data_dir, 0777, true);
+					$data_upload_dir = "/var/uoj_data/upload/{$problem['id']}";
+					is_dir($data_upload_dir) or mkdir($data_upload_dir, 0777, true);
 					$zip->extractTo($up_filename);
 					$zip->close();
 					$all_files = array_values(array_filter(scandir($up_filename), function ($x) {return $x !== '.' && $x !== '..';}));
 					if (is_dir($up_filename . '/' . $all_files[0]) && !isset($all_files[1])) {
-						exec("mv -bt $svn_data_dir $up_filename/{$all_files[0]}/* $up_filename/{$all_files[0]}/.[!.]*");
+						exec("mv -bt $data_upload_dir $up_filename/{$all_files[0]}/* $up_filename/{$all_files[0]}/.[!.]*");
 						rmdir("$up_filename/{$all_files[0]}");
 					} else {
-						exec("mv -bt $svn_data_dir $up_filename/* $up_filename/.[!.]*");
+						exec("mv -bt $data_upload_dir $up_filename/* $up_filename/.[!.]*");
 					}
-					exec("rm $svn_data_dir/*~ -r");
+					exec("rm $data_upload_dir/*~ -r");
 					rmdir($up_filename);
 					unlink($up_filename . '.zip');
 					echo '<script>alert("上传成功！")</script>';
@@ -92,7 +92,7 @@
 		<div class="form-control-static">
 			<row>
 			<button type="button" style="width: 30%" class="btn btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
-			<button type="submit" style="width: 30%" id="button-submit-data" name="submit-data" value="data" class="btn btn-danger">与svn仓库同步</button>
+			<button type="submit" style="width: 30%" id="button-submit-data" name="submit-data" value="data" class="btn btn-danger">完全同步数据</button>
 			</row>
 		</div>
 	</div>
@@ -232,6 +232,7 @@ EOD
 				$info_form->printHTML();
 				echo '<div class="top-buffer-md"></div>';
 
+				/*
 				echo '<table class="table table-bordered table-hover table-striped table-text-center">';
 				echo '<thead>';
 				echo '<tr>';
@@ -252,6 +253,27 @@ EOD
 						echo '<td>', htmlspecialchars($info['val']), ' <span class="glyphicon glyphicon-remove"></span>', '</td>';
 						echo '</tr>';
 					}
+				}
+				echo '</tbody>';
+				echo '</table>';
+				*/
+
+				echo '<table class="table table-bordered table-hover table-striped table-text-center">';
+				echo '<thead>';
+				echo '<tr>';
+				echo '<th>评测机</th>';
+				echo '<th>ip</th>';
+				echo '<th>同步状态</th>';
+				echo '</tr>';
+				echo '</thead>';
+				echo '<tbody>';
+				foreach (DB::selectAll("select * from judger_info") as $judger) {
+					echo '<tr>';
+					echo '<td>', htmlspecialchars($judger["judger_name"]), '</td>';
+					echo '<td>', htmlspecialchars($judger["ip"]), '</td>';
+					$sync = queryJudgerDataNeedUpdate($_GET['id'], $judger["judger_name"]);
+					echo '<td>', ($sync ? '<span class="glyphicon glyphicon-remove"></span>未同步' : '<span class="glyphicon glyphicon-ok"></span>已同步'), '</td>';
+					echo '</tr>';
 				}
 				echo '</tbody>';
 				echo '</table>';
@@ -440,7 +462,7 @@ EOD
 			global $problem;
 			$problem['hackable'] = !$problem['hackable'];
 			set_time_limit(600);
-			$ret = svnSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
+			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
@@ -458,13 +480,13 @@ EOD
 		$data_form->handle = function() {
 			global $problem;
 			set_time_limit(600);
-			$ret = svnSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
+			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
 		};
 		$data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
-		$data_form->submit_button_config['text'] = '与svn仓库同步';
+		$data_form->submit_button_config['text'] = '完全同步数据';
 		$data_form->submit_button_config['smart_confirm'] = '';
 	}
 
@@ -473,21 +495,21 @@ EOD
 		$fast_data_form->handle = function() {
 			global $problem;
 			set_time_limit(600);
-			$ret = svnFastSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
+			$ret = dataFastSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
 			if ($ret) {
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
 		};
 		$fast_data_form->submit_button_config['class_str'] = 'btn btn-success btn-block';
-		$fast_data_form->submit_button_config['text'] = '<sup>new</sup> 快速 (非编译) 同步';
-		$fast_data_form->submit_button_config['confirm_text'] = '你真的要快速同步 (非编译同步) 吗？\nWarning: 快速同步只适用于不改变任何代码的情形，否则请使用完全同步 (与svn仓库同步)。';
+		$fast_data_form->submit_button_config['text'] = '快速同步数据';
+		$fast_data_form->submit_button_config['confirm_text'] = '你真的要快速同步数据吗？\nWarning: 快速同步只适用于不改变任何代码的情形，否则请使用完全同步数据。';
 	}
 
 	if (!$problem['data_locked']) {
 		$clear_data_form = new UOJForm('clear_data');
 		$clear_data_form->handle = function() {
 			global $problem;
-			svnClearProblemData($problem);
+			dataClearProblemData($problem);
 		};
 		$clear_data_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
 		$clear_data_form->submit_button_config['text'] = '清空题目数据';
@@ -578,7 +600,7 @@ EOD
 			$content['config'] = array();
 			foreach ($requirement as $req) {
 				if ($req['type'] == 'source code') {
-					$std_lang = isset($req['std_language']) ? $req['std_language'] : 'C++';
+					$std_lang = isset($req['std_language']) ? $req['std_language'] : 'C++11';
 					$content['config'][] = array("{$req['name']}_language", $std_lang);
 				}
 			}
@@ -623,6 +645,15 @@ EOD
 	else
 		$problem_lock_form->submit_button_config['confirm_text'] = '你真的要解锁题目数据吗？';
 
+	$judger_data_clean_form = new UOJForm('judger_data_clean');
+	$judger_data_clean_form->handle = function() {
+		global $problem;
+		clearJudgerData($problem['id']);
+	};
+	$judger_data_clean_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+	$judger_data_clean_form->submit_button_config['text'] = '清空该题评测机数据';
+	$judger_data_clean_form->submit_button_config['confirm_text'] = '你真的要清空对应的评测机数据吗？';
+
 	if (!$problem['data_locked']) {
 		$hackable_form->runAtServer();
 	}
@@ -635,6 +666,7 @@ EOD
 		$rejudgege97_form->runAtServer();
 	}
 	$problem_lock_form->runAtServer();
+	$judger_data_clean_form->runAtServer();
 	$info_form->runAtServer();
 
 ?>
@@ -731,6 +763,9 @@ EOD
 <?php } ?>
 		<div class="top-buffer-md">
 			<?php $problem_lock_form->printHTML(); ?>
+		</div>
+		<div class="top-buffer-md">
+			<?php $judger_data_clean_form->printHTML(); ?>
 		</div>
 	</div>
 

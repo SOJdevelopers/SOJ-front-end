@@ -3,7 +3,7 @@ return [
 	'profile' => [
 		'oj-name'  => 'Universal Online Judge',
 		'oj-name-short' => 'UOJ',
-		'oj-version' => '6.0',
+		'oj-version' => '6.1',
 		'administrator' => 'root',
 		'admin-email' => 'root@uoj',
 		'qq-group' => '1145141919810',
@@ -53,14 +53,9 @@ return [
 			'password' => 'password233'
 		]
 	],
-	'svn' => [
-		'our-root' => [
-			'username' => 'our-root',
-			'password' => 'our-root'
-		]
-	],
 	'switch' => [
 		'web-analytics' => false,
 		'blog-use-subdomain' => false
-	]
+	],
+	'gravatar' => '//cn.gravatar.com/avatar/',
 ];

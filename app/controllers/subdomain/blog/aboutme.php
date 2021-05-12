@@ -14,7 +14,7 @@
 <?php
 	$hisUser = UOJContext::user();
 
-	$blog_id = $hisUser['about_me'];
+	$blog_id = $hisUser['extra_config']['aboutme'];
 
 	if ($blog_id && ($blog = queryBlog($blog_id))) {
 		echoBlog($blog, array('content_only' => true));

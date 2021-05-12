@@ -1,8 +1,20 @@
 <?php
 	global $uojSupportedLanguages, $uojMainJudgerWorkPath;
-	$uojSupportedLanguages = array('C++', 'Python2.7', 'C++11', 'Python3', 'Java8', 'C', 'Pascal');
-	$uojMainJudgerWorkPath = "/home/local_main_judger/judge_client/uoj_judger";
+	$uojSupportedLanguages = array(
+		'C++98', 'C++11', 'C++14', 'C++17',
+		'C99', 'C11',
+		'Python2', 'Python3',
+		'Java8', 'Java11',
+		'Pascal'
+	);
+	$uojMainJudgerWorkPath = "/opt/judger/uoj_judger";
 	
+	function queryJudgerDataNeedUpdate($problem_id, $judger_name = null) {
+		$esc_judger_name = DB::escape($judger_name === null ? $_POST['judger_name'] : $judger_name);
+		$res = DB::selectFirst("select 1 from judger_data_sync where judger_name='$esc_judger_name' and problem_id=$problem_id");
+		return empty($res);
+	}
+
 	function authenticateJudger() {
 		if (!is_string($_POST['judger_name']) || !is_string($_POST['password'])) {
 			return false;

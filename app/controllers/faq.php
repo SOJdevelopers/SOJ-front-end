@@ -21,11 +21,11 @@
 			<h4>3．<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的测评环境</h4>
 		</header>
 		<p>测评环境是 Ubuntu Linux 14.04 LTS x64。</p>
-		<p>C++ 的编译器是 g++ 4.8.4，编译命令：<code>g++ code.cpp -o code -lm -O2 -DONLINE_JUDGE</code>。如果选择 C++11 会在编译命令后面添加<code>-std=c++11</code>。</p>
-		<p>C 的编译器是 gcc 4.8.4，编译命令：<code>gcc code.c -o code -lm -O2 -DONLINE_JUDGE</code>。</p>
-		<p>Pascal 的编译器是 fpc 2.6.2，编译命令：<code>fpc code.pas -O2</code>。</p>
-		<p>Java8 的 JDK 版本是 jdk-8u152，编译命令：<code>javac code.java</code>。</p>
-		<p>Python 会先编译为优化过的字节码 <samp>.pyo</samp> 文件。支持的 Python 版本分别为 Python 2.7 和 3.4。</p>
+		<p>C++ 的编译器是 g++ 7.5.0，编译命令：<code>g++ code.cpp -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=c++XX</code>。</p>
+		<p>C 的编译器是 gcc 7.5.0，编译命令：<code>gcc code.c -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=cXX</code>。</p>
+		<p>Pascal 的编译器是 fpc 3.0.4，编译命令：<code>fpc code.pas -O2</code>。</p>
+		<p>Java 采用 OpenJDK，Java8 为 1.8.0_282，Java11 为 11.0.10，编译命令：<code>javac code.java</code>。</p>
+		<p>Python 会先编译为优化过的字节码 <samp>.pyo</samp> 文件。支持的 Python 版本分别为 Python 2.7.17 和 3.6.9。</p>
 		<p>评测机效率见 <a href="/blog/502"> 理性理解 Stupid OJ 测评机速度</a>。</p>
 	</section>
 	<section>
@@ -55,7 +55,7 @@
 		<p>其中标绿表示你是成员，标蓝表示你是管理员，不标表示不在组内。</p>
 		<p>用户组是参加组队比赛用的组，<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的 ACM 赛制基于组功能。</p>
 		<p>系统组决定用户的权限，例如登录，看题，参加比赛，管理 OJ 等。</p>
-		<p>如果你<strong style="color: red">看不了题</strong>那是因为你被分到了未分类组，请联系管理员来获得权限。</p>
+		<p>如果你<strong style="color: red">看不了很多题目</strong>那是因为你没在组里，请<del>氪金</del>联系管理员来获得权限。</p>
 	</section>
 	<section>
 		<header>
@@ -84,11 +84,10 @@
 		<header>
 			<h4>10．联系方式</h4>
 		</header>
-		<p>如果你<strong style="color: red">想注册</strong>、想出题、想办比赛、发现了 BUG 或者对网站有什么建议，可以通过下面的方式联系我们：</p>
+		<p>如果你想联系管理员：</p>
 		<ul>
 			<li>私信联系 <?= UOJConfig::$data['profile']['administrator'] ?>。</li>
-			<li>直接在机房里喊一声。</li>			
-			<li>你也可以进 QQ 群水水，群号是 <?= UOJConfig::$data['profile']['qq-group'] ?>，Stupid OJ <em>珂学</em>群。</li>
+			<li>你也可以去SOJ<a href="https://github.com/SOJdevelopers">项目页面</a>看看</li>
 		</ul>
 	</section>
 </article>

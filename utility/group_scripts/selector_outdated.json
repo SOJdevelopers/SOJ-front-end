@@ -1,9 +1,0 @@
-{
-	"author" : "daklqw",
-	"version" : "1.0",
-	"description" : "outdated",
-	"document" : [
-		"参数：无。",
-		"返回值：json，[{\"username\":}]，表示 180 天未登录的用户。"
-	]
-}

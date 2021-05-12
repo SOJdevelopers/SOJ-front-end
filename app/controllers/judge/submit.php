@@ -1,6 +1,6 @@
 <?php
 	requirePHPLib('judger');
-	requirePHPLib('svn');
+	requirePHPLib('data');
 	
 	if (!authenticateJudger()) {
 		become404Page();
@@ -77,13 +77,13 @@
 		$ok = DB::update("update hacks set success = {$result['score']}, details = '$esc_details' where id = {$_POST['id']}");
 		
 		if ($ok) {
-			list($hack_input) = DB::selectFirst("select input from hacks where id = {$_POST['id']}", MYSQL_NUM);
+			list($hack_input) = DB::selectFirst("select input from hacks where id = {$_POST['id']}", MYSQLI_NUM);
 			unlink(UOJContext::storagePath().$hack_input);
 
 			if ($result['score']) {
-				list($problem_id) = DB::selectFirst("select problem_id from hacks where id = {$_POST['id']}", MYSQL_NUM);
+				list($problem_id) = DB::selectFirst("select problem_id from hacks where id = {$_POST['id']}", MYSQLI_NUM);
 				if (validateUploadedFile('hack_input') && validateUploadedFile('std_output')) {
-					svnAddExtraTest(queryProblemBrief($problem_id), $_FILES["hack_input"]["tmp_name"], $_FILES["std_output"]["tmp_name"]);
+					dataAddExtraTest(queryProblemBrief($problem_id), $_FILES["hack_input"]["tmp_name"], $_FILES["std_output"]["tmp_name"]);
 				} else {
 					error_log("hack successfully but received no data. id: {$_POST['id']}");
 				}
@@ -198,8 +198,10 @@
 	
 	$submission['id'] = (int)$submission['id'];
 	$submission['problem_id'] = (int)$submission['problem_id'];
-	$submission['problem_mtime'] = filemtime("/var/uoj_data/{$submission['problem_id']}");
-	$submission['content'] = json_decode($submission['content']);
+	$submission['update_data'] = queryJudgerDataNeedUpdate($submission['problem_id']);
+	$submission['content'] = json_decode($submission['content'], true);
+	$submitter = DB::selectFirst("select submitter from submissions where id=" . $submission['id'])['submitter'];
+	$submission['content']['config'][] = array('submitter', $submitter);
 	
 	if ($hack) {
 		$submission['is_hack'] = "";

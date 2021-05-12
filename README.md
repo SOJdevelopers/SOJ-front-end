@@ -1,85 +1,18 @@
-### update Aug 31 09:00
-```sql
-alter table group_info add group_type char(1);
-update group_info set group_type='N';
-update group_info set group_type='S' where group_name='outdated';
-update group_info set group_type='S' where group_name='site_manager';
-update group_info set group_type='S' where group_name='statement_maintainer';
-update group_info set group_type='S' where group_name='problem_manager';
-update group_info set group_type='S' where group_name='zhzx';
-update group_info set group_type='S' where group_name='zhjc';
-update group_info set group_type='S' where group_name='banned';
+### Stupid Online Judge
+Based on [UOJ-System](https://github.com/UniversalOJ/UOJ-System) and [uoj](https://github.com/vfleaking/uoj)
+
+An online judge for competitive programming.
+
+By Zhenhai High School's OI (Olympiad in Informatics) team.
+
+### For Tencent QQ users
+<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=PbP0VGHE7tquc6Ywg9ONN2zZXPRPivyB&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="Stupid（OJ 粉）丝群" title="Stupid（OJ 粉）丝群"></a>
+
+### Assets
+Scripts, icons, emoticons.
 ```
-
-### update Aug 31 11:04
-```bash
-mv utility/scripts utility/contest_scripts
-```
-
-### update Aug 31 11:09
-```bash
-mkdir utility/group_scripts
-```
-
-### update Sep 8
-```sql
-alter table blogs add latest_comment datetime not null;
-alter table blogs add latest_commenter varchar(20) not null;
-
-# History
-update blogs left join (
-select * from (select id, blog_id, post_time, poster from blogs_comments order by id desc limit 1919810) tmp1 group by blog_id
-) tmp2 on blogs.id = tmp2.blog_id set blogs.latest_comment = tmp2.post_time, blogs.latest_commenter = tmp2.poster;
-
-update blogs set latest_comment = post_time where latest_comment = 0 and is_draft = 0;
-```
-
-### update Oct 8
-```sql
-alter table problems add data_locked tinyint(1);
-```
-
-### update Dec 28
-```sql
-drop index is_hidden on submissions;
-drop index is_hidden on hacks;
-alter table submissions add index contest_id (contest_id, problem_id);
-alter table hacks add index contest_id (contest_id, problem_id);
-alter table submissions drop column is_hidden;
-alter table hacks drop column is_hidden;
-```
-
-### update Dec 28 14:29
-```sql
-CREATE TABLE `contests_visibility` (
-  `contest_id` int(11) NOT NULL,
-  `group_name` varchar(20) NOT NULL,
-  PRIMARY KEY (`contest_id`,`group_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-```
-
-### update Dec 28 18:44
-```sql
-insert ignore into contests_visibility select id contest_id, 'zhjc' group_name from contests;
-```
-
-### update DEC 28 19:19
-please remove "default-group" in .config.php
-
-please create group "default"
-```sql
-update group_info set group_type='S' where group_name='default';
-```
-
-### update DEC 28 19:46
-```sql
-CREATE TABLE `blogs_visibility` (
-  `blog_id` int(11) NOT NULL,
-  `group_name` varchar(20) NOT NULL,
-  PRIMARY KEY (`blog_id`,`group_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-```
-
-```sql
-insert ignore into blogs_visibility select id blog_id, 'zhjc' group_name from blogs;
+git clone -b legacy-v2 https://github.com/mathjax/MathJax.git js/mathjax
+git clone https://github.com/SOJdevelopers/SOJ-fe-assets.git
+mv assets/* ./
+rm -rf assets
 ```

@@ -14,8 +14,11 @@
 				<ul class="list-inline">
 					<li><?= UOJConfig::$data['profile']['oj-name'] ?></li>|<li>version: <?= UOJConfig::$data['profile']['oj-version'] ?></li>
 				</ul>
+				<?php if (UOJConfig::$data['switch']['ICP-license'] === true) { ?>
+				<p> <?= UOJConfig::$data['profile']['ICP-license'] ?> </p>
+				<?php } ?>
 
-				<p>Server time: <?= UOJTime::$time_now_str ?> | <a href="http://github.com/vfleaking/uoj"><?= UOJLocale::get('open source') ?></a></p>
+				<p>Server time: <?= UOJTime::$time_now_str ?> | <a href="https://github.com/SOJdevelopers"><?= UOJLocale::get('open source') ?></a></p>
 			</div>
 <?php endif ?>
 		</div>
