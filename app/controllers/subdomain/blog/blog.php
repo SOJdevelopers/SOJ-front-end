@@ -63,8 +63,8 @@
 		$username = Auth::id();
 		$esc_comment = DB::escape($comment);
 		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$username}', {$blog['id']}, '{$esc_comment}', 0, now(), 0)");
-		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 		$comment_id = DB::insert_id();
+		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$comment_id}");
 		$page = floor($rank / 20) + 1;
@@ -127,8 +127,8 @@
 
 		$username = Auth::id();
 		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$username}', {$blog['id']}, '{$esc_comment}', {$reply_id}, now(), 0)");
-		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 		$comment_id = DB::insert_id();
+		DB::update("update blogs set latest_comment = now(), latest_commenter = '{$username}' where id = {$blog['id']}");
 		
 		$rank = DB::selectCount("select count(*) from blogs_comments where blog_id = {$blog['id']} and reply_id = 0 and id < {$reply_id}");
 		$page = floor($rank / 20) + 1;
