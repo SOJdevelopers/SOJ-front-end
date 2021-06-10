@@ -1258,9 +1258,6 @@ function echoGrouplist($config = array(), $mygroups = false) {
 		$cond = 'group_type = "S"';
 		if ($mygroups) {
 			$cond .= ' and group_name in (select group_name from group_t)';
-			$config['custom_query'] = "select group_name, rating, description, rank from ({$qheader} where ${cond} {$tail}) _2 where group_name in (select group_name from group_t)";
-		} else {
-			$config['custom_query'] = "{$qheader} where ${cond} {$tail}";
 		}
 		echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 
