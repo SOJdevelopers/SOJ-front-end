@@ -51,7 +51,7 @@
 			<h4>7．为什么我看不了题？组是什么？</h4>
 		</header>
 		<p>组是 <?= UOJConfig::$data['profile']['oj-name-short'] ?> 的一个特色，如有雷同，那就雷同吧。</p>
-		<p>SOJ 的权限管理依赖于组，点击<a href="/groups">查看自己所在的组</a></p>
+		<p>SOJ 的权限管理依赖于组，点击<a href="/groups">查看自己所在的组</a>。</p>
 		<p>其中标绿表示你是成员，标蓝表示你是管理员，不标表示不在组内。</p>
 		<p>用户组是参加组队比赛用的组，<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的 ACM 赛制基于组功能。</p>
 		<p>系统组决定用户的权限，例如登录，看题，参加比赛，管理 OJ 等。</p>
