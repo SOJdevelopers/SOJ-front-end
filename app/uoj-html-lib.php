@@ -1265,10 +1265,10 @@ function echoGrouplist($config = array(), $mygroups = false) {
 		echo '<h4>', UOJLocale::get('user groups'), '</h4>';
 		$cond = 'group_type = "N"';
 		if ($mygroups) {
-			$config['custom_query'] = "select group_name, rating, description, rank from ({$qheader} where ${cond} {$tail}) _2 where group_name in (select group_name from group_t)";
+			$config['custom_query'] = "select group_name, rating, description, rank from ({$qheader} where {$cond} {$tail}) _2 where group_name in (select group_name from group_t)";
 			$cond .= ' and group_name in (select group_name from group_t)';
 		} else {
-			$config['custom_query'] = "{$qheader} where ${cond} {$tail}";
+			$config['custom_query'] = "select group_name, rating, description, rank from ({$qheader} where {$cond} {$tail}) _2";
 		}
 		echoLongTable($col_names, 'group_info', $cond, $tail, $header_row, $print_row, $config);
 	}
