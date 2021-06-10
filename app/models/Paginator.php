@@ -16,7 +16,7 @@ class Paginator {
 			$this->cur_start = 0;
 			$this->table = $config['data'];
 		} elseif (!isset($config['echo_full'])) {
-			if ($config['custom_query_count']) {
+			if (isset($config['custom_query_count'])) {
 				$this->n_rows = DB::selectCount($config['custom_query_count']);
 			} else {
 				$this->n_rows = DB::selectCount("select count(*) from {$config['table_name']} where {$config['cond']}");
@@ -34,7 +34,7 @@ class Paginator {
 			}
 			$this->cur_start = ($this->cur_page - 1) * $this->page_len;
 
-			if ($config['custom_query']) {
+			if (isset($config['custom_query'])) {
 				$this->table = DB::selectAll("{$config['custom_query']} limit {$this->cur_start}, {$this->page_len}");
 			} else {
 				$this->table = DB::selectAll("select " . join($config['col_names'], ',') . " from {$config['table_name']} where {$config['cond']} {$config['tail']} limit {$this->cur_start}, {$this->page_len}");
@@ -43,7 +43,7 @@ class Paginator {
 			$this->n_pages = 1;
 			$this->cur_page = 1;
 			$this->cur_start = ($this->cur_page - 1) * $this->page_len;
-			if ($config['custom_query']) {
+			if (isset($config['custom_query'])) {
 				$this->table = DB::selectAll($config['custom_query']);
 			} else {
 				$this->table = DB::selectAll("select ".join($config['col_names'], ',')." from {$config['table_name']} where {$config['cond']} {$config['tail']}");
