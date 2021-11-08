@@ -1,6 +1,5 @@
 /app/.config.php
 /app/.userinfo.php
-/js/mathjax
 /app/storage/*
 /uploads/*
 /utility

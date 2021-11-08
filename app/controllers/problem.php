@@ -173,8 +173,8 @@
 	$estimate_config = array();
 	if ($is_in_contest) {
 		$estimate_config['default'] = Cookie::get("estimate_{$problem['id']}");
-		if (!isset($estimate_config['default'])) $estimate_config['default'] = 0;
 		$estimate_config['max'] = isset($contest['extra_config']["full_score_{$problem['id']}"]) ? $contest['extra_config']["full_score_{$problem['id']}"] : 100;
+		if (!isset($estimate_config['default'])) $estimate_config['default'] = $estimate_config['max'];
 	}
 
 	if ($can_use_zip_upload) {

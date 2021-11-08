@@ -11,8 +11,7 @@ By Zhenhai High School's OI (Olympiad in Informatics) team.
 ### Assets
 Scripts, icons, emoticons.
 ```
-git clone -b legacy-v2 https://github.com/mathjax/MathJax.git js/mathjax
-git clone https://github.com/SOJdevelopers/SOJ-fe-assets.git
+git clone https://github.com/SOJdevelopers/SOJ-fe-assets.git assets
 mv assets/* ./
 rm -rf assets
 ```
