@@ -233,7 +233,7 @@
 <p><?= UOJLocale::get('at tip') ?></p>
 <p><?= UOJLocale::get('emoticon tip') ?></p>
 <?php
-	if (isBlogAllowedUser(Auth::user()) {
+	if (isBlogAllowedUser(Auth::user())) {
 		$comment_form->printHTML();
 	}
 ?>
