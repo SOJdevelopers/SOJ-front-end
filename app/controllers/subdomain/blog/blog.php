@@ -124,6 +124,10 @@
 		$comment = HTML::escape($_POST['reply_comment']);
 		
 		list($comment, $referrers) = uojHandleSign($comment);
+
+		if (!isBlogAllowedUser(Auth::user())) {
+			die('permission denied');
+		}
 		
 		$reply_id = $_POST['reply_id'];
 		
@@ -239,7 +243,11 @@
 ?>
 
 <div id="div-form-reply" style="display: none">
-<?php $reply_form->printHTML() ?>
+<?php
+	if (isBlogAllowedUser(Auth::user())) {
+		$reply_form->printHTML();
+	}
+?>
 </div>
 
 <?php echoUOJPageFooter() ?>
