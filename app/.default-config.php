@@ -10,6 +10,7 @@ return [
 		'ICP-license' => '',
 		'default-group' => 'default',
 		'common-group' => 'zhjc',
+		'blog-allowed-groups' => ['default'],
 	],
 	'database' => [
 		'database'  => 'uoj',
