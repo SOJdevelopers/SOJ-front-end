@@ -60,6 +60,10 @@
 		
 		list($comment, $referrers) = uojHandleSign($comment);
 		
+		if (!isBlogAllowedUser(Auth::user())) {
+			die('permission denied');
+		}
+
 		$username = Auth::id();
 		$esc_comment = DB::escape($comment);
 		DB::insert("insert into blogs_comments (poster, blog_id, content, reply_id, post_time, zan) values ('{$username}', {$blog['id']}, '{$esc_comment}', 0, now(), 0)");
@@ -228,7 +232,11 @@
 <h3><?= UOJLocale::get('post comment') ?></h3>
 <p><?= UOJLocale::get('at tip') ?></p>
 <p><?= UOJLocale::get('emoticon tip') ?></p>
-<?php $comment_form->printHTML() ?>
+<?php
+	if (isBlogAllowedUser(Auth::user()) {
+		$comment_form->printHTML();
+	}
+?>
 
 <div id="div-form-reply" style="display: none">
 <?php $reply_form->printHTML() ?>

@@ -33,6 +33,14 @@ function isCommonUser($user) {
 	return isSuperUser($user) or isGroupMember($user, array('group_name' => UOJConfig::$data['profile']['common-group']));
 }
 
+function isBlogAllowedUser($user) {
+	if (isSuperUser($user)) return true;
+	foreach (UOJConfig::$data['profile']['blog-allowed-groups'] as $group)
+		if (isGroupMember($user, array('group_name' => $group)))
+			return true;
+	return false;
+}
+
 function selectUsersByScript($selector = 'default', $args) {
 	$script = 'selector_' . $selector;
 	$file = UOJContext::documentRoot() . '/utility/group_scripts/' . $script . '.php';

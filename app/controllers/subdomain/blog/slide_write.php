@@ -5,6 +5,10 @@
 		become403Page();
 	}
 
+	if (!isBlogAllowedUser(Auth::user())) {
+		become403Page();
+	}
+
 	if (isset($_GET['id'])) {
 		if (!validateUInt($_GET['id']) || !($blog = queryBlog($_GET['id'])) || !UOJContext::isHisSlide($blog)) {
 			become404Page();
