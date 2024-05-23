@@ -14,7 +14,7 @@ function crsf_token() {
 	if (!isset($_SESSION['_token'])) {
 		$_SESSION['_token'] = uojRandString(60);
 		$_SESSION['_remote_addr'] = UOJContext::remoteAddr();
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $_SESSION['_http_x_forearded_for']=$_SERVER['HTTP_X_FORWARDED_FOR'];
+		if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $_SESSION['_x_forwarded_for'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
 	}
 	return $_SESSION['_token'];
 }
