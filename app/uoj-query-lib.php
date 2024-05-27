@@ -161,7 +161,7 @@ function isProblemVisible($user, $problem, $contest = null) {
 		return true;
 	} elseif (!$contest) {
 		return false;
-	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS) {
+	} elseif ($contest['cur_progress'] > CONTEST_IN_PROGRESS and checkContestGroup($user, $contest)) {
 		return true;
 	} elseif (hasContestPermission($user, $contest)) {
 		return true;
