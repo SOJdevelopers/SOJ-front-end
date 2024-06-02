@@ -1,0 +1,8 @@
+app/.config.php
+app/.config.php.bak
+app/.userinfo.php
+app/storage/*
+uploads/*
+utility/
+pictures/
+js/mathjax/
