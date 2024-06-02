@@ -1,6 +1,6 @@
-/app/.config.php
-/app/.userinfo.php
-/app/storage/*
-/uploads/*
-/utility
-/pictures
+app/.config.php
+app/.userinfo.php
+app/storage/*
+uploads/*
+utility/
+pictures/
