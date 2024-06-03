@@ -10,6 +10,7 @@ return [
 	'ac ratio' => 'AC 率',
 	'show tags' => '显示标签',
 	'show statistics' => '显示提交情况',
+	'search contents' => '搜索题目内容',
 	'statement' => '描述',
 	'custom test' => '自定义测试',
 	'manage' => '管理',
