@@ -292,7 +292,7 @@
 							}
 						}
 
-						$this->requirement[] = array('name' => 'answer', 'type' => 'source code', 'file_name' => 'answer.code', 'std_language' => 'C++11');
+						$this->requirement[] = array('name' => 'answer', 'type' => 'source code', 'file_name' => 'answer.code', 'std_language' => 'C++14');
 					}
 				} else {
 					if ($this->permission_level !== true) {
@@ -303,7 +303,7 @@
 						}
 						$this->makefile_at_prepare();
 						
-						$this->requirement[] = array('name' => 'answer', 'type' => 'source code', 'file_name' => 'answer.code', 'std_language' => 'C++11');
+						$this->requirement[] = array('name' => 'answer', 'type' => 'source code', 'file_name' => 'answer.code', 'std_language' => 'C++14');
 					}
 				}
 				putUOJConf("{$this->prepare_dir}/problem.conf", $this->final_problem_conf);
