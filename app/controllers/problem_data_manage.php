@@ -536,6 +536,16 @@ EOD
 		$rejudgege97_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
 		$rejudgege97_form->submit_button_config['text'] = '重测不低于 97 分的程序';
 		$rejudgege97_form->submit_button_config['smart_confirm'] = '';
+		
+		$rejudgeac_form = new UOJForm('rejudgeac');
+		$rejudgeac_form->handle = function() {
+			global $problem;
+			rejudgeProblemAC($problem);
+		};
+		$rejudgeac_form->succ_href = "/submissions?problem_id={$problem['id']}";
+		$rejudgeac_form->submit_button_config['class_str'] = 'btn btn-danger btn-block';
+		$rejudgeac_form->submit_button_config['text'] = '重测通过的程序';
+		$rejudgeac_form->submit_button_config['smart_confirm'] = '';
 	}
 
 	$view_type_form = new UOJForm('view_type');
@@ -664,6 +674,7 @@ EOD
 		$clear_data_form->runAtServer();
 		$rejudge_form->runAtServer();
 		$rejudgege97_form->runAtServer();
+		$rejudgeac_form->runAtServer();
 	}
 	$problem_lock_form->runAtServer();
 	$judger_data_clean_form->runAtServer();
@@ -756,6 +767,9 @@ EOD
 		</div>
 		<div class="top-buffer-md">
 			<?php $rejudgege97_form->printHTML(); ?>
+		</div>
+		<div class="top-buffer-md">
+			<?php $rejudgeac_form->printHTML(); ?>
 		</div>
 		<div class="top-buffer-md">
 			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
