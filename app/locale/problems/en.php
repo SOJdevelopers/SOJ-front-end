@@ -11,6 +11,7 @@ return [
 	'ac ratio' => 'AC Rate',
 	'show tags' => 'Show tags',
 	'show statistics' => 'Show statistics',
+	'search contents' => 'Search by content',
 	'statement' => 'Statement',
 	'custom test' => 'Custom Test',
 	'manage' => 'Manage',
