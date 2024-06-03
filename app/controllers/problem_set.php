@@ -85,7 +85,10 @@ EOD;
 
 	if (isset($_GET['search'])) {
 		$esc_search = DB::escape($_GET['search']);
-     	$cond[] = "(title like '%{$esc_search}%' or id like '%{$esc_search}%' or exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag like '%{$esc_search}%'))";
+		$cond[] = "(title like '%{$esc_search}%' or id like '%{$esc_search}%' or ".
+			"exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag like '%{$esc_search}%')".
+			((isset($_GET['content']) ? $_GET['content']=='true' : isset($_COOKIE['search_contents_mode']))
+			?" or exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md like '%{$esc_search}%')":'').')';
 	}
 
 	if ($cond) {
@@ -138,6 +141,7 @@ EOD;
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 	</div>
 	<div class="col-sm-4 col-sm-push-4 checkbox text-right">
+		<label class="checkbox-inline" for="input-search_contents_mode"><input type="checkbox" id="input-search_contents_mode" <?= isset($_COOKIE['search_contents_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::search contents') ?></label>
 		<label class="checkbox-inline" for="input-show_tags_mode"><input type="checkbox" id="input-show_tags_mode" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show tags') ?></label>
 		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
 	</div>
@@ -162,6 +166,13 @@ EOD;
 ?>
 <div class="top-buffer-sm"></div>
 <script type="text/javascript">
+$('#input-search_contents_mode').click(function() {
+	if (this.checked) {
+		$.cookie('search_contents_mode', '', {path: '/problems'});
+	} else {
+		$.removeCookie('search_contents_mode', {path: '/problems'});
+	}
+});
 $('#input-show_tags_mode').click(function() {
 	if (this.checked) {
 		$.cookie('show_tags_mode', '', {path: '/problems'});
