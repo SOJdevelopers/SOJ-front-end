@@ -681,13 +681,13 @@ $.fn.long_table = function(data, cur_page, header_row, get_row_str, config) {
 
 // code mirror
 function require_codemirror(config, callback) {
-	if ($('link[href="/js/codemirror/lib/codemirror.css' + '"]').length == 0) {
-		$('<link type="text/css" rel="stylesheet" href="/js/codemirror/lib/codemirror.css' + '" />').appendTo('head');
+	if ($('link[href="' + uojHome + '/js/codemirror/lib/codemirror.css' + '"]').length == 0) {
+		$('<link type="text/css" rel="stylesheet" href="' + uojHome + '/js/codemirror/lib/codemirror.css' + '" />').appendTo('head');
 	}
-	$LAB.script('/js/codemirror/lib/codemirror.js')
+	$LAB.script(uojHome + '/js/codemirror/lib/codemirror.js')
 		.wait()
-		.script('/js/codemirror/addon/mode/overlay.js')
-		.script('/js/codemirror/addon/selection/active-line.js')
+		.script(uojHome + '/js/codemirror/addon/mode/overlay.js')
+		.script(uojHome + '/js/codemirror/addon/selection/active-line.js')
 		.wait(callback)
 }
 
@@ -731,7 +731,7 @@ function require_codemirror_mode(mode, callback) {
 			break;
 	}
 	if (name !== 'none') {
-		$LAB.script('/js/codemirror/mode/' + name + '/' + name + '.js')
+		$LAB.script(uojHome + '/js/codemirror/mode/' + name + '/' + name + '.js')
 			.wait(callback);
 	} else {
 		setTimeout(callback, 0);

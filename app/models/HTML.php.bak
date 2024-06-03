@@ -45,9 +45,9 @@ class HTML {
 	public static function blog_url($username, $uri) {
 		$port = UOJConfig::$data['web']['blog']['port'] == 80 ? '' : (':'.UOJConfig::$data['web']['blog']['port']);
 		if (UOJConfig::$data['switch']['blog-use-subdomain'])
-			$url = blog_name_encode($username).'.'.UOJConfig::$data['web']['blog']['host'].$port;
+			$url = UOJConfig::$data['web']['blog']['protocol'].'://'.blog_name_encode($username).'.'.UOJConfig::$data['web']['blog']['host'].$port;
 		else
-			$url = $port.'/blogof/'.blog_name_encode($username);
+			$url = UOJConfig::$data['web']['blog']['protocol'].'://'.UOJConfig::$data['web']['blog']['host'].$port.'/blogof/'.blog_name_encode($username);
 		$url .= $uri;
 		$url = rtrim($url, '/');
 		return HTML::escape($url);
@@ -67,8 +67,8 @@ class HTML {
 			$param = array_merge($param, $config['params']);
 		}
 		
-		//$url = UOJConfig::$data['web'][$config['location']]['protocol'].'://'.UOJConfig::$data['web'][$config['location']]['host'];
-		$url = '';
+		$url = UOJConfig::$data['web'][$config['location']]['protocol'].'://'.UOJConfig::$data['web'][$config['location']]['host'];
+		//$url = '';
 		if (UOJConfig::$data['web'][$config['location']]['port'] != 80) {
 			$url .= ':' . UOJConfig::$data['web'][$config['location']]['port'];
 		}
@@ -77,7 +77,6 @@ class HTML {
 		} else {
 			$url .= rtrim($path, '/');
 		}
-		if($url=='') $url='/';
 		return HTML::escape($url);
 	}
 	public static function timeanddate_url($time, $config = array()) {

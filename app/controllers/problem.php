@@ -46,7 +46,7 @@
 				}
 				DB::update("update contests_registrants set has_participated = 1 where username = '{$agent}' and contest_id = {$contest['id']}");
 			} elseif (!isProblemVisible(Auth::user(), $problem, $contest)) {
-    				become404Page();
+				become404Page();
 			} else {
 				$ban_in_contest = !$is_visible;
 			}

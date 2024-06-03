@@ -268,7 +268,7 @@ EOD;
 					},
 					success : function (data) {
 						for (var f of data) {
-							entries.push([f[0], dir + '/' + f[0], uojHome + '/' + dir + '/' + f[0], f[1]]);
+							entries.push([f[0], dir + '/' + f[0], '/' + dir + '/' + f[0], f[1]]);
 						}
 					}
 				});
