@@ -203,7 +203,7 @@
 		<div class="media<?= $comment['zan'] < -10 ? ' comttoobad' : ($comment['zan'] < -5 ? ' comtbad' : '') ?>">
 			<div class="media-left comtposterbox">
 				<a href="<?= HTML::url('/user/profile/'.$poster['username']) ?>" class="hidden-xs">
-					<img class="media-object img-rounded" src="<?= $asrc ?>" alt="avatar" />
+					<img class="media-object img-rounded" src="<?= $asrc ?>" alt="avatar" width="80" height="80"/>
 				</a>
 			</div>
 			<div id="comment-body-<?= $comment['id'] ?>" class="media-body comtbox">
