@@ -154,7 +154,7 @@ return [
 	'sticky 3' => 'Level 3 sticky',
 	'at tip' => 'You can use "@mike" to refer to mike, and "mike" will be highlighted. If you really wants to type the character "@", please use "@@".',
 	'emoticon tip' => 'Want to use emoticons? Here is the <a href="/blog/791">emoticon guide</a>.',
-	'open source' => 'UOJ on Github',
+	'open source' => 'SOJ OpenSource Project on Github',
 	'system groups' => 'System Groups',
 	'user groups' => 'User Groups',
 	'latest comment' => 'Latest comment'

@@ -471,7 +471,7 @@ EOD
 			DB::update("update problems set hackable = $hackable where id = {$problem['id']}");
 		};
 		$hackable_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
-		$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用hack' : '允许使用hack';
+		$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用 hack' : '允许使用 hack';
 		$hackable_form->submit_button_config['smart_confirm'] = '';
 	}
 
