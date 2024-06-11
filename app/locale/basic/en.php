@@ -152,9 +152,9 @@ return [
 	'sticky 1' => 'Level 1 sticky',
 	'sticky 2' => 'Level 2 sticky',
 	'sticky 3' => 'Level 3 sticky',
-	'at tip' => 'You can use "@mike" to refer to mike, and "mike" will be highlighted. If you really wants to type the character "@", please use "@@".',
+	'at tip' => 'You can use "@mike" to refer to mike, and "mike" will be highlighted. If you really want to type the character "@", please use "@@".',
 	'emoticon tip' => 'Want to use emoticons? Here is the <a href="/blog/791">emoticon guide</a>.',
-	'open source' => 'SOJ OpenSource Project on Github',
+	'open source' => 'OpenSource Project',
 	'system groups' => 'System Groups',
 	'user groups' => 'User Groups',
 	'latest comment' => 'Latest comment'
