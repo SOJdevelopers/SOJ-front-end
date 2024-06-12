@@ -36,6 +36,7 @@ return [
 	'submit' => 'Submit',
 	'browse' => 'Browse',
 	'score range' => 'Score range',
+	'judger info' => 'Judger Info',
 	'details' => 'Details',
 	'hours' => function($h) {
 		return $h . ($h <= 1 ? ' hour' : ' hours');

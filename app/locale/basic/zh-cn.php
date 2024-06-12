@@ -36,6 +36,7 @@ return [
 	'submit' => '提交',
 	'browse' => '浏览',
 	'score range' => '分数范围',
+	'judger info' => '评测机信息',
 	'details' => '详细',
 	'hours' => function($h) {
 		return "$h 小时";
