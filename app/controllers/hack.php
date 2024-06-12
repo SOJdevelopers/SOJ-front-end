@@ -41,7 +41,8 @@
 		$delete_form->succ_href = '/hacks';
 		$delete_form->runAtServer();
 	}
-	
+
+	$should_show_judger_info = hasViewJudgerInfoPermission(Auth::user());
 	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], Auth::user(), $problem, $submission);
 	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], Auth::user(), $problem, $submission);
 	$should_show_details = hasViewPermission($problem_extra_config['view_details_type'], Auth::user(), $problem, $submission);
@@ -64,6 +65,18 @@
 <?php echoUOJPageHeader(UOJLocale::get('problems::hack').' #'.$hack['id']) ?>
 
 <?php echoHackListOnlyOne($hack, array(), Auth::user()) ?>
+
+<?php if ($should_show_judger_info) { ?>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title"><?= UOJLocale::get('judger info') ?></h4>
+		</div>
+		<div class="panel-body">
+			<?php echoJudgerInfo($hack['judger_name']) ?>
+		</div>
+	</div>
+<?php } ?>
+
 <?php if ($should_show_all_details) { ?>
 	<div class="panel panel-info">
 		<div class="panel-heading">

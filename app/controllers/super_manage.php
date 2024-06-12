@@ -483,6 +483,10 @@ function showCustomTests() {
 		echo '<dd>', $submission['submitter'], '</dd>';
 		echo '<dt>judge_time</dt>';
 		echo '<dd>', $submission['judge_time'], '</dd>';
+		if ($submission['judger_name'] != '') {
+			echo '<dt>judger_name</dt>';
+			echo '<dd>', $submission['judger_name'], '</dd>';
+		}
 		echo '</dl>';
 		echoSubmissionContent($submission, getProblemCustomTestRequirement($problem));
 		echoCustomTestSubmissionDetails($submission_result['details'], "submission-{$submission['id']}-details");

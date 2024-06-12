@@ -249,6 +249,14 @@ function getSubmissionStatusDetails($submission) {
 	return $html;
 }
 
+function echoJudgerInfo($judger_name) {
+	if($judger_name == ''){
+		echo "未知";
+		return;
+	}
+	echo "评测机名称：" . $judger_name;
+}
+
 function echoSubmission($submission, $config, $user) {
 	$limitLevel = querySubmissionDetailPermission($user, $submission);
 	$problem = queryProblemBrief($submission['problem_id']);
