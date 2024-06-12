@@ -400,7 +400,7 @@ function showSubmissions() {
 				return 'ID不合法';
 			}
 			if (!queryContest($x)) {
-				return '博客不存在';
+				return '比赛不存在';
 			}
 			return '';
 		},
