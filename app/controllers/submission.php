@@ -151,7 +151,7 @@
 			<h4 class="panel-title"><?= UOJLocale::get('judger info') ?></h4>
 		</div>
 		<div class="panel-body">
-			<?php echo "评测机名称：" . $submission['judger_name'] ?>
+			<?php echoJudgerInfo($submission['judger_name']) ?>
 		</div>
 	</div>
 <?php } ?>
