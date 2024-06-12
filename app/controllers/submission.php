@@ -95,6 +95,7 @@
 		$delete_form->runAtServer();
 	}
 	
+	$should_show_judger_info = hasViewJudgerInfoPermission(Auth::user());
 	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], Auth::user(), $problem, $submission);
 	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], Auth::user(), $problem, $submission);
 	$should_show_details = hasViewPermission($problem_extra_config['view_details_type'], Auth::user(), $problem, $submission);
@@ -142,6 +143,17 @@
 			});
 		</script>
 	<?php } ?>
+<?php } ?>
+
+<?php if ($should_show_judger_info) { ?>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title"><?= UOJLocale::get('judger info') ?></h4>
+		</div>
+		<div class="panel-body">
+			<?php echo "评测机名称：" . $submission['judger_name'] ?>
+		</div>
+	</div>
 <?php } ?>
 
 <?php if ($should_show_all_details) { ?>
