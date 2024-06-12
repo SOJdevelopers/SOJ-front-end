@@ -132,7 +132,7 @@
 		global $submission;
 		$submission = DB::selectFirst("select id, problem_id, content from custom_test_submissions where judge_time is null order by id limit 1");
 		if ($submission) {
-			DB::update("update custom_test_submissions set judge_time = now(), status = 'Judging' where id = {$submission['id']} and judge_time is null");
+			DB::update("update custom_test_submissions set judge_time = now(), judger_name = '" . DB::escape($_POST['judger_name']). "', status = 'Judging' where id = {$submission['id']} and judge_time is null");
 			if (DB::affected_rows() != 1) {
 				$submission = null;
 			}
@@ -145,7 +145,7 @@
 		global $hack;
 		$hack = DB::selectFirst("select id, submission_id, input, input_type from hacks where judge_time is null order by id limit 1");
 		if ($hack) {
-			DB::update("update hacks set judge_time = now() where id = {$hack['id']} and judge_time is null");
+			DB::update("update hacks set judge_time = now(), judger_name = '" . DB::escape($_POST['judger_name']). "' where id = {$hack['id']} and judge_time is null");
 			if (DB::affected_rows() != 1) {
 				$hack = null;
 			}
@@ -153,7 +153,7 @@
 	}
 	function findSubmissionToJudge() {
 		global $submission, $hack;
-		querySubmissionToJudge('Waiting', "judge_time = now(), status = 'Judging'");
+		querySubmissionToJudge('Waiting', "judge_time = now(), judger_name = '" . DB::escape($_POST['judger_name']). "', status = 'Judging'");
 		if ($submission) {
 			return true;
 		}
@@ -163,7 +163,7 @@
 			return true;
 		}
 		
-		querySubmissionToJudge('Waiting Rejudge', "judge_time = now(), status = 'Judging'");
+		querySubmissionToJudge('Waiting Rejudge', "judge_time = now(), judger_name = '" . DB::escape($_POST['judger_name']). "', status = 'Judging'");
 		if ($submission) {
 			return true;
 		}
