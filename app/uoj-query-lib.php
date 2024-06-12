@@ -25,6 +25,10 @@ function hasContestPermission($user, $contest) {
 	return $user != null && (isSuperUser($user) || DB::selectFirst("select * from contests_permissions where username = '{$user['username']}' and contest_id = {$contest['id']}"));
 }
 
+function hasViewJudgerInfoPermission($user) {
+	return $user != null && (isSuperUser($user));
+}
+
 function hasRegistered($user, $contest) {
 	return DB::selectFirst("select * from contests_registrants where username = '{$user['username']}' and contest_id = {$contest['id']}");
 }
