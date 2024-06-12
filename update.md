@@ -129,3 +129,13 @@ update submissions set language="Python2" where language="Python2.7";
 ```sql
 alter table problems change zan zan int(11) not null default 0;
 ```
+
+# 2024
+
+### update JUN 12 16:00
+
+```sql
+alter table submissions add column judger_name varchar(50) not null default '' after judge_time;
+alter table custom_test_submissions add column judger_name varchar(50) not null default '' after judge_time;
+alter table hacks add column judger_name varchar(50) not null default '' after judge_time;
+```
