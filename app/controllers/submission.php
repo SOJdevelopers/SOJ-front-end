@@ -10,7 +10,7 @@
 		become404Page();
 	}
 
-	if (isset($_GET['judgement_id']) {
+	if (isset($_GET['judgement_id'])) {
 		if (!validateUInt($_GET['judgement_id']) || !($judgement = queryJudgement($_GET['judgement_id'])) || !($judgement['submission_id'] == $submission['id'])) {
 			become404Page();
 		}
