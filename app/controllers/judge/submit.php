@@ -7,7 +7,7 @@
 	}
 	
 	function submissionJudged() {
-		$submission = DB::selectFirst("select submitter, status, content, result, problem_id from submissions where id = {$_POST['id']}");
+		$submission = DB::selectFirst("select id, problem_id, submitter, content, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details from submissions where id = {$_POST['id']}");
 		if ($submission == null) {
 			return;
 		}
