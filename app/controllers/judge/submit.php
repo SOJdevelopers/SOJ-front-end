@@ -173,7 +173,7 @@
 			return true;
 		}
 		
-		querySubmissionToJudge('Judged, Waiting', "status = 'Judged, Judging'");
+		querySubmissionToJudge('Judged, Waiting', "judger_name = '" . DB::escape($_POST['judger_name']). "', status = 'Judged, Judging'");
 		if ($submission) {
 			return true;
 		}
