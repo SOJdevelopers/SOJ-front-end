@@ -111,7 +111,7 @@
 					}
 					if ($need_rejudge) {
 						$esc_content = DB::escape(json_encode($content));
-						DB::update("update submissions set judge_time = NULL, judger_name = '', result = '', score = NULL, status = 'Waiting Rejudge', content = '$esc_content' where id = {$submission['id']}");
+						DB::update("update submissions set active_version_id = NULL, judge_time = NULL, judger_name = '', result = '', score = NULL, status = 'Waiting Rejudge', content = '$esc_content' where id = {$submission['id']}");
 					}
 				}
 				DB::update("update contests set status = 'testing' where id = {$contest['id']}");

@@ -139,3 +139,28 @@ alter table submissions add column judger_name varchar(50) not null default '' a
 alter table custom_test_submissions add column judger_name varchar(50) not null default '' after judge_time;
 alter table hacks add column judger_name varchar(50) not null default '' after judge_time;
 ```
+
+### update JUN 13 10:00
+
+```sql
+CREATE TABLE `submissions_history` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `submission_id` int(10) unsigned NOT NULL,
+  `judge_time` datetime DEFAULT NULL,
+  `judger_name` varchar(50) NOT NULL DEFAULT '',
+  `result` mediumblob NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `result_error` varchar(20) DEFAULT NULL,
+  `score` int(11) DEFAULT NULL,
+  `used_time` int(11) NOT NULL DEFAULT '0',
+  `used_memory` int(11) NOT NULL DEFAULT '0',
+  `status_details` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `submission` (`submission_id`,`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+alter table submissions add column contest_final_version_id int(10) unsigned default NULL after contest_id;
+alter table submissions add column active_version_id int(10) unsigned default NULL after contest_id;
+insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details) select id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details from submissions where status="Judged" order by judge_time asc;
+update submissions inner join submissions_history on submissions.id = submissions_history.submission_id set submissions.active_version_id = submissions_history.id;
+```
