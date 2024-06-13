@@ -26,16 +26,21 @@
 			$content['config'] = $content['first_test_config'];
 			unset($content['first_test_config']);
 			$esc_content = DB::escape(json_encode($content));
-			
-			DB::update("update submissions set status = 'Judged', result = '$esc_result', content = '$esc_content' where id = {$_POST['id']}");
+			DB::update("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details) values ({$submissions['id']}, {$submissions['judge_time']}, {$submissions['judger_name']}, '$esc_result', 'Judged', {$submissions['result_error']}, {$submissions['score']}, {$submissions['used_time']}, {$submissions['used_memory']}, {$submissions['status_details']})");
+			$history_id = DB::insert_id();
+			DB::update("update submissions set active_version_id = $history_id, status = 'Judged', result = '$esc_result', content = '$esc_content' where id = {$_POST['id']}");
 		} else {
 			$result = json_decode($_POST['result'], true);
 			$result['details'] = uojTextEncode($result['details']);
 			$esc_result = DB::escape(json_encode($result, JSON_UNESCAPED_UNICODE));
 			if (isset($result["error"])) {
-				DB::update("update submissions set status = '{$result['status']}', result_error = '{$result['error']}', result = '$esc_result', score = null, used_time = null, used_memory = null where id = {$_POST['id']}");
+				DB::update("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details) values ({$submissions['id']}, {$submissions['judge_time']}, {$submissions['judger_name']}, '$esc_result', '{$result['status']}', '{$result['error']}', null, null, null, {$submissions['status_details']})");
+				$history_id = DB::insert_id();
+				DB::update("update submissions set active_version_id = $history_id, status = '{$result['status']}', result_error = '{$result['error']}', result = '$esc_result', score = null, used_time = null, used_memory = null where id = {$_POST['id']}");
 			} else {
-				DB::update("update submissions set status = '{$result['status']}', result_error = null, result = '$esc_result', score = {$result['score']}, used_time = {$result['time']}, used_memory = {$result['memory']} where id = {$_POST['id']}");
+				DB::update("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory, status_details) values ({$submissions['id']}, {$submissions['judge_time']}, {$submissions['judger_name']}, '$esc_result', '{$result['status']}', null, {$result['score']}, {$result['time']}, {$result['memory']}, {$submissions['status_details']})");
+				$history_id = DB::insert_id();
+				DB::update("update submissions set active_version_id = $history_id, status = '{$result['status']}', result_error = null, result = '$esc_result', score = {$result['score']}, used_time = {$result['time']}, used_memory = {$result['memory']} where id = {$_POST['id']}");
 			}
 			
 			if (isset($content['final_test_config'])) {
