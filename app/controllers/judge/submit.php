@@ -34,9 +34,9 @@
 			$result['details'] = uojTextEncode($result['details']);
 			$esc_result = DB::escape(json_encode($result, JSON_UNESCAPED_UNICODE));
 			if (isset($result["error"])) {
-				DB::insert("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory) values ({$submission['id']}, '{$submission['judge_time']}', '{$submission['judger_name']}', '$esc_result', '{$result['status']}', '{$result['error']}', null, null, null)");
+				DB::insert("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error) values ({$submission['id']}, '{$submission['judge_time']}', '{$submission['judger_name']}', '$esc_result', '{$result['status']}', '{$result['error']}')");
 				$history_id = DB::insert_id();
-				DB::update("update submissions set active_version_id = $history_id, status = '{$result['status']}', result_error = '{$result['error']}', result = '$esc_result', score = null, used_time = null, used_memory = null where id = {$_POST['id']}");
+				DB::update("update submissions set active_version_id = $history_id, status = '{$result['status']}', result_error = '{$result['error']}', result = '$esc_result', score = DEFAULT, used_time = DEFAULT, used_memory = DEFAULT where id = {$_POST['id']}");
 			} else {
 				DB::insert("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory) values ({$submission['id']}, '{$submission['judge_time']}', '{$submission['judger_name']}', '$esc_result', '{$result['status']}', null, {$result['score']}, {$result['time']}, {$result['memory']})");
 				$history_id = DB::insert_id();
