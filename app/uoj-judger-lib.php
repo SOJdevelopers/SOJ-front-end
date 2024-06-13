@@ -167,16 +167,16 @@
 	}
 	
 	function rejudgeProblem($problem) {
-		DB::update("update submissions set judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']}");
+		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']}");
 	}
 	function rejudgeProblemAC($problem) {
-		DB::update("update submissions set judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score = 100");
+		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score = 100");
 	}
 	function rejudgeProblemGe97($problem) {
-		DB::update("update submissions set judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score >= 97");
+		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score >= 97");
 	}
 	function rejudgeSubmission($submission) {
-		DB::update("update submissions set judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where id = {$submission['id']}");
+		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where id = {$submission['id']}");
 	}
 	function updateBestACSubmissions($username, $problem_id) {
 		$best = DB::selectFirst("select id, used_time, used_memory, tot_size from submissions where submitter = '$username' and problem_id = $problem_id and score = 100 order by used_time, used_memory, tot_size asc limit 1");
