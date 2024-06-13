@@ -2,15 +2,25 @@
 	requirePHPLib('form');
 	requirePHPLib('judger');
 
-	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
-		become404Page();
-	}
-
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
 
-	$submission_result = json_decode($submission['result'], true);
+	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
+		become404Page();
+	}
+
+	if (isset($_GET['judgement_id']) {
+		if (!validateUInt($_GET['judgement_id']) || !($judgement = queryJudgement($_GET['judgement_id'])) || !($judgement['submission_id'] == $submission['id'])) {
+			become404Page();
+		}
+		$judger_name = $judgement['judger_name'];
+		$submission_result = json_decode($judgement['result'], true);
+	} else {
+		$judgement = null;
+		$judger_name = $submission['judger_name'];
+		$submission_result = json_decode($submission['result'], true);
+	}
 	$problem = queryProblemBrief($submission['problem_id']);
 	$problem_extra_config = getProblemExtraConfig($problem);
 	$has_permission = hasProblemPermission(Auth::user(), $problem);
@@ -33,7 +43,9 @@
 		become403Page();
 	}
 
-	$hackable = $submission['score'] == 100 && $problem['hackable'] == 1;
+	$active = !isset($judgement);
+
+	$hackable = $active && $submission['score'] == 100 && $problem['hackable'] == 1;
 	if ($contest != null && $contest['cur_progress'] < CONTEST_FINISHED) {
 		$hackable = false;
 	}
@@ -69,7 +81,7 @@
 		$hack_form->runAtServer();
 	}
 
-	if ($submission['status'] === 'Judged' && $has_permission) {
+	if ($active && $submission['status'] === 'Judged' && $has_permission) {
 		$rejudge_form = new UOJForm('rejudge');
 		$rejudge_form->handle = function() {
 			global $submission;
@@ -81,7 +93,7 @@
 		$rejudge_form->runAtServer();
 	}
 	
-	if ($has_permission) {
+	if ($active && $has_permission) {
 		$delete_form = new UOJForm('delete');
 		$delete_form->handle = function() {
 			global $submission;
@@ -151,7 +163,7 @@
 			<h4 class="panel-title"><?= UOJLocale::get('judger info') ?></h4>
 		</div>
 		<div class="panel-body">
-			<?php echoJudgerInfo($submission['judger_name']) ?>
+			<?php echoJudgerInfo($judger_name) ?>
 		</div>
 	</div>
 <?php } ?>
