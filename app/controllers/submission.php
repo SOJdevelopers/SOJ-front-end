@@ -14,10 +14,12 @@
 		if (!validateUInt($_GET['judgement_id']) || !($judgement = queryJudgement($_GET['judgement_id'])) || !($judgement['submission_id'] == $submission['id'])) {
 			become404Page();
 		}
+		$submission_judgement = array_merge($submission, $judgement);
 		$judger_name = $judgement['judger_name'];
 		$submission_result = json_decode($judgement['result'], true);
 	} else {
 		$judgement = null;
+		$submission_judgement = $submission;
 		$judger_name = $submission['judger_name'];
 		$submission_result = json_decode($submission['result'], true);
 	}
@@ -136,7 +138,7 @@
 	$REQUIRE_LIB['shjs'] = '';
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
-<?php echoSubmissionsListOnlyOne($submission, array(), Auth::user()) ?>
+<?php echoSubmissionsListOnlyOne($submission_judgement, array(), Auth::user()) ?>
 
 <?php if ($should_show_content) { ?>
 	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>
