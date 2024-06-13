@@ -101,6 +101,10 @@ function querySubmission($id) {
 	return DB::selectFirst("select * from submissions where id = $id", MYSQLI_ASSOC);
 }
 
+function queryJudgement($id) {
+	return DB::selectFirst("select * from submissions_history where id = $id", MYSQLI_ASSOC);
+}
+
 function queryHack($id) {
 	return DB::selectFirst("select * from hacks where id = $id", MYSQLI_ASSOC);
 }
