@@ -517,7 +517,7 @@ function echoSubmissionMessages($messages) {
 				$main_message .= '<ul class="list-group-item-text list-inline">';
 				$main_message .= '<li>';
 				$main_message .= '<strong>测评结果：</strong>';
-				$main_message .= isset($mes['result_error'])?"<div class=\"small\">{$mes['result_error']}</div>":"<div class=\"uoj-score\">{$mes['score']}</div>";
+				$main_message .= isset($mes['result_error'])?"<span class=\"small\">{$mes['result_error']}</span>":"<span class=\"uoj-score\">{$mes['score']}</span>";
 				$main_message .= '</li>';
 				if (!isset($mes['result_error'])) {
 					$main_message .= '<li>';
