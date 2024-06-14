@@ -186,6 +186,16 @@ function getUsedMemoryStr($used_memory) {
 	return $used_memory . 'KiB';
 }
 
+function getFileSizeStr($size) {
+	if ($size < 2048)
+		return $size . 'B';
+	if ($size < 1024 * 1024)
+		return sprintf("%.1f", $size / 1024) . 'KiB';
+	if ($size < 1024 * 1024 * 1024)
+		return sprintf("%.3f", $size / 1024 / 1024) . 'MiB';
+	return sprintf("%.3f", $size / 1024 / 1024 / 1024) . 'GiB';
+}
+
 function getCodeSizeStr($size) {
 	if ($size < 2048)
 		return $size . 'B';
