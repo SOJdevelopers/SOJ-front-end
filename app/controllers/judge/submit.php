@@ -113,7 +113,8 @@
 			die("Wow! hacker! T_T....");
 		}
 		$esc_status_details = DB::escape($_POST['status']);
-		if (isset($_POST['is_custom_test'])) {
+		if (isset($_POST['is_hack'])) {
+		} elseif (isset($_POST['is_custom_test'])) {
 			DB::update("update custom_test_submissions set status_details = '$esc_status_details' where id = {$_POST['id']}");
 		} else {
 			DB::update("update submissions set status_details = '$esc_status_details' where id = {$_POST['id']}");
