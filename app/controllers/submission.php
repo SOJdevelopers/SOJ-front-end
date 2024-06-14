@@ -10,6 +10,8 @@
 		become404Page();
 	}
 
+	$time_now = DB::query_time_now();
+
 	if (isset($_GET['judgement_id'])) {
 		if (!validateUInt($_GET['judgement_id']) || !($judgement = queryJudgement($_GET['judgement_id'])) || !($judgement['submission_id'] == $submission['id'])) {
 			become404Page();
@@ -108,7 +110,8 @@
 		$delete_form->succ_href = '/submissions';
 		$delete_form->runAtServer();
 	}
-	
+
+	$should_show_timeline = true;
 	$should_show_judger_info = hasViewJudgerInfoPermission(Auth::user());
 	$should_show_content = hasViewPermission($problem_extra_config['view_content_type'], Auth::user(), $problem, $submission);
 	$should_show_all_details = hasViewPermission($problem_extra_config['view_all_details_type'], Auth::user(), $problem, $submission);
@@ -157,6 +160,17 @@
 			});
 		</script>
 	<?php } ?>
+<?php } ?>
+
+<?php if ($should_show_timeline) { ?>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title"><?= UOJLocale::get('submission history') ?></h4>
+		</div>
+		<div class="panel-body">
+			<?php echoSubmissionTimeline($submission, $time_now) ?>
+		</div>
+	</div>
 <?php } ?>
 
 <?php if ($should_show_judger_info) { ?>
