@@ -196,6 +196,28 @@ pre {
 	vertical-align: middle;
 }
 
+@media (min-width: 768px) {
+	.vcenter-sm {
+		display: inline-block;
+		vertical-align: middle;
+		float: none;
+	}
+}
+@media (min-width: 992px) {
+	.vcenter-md {
+		display: inline-block;
+		vertical-align: middle;
+		float: none;
+	}
+}
+@media (min-width: 1200px) {
+	.vcenter-lg {
+		display: inline-block;
+		vertical-align: middle;
+		float: none;
+	}
+}
+
 .top-buffer-no {
 	margin-top: 0px;
 }
