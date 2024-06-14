@@ -478,6 +478,97 @@ EOD;
 		}, $table_config);
 }
 
+function echoSubmissionMessages($messages) {
+	echo '<!-- credit to https://bootsnipp.com/snippets/xrKXW -->';
+	echo '<div class="list-group timeline">';
+	foreach ($messages as $mes) {
+		$cls = 'list-group-item';
+		$main_message = "";
+		$main_message .= '<ul class="list-group-item-text list-inline text-info">';
+		$main_message .= '<li>';
+		if ($mes['time'])
+			$main_message .= "<strong>[{$mes['time']}]</strong>";
+		else
+			$main_message .= '<strong>[error]</strong>';
+		$main_message .= '</li>';
+		$extra = null;
+		switch($mes['message_type']){
+			case 'submit':
+				$main_message .= '<li>';
+				$main_message .= '提交';
+				$main_message .= '</li>';
+				break;
+			case 'judgement':
+				$main_message .= '<li>';
+				$main_message .= '评测';
+				$main_message .= '</li>';
+				break;
+			case 'current_submission_status':
+				$main_message .= '<li>';
+				$main_message .= '当前提交记录状态';
+				$main_message .= '</li>';
+				break;
+		}
+		$main_message .= '</ul>';
+		switch($mes['message_type']){
+			case 'submit':
+				break;
+			case 'judgement':
+				$main_message .= '<ul class="list-group-item-text list-inline">';
+				$main_message .= '<li>';
+				$main_message .= '<strong>测评结果：</strong>';
+				$main_message .= isset($mes['result_error'])?$mes['result_error']:$mes['score'];
+				$main_message .= '</li>';
+				$main_message .= '<li>';
+				$main_message .= '<strong>用时：</strong>';
+				$main_message .= $used_time;
+				$main_message .= '</li>';
+				$main_message .= '<li>';
+				$main_message .= '<strong>内存：</strong>';
+				$main_message .= $used_memory;
+				$main_message .= '</li>';
+				$main_message .= '</ul>';
+				$extra = '<a href="'."/submission/{$mes['submission_id']}?judgement_id={$mes['judgement_id']}".'"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
+				break;
+			case 'current_submission_status':
+				$extra = '<a href="'."/submission/{$mes['submission_id']}".'"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
+				break;
+		}
+		echo '<div class="', $cls, '">';
+		if ($extra) {
+			if(!isset($split_cls))
+				$split_cls = ['col-sm-10 vcenter-sm', 'col-sm-2 vcenter-sm'];
+			echo '<div class="row">';
+			echo '<div class="', $split_cls[0], '">';
+			echo $main_message , '</div>';
+			echo '<div class="', $split_cls[1],' text-right">', $extra, '</div>';
+			echo '</div>';
+		}
+		else
+			echo $main_message;
+		echo '</div>';
+	}
+	echo '</div>';
+}
+
+function echoSubmissionTimeline($submission, $time_now) {
+	$hiss = DB::select("select judge_time as time, 'judgement' as message_type, submission_id, id as judgement_id, judge_time, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission['id']} order by judge_time desc");
+	$messages = array();
+	$messages[] = array(
+		'time' => $time_now,
+		'message_type' => 'current_submission_status',
+		'submission_id' => $submission['id']
+	);
+	while ($his = DB::fetch($hiss)) {
+		$messages[] = $his;
+	}
+	$messages[] = array(
+		'time' => $submission['submit_time'],
+		'message_type' => 'submit',
+		'submission_id' => $submission['id']
+	);
+	echoSubmissionMessages($messages);
+}
 
 function echoSubmissionContent($submission, $requirement) {
 	$zip_file = new ZipArchive();
