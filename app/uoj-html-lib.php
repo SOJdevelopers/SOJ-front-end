@@ -202,8 +202,10 @@ function getFileSizeStr($size) {
 
 function getCodeSizeStr($size) {
 	if ($size < 2048)
-		return $size . 'B';
-	return sprintf("%.1f", $size / 1024) . 'KiB';
+		return sprintf("<span title='%d Bytes'>%dB</span>", $size, $size);
+	if ($size < 1024 * 1024)
+		return sprintf("<span title='%d Bytes'>%.1fKiB</span>", $size, $size / 1024);
+	return sprintf("<span title='%d Bytes, %.1fKiB'>%.2fMiB</span>", $size, $size / 1024, $size / 1024 / 1024);
 }
 
 function getBlogLink($id) {
