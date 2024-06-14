@@ -179,11 +179,15 @@ function getSubmissionStatusStr($status, $result_error, $score, $uri = null) {
 }
 
 function getUsedTimeStr($used_time) {
-	return $used_time . 'ms';
+	if($used_time < 10000)
+		return $used_time . 'ms';
+	return sprintf("<span title='%dms'>%.2fs</span>", $used_time, $used_time / 1000);
 }
 
 function getUsedMemoryStr($used_memory) {
-	return $used_memory . 'KiB';
+	if($used_memory < 8192)
+		return $used_memory . 'KiB';
+	return sprintf("<span title='%dKiB'>%.1fMiB</span>", $used_memory, $used_memory / 1024);
 }
 
 function getFileSizeStr($size) {
@@ -192,14 +196,16 @@ function getFileSizeStr($size) {
 	if ($size < 1024 * 1024)
 		return sprintf("%.1f", $size / 1024) . 'KiB';
 	if ($size < 1024 * 1024 * 1024)
-		return sprintf("%.3f", $size / 1024 / 1024) . 'MiB';
+		return sprintf("%.2f", $size / 1024 / 1024) . 'MiB';
 	return sprintf("%.3f", $size / 1024 / 1024 / 1024) . 'GiB';
 }
 
 function getCodeSizeStr($size) {
 	if ($size < 2048)
-		return $size . 'B';
-	return sprintf("%.1f", $size / 1024) . 'KiB';
+		return sprintf("<span title='%d Bytes'>%dB</span>", $size, $size);
+	if ($size < 1024 * 1024)
+		return sprintf("<span title='%d Bytes'>%.1fKiB</span>", $size, $size / 1024);
+	return sprintf("<span title='%d Bytes, %.1fKiB'>%.2fMiB</span>", $size, $size / 1024, $size / 1024 / 1024);
 }
 
 function getBlogLink($id) {
