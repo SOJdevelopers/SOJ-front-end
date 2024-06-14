@@ -415,3 +415,37 @@ a.uoj-index-ranklist:visited {
 a.uoj-index-ranklist:hover {
 	color: #428bca;
 }
+
+.list-group.timeline {
+	margin: auto;
+}
+
+@media(min-width: 768px) {
+	.list-group.timeline {
+		display: block;
+		max-width: 90%;
+		position: relative;
+	}
+	.list-group.timeline:before {
+		content: ' ';
+		background: #d4d9df;
+		display: inline-block;
+		position: absolute;
+		left: -17.5px;
+		width: 2px;
+		height: 100%;
+		z-index: 400;
+	}
+	.list-group.timeline > .list-group-item:before {
+		content: ' ';
+		background: white;
+		display: inline-block;
+		position: absolute;
+		border-radius: 50%;
+		border: 3px solid #22c0e8;
+		left: -25px;
+		width: 15px;
+		height: 15px;
+		z-index: 500;
+	}
+}
