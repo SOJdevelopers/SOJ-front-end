@@ -517,16 +517,18 @@ function echoSubmissionMessages($messages) {
 				$main_message .= '<ul class="list-group-item-text list-inline">';
 				$main_message .= '<li>';
 				$main_message .= '<strong>测评结果：</strong>';
-				$main_message .= isset($mes['result_error'])?$mes['result_error']:$mes['score'];
+				$main_message .= isset($mes['result_error'])?"<div class=\"small\">{$mes['result_error']}</div>":"<div class=\"uoj-score\">{$mes['score']}</div>";
 				$main_message .= '</li>';
-				$main_message .= '<li>';
-				$main_message .= '<strong>用时：</strong>';
-				$main_message .= $used_time;
-				$main_message .= '</li>';
-				$main_message .= '<li>';
-				$main_message .= '<strong>内存：</strong>';
-				$main_message .= $used_memory;
-				$main_message .= '</li>';
+				if (!isset($mes['result_error'])) {
+					$main_message .= '<li>';
+					$main_message .= '<strong>用时：</strong>';
+					$main_message .= $mes['used_time'] . 'ms';
+					$main_message .= '</li>';
+					$main_message .= '<li>';
+					$main_message .= '<strong>内存：</strong>';
+					$main_message .= $mes['used_memory'] . 'KiB';
+					$main_message .= '</li>';
+				}
 				$main_message .= '</ul>';
 				$extra = '<a href="'."/submission/{$mes['submission_id']}?judgement_id={$mes['judgement_id']}".'"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
 				break;
