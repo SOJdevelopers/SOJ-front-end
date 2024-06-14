@@ -293,7 +293,7 @@ EOD;
 							$('<a href="' + row[2] + '" target="_blank">' + row[2] + '</a></td>')
 						)
 					).append(
-						$('<td>' + (row[3] < 1024 ? row[3] + 'b' : (row[3] / 1024).toFixed(1) + 'kb') + '</td>')
+						$('<td>' + getFileSizeStr(row[3]) + '</td>')
 					).append(
 						$('<td />').append(
 							$('<a href="#"><span class="glyphicon glyphicon-remove"></span> Delete</a>').click(function(e) {
