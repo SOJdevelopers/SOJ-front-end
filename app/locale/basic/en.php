@@ -36,6 +36,7 @@ return [
 	'submit' => 'Submit',
 	'browse' => 'Browse',
 	'score range' => 'Score range',
+	'submission history' => 'Submission History',
 	'judger info' => 'Judger Info',
 	'details' => 'Details',
 	'hours' => function($h) {
