@@ -181,7 +181,7 @@ function getSubmissionStatusStr($status, $result_error, $score, $uri = null) {
 function getUsedTimeStr($used_time) {
 	if($used_time < 10000)
 		return $used_time . 'ms';
-	return sprintf("<span title='%dms'>%.1fs</span>", $used_time, $used_time / 1000);
+	return sprintf("<span title='%dms'>%.2fs</span>", $used_time, $used_time / 1000);
 }
 
 function getUsedMemoryStr($used_memory) {
