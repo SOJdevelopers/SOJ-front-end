@@ -17,6 +17,8 @@
 			become404Page();
 		}
 		$submission_judgement = array_merge($submission, $judgement);
+		$submission_judgement['judgement_id'] = $judgement['id'];
+		$submission_judgement['id'] = $submission['id'];
 		$judger_name = $judgement['judger_name'];
 		$submission_result = json_decode($judgement['result'], true);
 	} else {
@@ -143,6 +145,17 @@
 <?php echoUOJPageHeader(UOJLocale::get('problems::submission').' #'.$submission['id']) ?>
 <?php echoSubmissionsListOnlyOne($submission_judgement, array(), Auth::user()) ?>
 
+<?php if ($should_show_timeline) { ?>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title"><?= UOJLocale::get('submission history') ?></h4>
+		</div>
+		<div class="panel-body">
+			<?php echoSubmissionTimeline($submission, $time_now) ?>
+		</div>
+	</div>
+<?php } ?>
+
 <?php if ($should_show_content) { ?>
 	<?php echoSubmissionContent($submission, getProblemSubmissionRequirement($problem)) ?>
 	<?php if ($hackable) { ?>
@@ -160,17 +173,6 @@
 			});
 		</script>
 	<?php } ?>
-<?php } ?>
-
-<?php if ($should_show_timeline) { ?>
-	<div class="panel panel-info">
-		<div class="panel-heading">
-			<h4 class="panel-title"><?= UOJLocale::get('submission history') ?></h4>
-		</div>
-		<div class="panel-body">
-			<?php echoSubmissionTimeline($submission, $time_now) ?>
-		</div>
-	</div>
 <?php } ?>
 
 <?php if ($should_show_judger_info) { ?>
