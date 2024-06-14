@@ -36,6 +36,7 @@ return [
 	'submit' => '提交',
 	'browse' => '浏览',
 	'score range' => '分数范围',
+	'submission history' => '测评历史',
 	'judger info' => '评测机信息',
 	'details' => '详细',
 	'hours' => function($h) {

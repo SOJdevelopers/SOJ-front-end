@@ -66,6 +66,13 @@ class DB {
 		global $uojMySQL;
 		return DB::query("select 1 from $name limit 1") !== false;
 	}
+
+	public static function query_time_now() {
+		global $uojMySQL;
+		$time_now = DB::select("select now()");
+        	$time_now = DB::fetch($time_now);
+		return $time_now['now()'];
+	}
 	
 	public static function num_rows() {
 		global $uojMySQL;
