@@ -236,6 +236,16 @@ function getGroupWithoutLink(groupname, rating) {
 	return '<a class="uoj-username' + (rating >= 2600 ? ' legendary' : '') + '" style="color: ' + getColOfRating(rating) + '">' + text + '</a>';
 }
 
+function getFileSizeStr(size) {
+	if (size < 2048)
+		return size + 'B';
+	if (size < 1024 * 1024)
+		return (size / 1024).toFixed(1) + 'KiB';
+	if (size < 1024 * 1024 * 1024)
+		return (size / 1024 / 1024).toFixed(2) + 'MiB';
+	return (size / 1024 / 1024 / 1024).toFixed(3) + 'GiB';
+}
+
 function replaceWithHighlightUsername() {
 	var name = $(this).text(), rating = $(this).data("rating");
 	if (isNaN(rating)) {
