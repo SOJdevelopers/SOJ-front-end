@@ -148,6 +148,50 @@ function getContestProblemLink($problem, $contest_id, $problem_title = '!title_o
 	return '<a href="/contest/' . $contest_id . '/problem/' . $problem['id'] . '">' . $problem_title . '</a>';
 }
 
+function getSubmissionUri($id, $judgement_id = null) {
+	if (isset($judgement_id)) {
+		return "/submission/$id?judgement_id=$judgement_id";
+	}
+	return "/submission/$id";
+}
+
+function getSubmissionLink($id) {
+	return "<a href=\"" . getSubmissionUri($id) . "\">#$id</a>";
+}
+
+function getSubmissionJudgedStatusStr($result_error, $score, $uri = null) {
+	if(isset($uri)){
+		$html_type = 'a';
+		$head = $html_type . ' href="' . $uri . '"';
+	}
+	else{
+		$html_type = 'span';
+		$head = $html_type;
+	}
+	if (isset($result_error))
+		return '<' . $head . " class=\"small\">$result_error</" . $html_type . '>';
+	else
+		return '<' . $head . " class=\"uoj-score\">$score</" . $html_type . '>';
+}
+
+function getSubmissionStatusStr($status, $result_error, $score, $uri = null) {
+	return getSubmissionJudgedStatusStr($status == 'Judged' ? $result_error : $status, $score, $uri);
+}
+
+function getUsedTimeStr($used_time) {
+	return $used_time . 'ms';
+}
+
+function getUsedMemoryStr($used_memory) {
+	return $used_memory . 'KiB';
+}
+
+function getCodeSizeStr($size) {
+	if ($size < 2048)
+		return $size . 'B';
+	return sprintf("%.1f", $size / 1024) . 'KiB';
+}
+
 function getBlogLink($id) {
 	if (validateUInt($id) && $blog = queryBlog($id)) {
 		return '<a href="/blog/' . $id . '">' . $blog['title'] . '</a>';
@@ -262,8 +306,9 @@ function echoSubmission($submission, $config, $user) {
 	$problem = queryProblemBrief($submission['problem_id']);
 	$status = explode(', ', $submission['status'])[0];
 	$show_status_details = isOurSubmission($user, $submission) && $status !== 'Judged';
+	$submission_uri = getSubmissionUri($submission['id']);
 
-	$submission_id_str = "<a href=\"/submission/{$submission['id']}\">#{$submission['id']}</a>";
+	$submission_id_str = getSubmissionLink($submission['id']);
 	$problem_link_str = '/';
 	$submitter_link_str = '/';
 	$submission_status_str = '/';
@@ -283,32 +328,18 @@ function echoSubmission($submission, $config, $user) {
 		}
 
 		$submitter_link_str = getUserOrGroupLink($submission['submitter']);
-
-		if ($status == 'Judged') {
-			if ($submission['score'] == null) {
-				$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">{$submission['result_error']}</a>";
-			} else {
-				$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"uoj-score\">{$submission['score']}</a>";
-			}
-		} else {
-			$submission_status_str = "<a href=\"/submission/{$submission['id']}\" class=\"small\">$status</a>";
-		}
+		$submission_status_str = getSubmissionStatusStr($status, $submission['result_error'], $submission['score'], $submission_uri);
 	}
 
 	// SUBMISSION_CODE_LIMIT : problem link, submitter link, submission status
 	if ($limitLevel & SUBMISSION_CODE_LIMIT) {
-		if ($submission['score'] != null) {
-			$used_time_str = $submission['used_time'] . 'ms';
-			$used_memory_str = $submission['used_memory'] . 'kb';
+		if (isset($submission['score'])) {
+			$used_time_str = getUsedTimeStr($submission['used_time']);
+			$used_memory_str = getUsedMemoryStr($submission['used_memory']);
 		}
 
-		$language_str = "<a href=\"/submission/{$submission['id']}\">{$submission['language']}</a>";
-
-		if ($submission['tot_size'] < 1024) {
-			$size_str = $submission['tot_size'] . 'b';
-		} else {
-			$size_str = sprintf("%.1f", $submission['tot_size'] / 1024) . 'kb';
-		}
+		$language_str = '<a href="' . $submission_uri . "\">{$submission['language']}</a>";
+		$size_str = getCodeSizeStr($submission['tot_size']);
 	}
 	
 	if (!$show_status_details) {
@@ -517,23 +548,23 @@ function echoSubmissionMessages($messages) {
 				$main_message .= '<ul class="list-group-item-text list-inline">';
 				$main_message .= '<li>';
 				$main_message .= '<strong>测评结果：</strong>';
-				$main_message .= isset($mes['result_error'])?"<span class=\"small\">{$mes['result_error']}</span>":"<span class=\"uoj-score\">{$mes['score']}</span>";
+				$main_message .= getSubmissionJudgedStatusStr($mes['result_error'],$mes['score']);
 				$main_message .= '</li>';
 				if (!isset($mes['result_error'])) {
 					$main_message .= '<li>';
 					$main_message .= '<strong>用时：</strong>';
-					$main_message .= $mes['used_time'] . 'ms';
+					$main_message .= getUsedTimeStr($mes['used_time']);
 					$main_message .= '</li>';
 					$main_message .= '<li>';
 					$main_message .= '<strong>内存：</strong>';
-					$main_message .= $mes['used_memory'] . 'KiB';
+					$main_message .= getUsedMemoryStr($mes['used_memory']);
 					$main_message .= '</li>';
 				}
 				$main_message .= '</ul>';
-				$extra = '<a href="'."/submission/{$mes['submission_id']}?judgement_id={$mes['judgement_id']}".'"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
+				$extra = '<a href="' . getSubmissionUri($mes['submission_id'], $mes['judgement_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
 				break;
 			case 'current_submission_status':
-				$extra = '<a href="'."/submission/{$mes['submission_id']}".'"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
+				$extra = '<a href="' . getSubmissionUri($mes['submission_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
 				break;
 		}
 		echo '<div class="', $cls, '">';
@@ -541,9 +572,12 @@ function echoSubmissionMessages($messages) {
 			if(!isset($split_cls))
 				$split_cls = ['col-sm-10 vcenter-sm', 'col-sm-2 vcenter-sm'];
 			echo '<div class="row">';
-			echo '<div class="', $split_cls[0], '">';
-			echo $main_message , '</div>';
-			echo '<div class="', $split_cls[1],' text-right">', $extra, '</div>';
+			echo '<div class="' . $split_cls[0] . '">';
+			echo $main_message;
+			echo '</div>';
+			echo '<div class="' . $split_cls[1] . ' text-right">';
+			echo $extra;
+			echo '</div>';
 			echo '</div>';
 		}
 		else
@@ -774,13 +808,13 @@ class JudgementDetailsPrinter {
 				
 			echo '<div class="col-sm-3">';
 			if (is_numeric($test_time) and $test_time >= 0) {
-				echo 'time: ', $test_time, 'ms';
+				echo 'time: ' . getUsedTimeStr($test_time);
 			}
 			echo '</div>';
 
 			echo '<div class="col-sm-3">';
 			if (!$test_dnum and $test_memory >= 0) {
-				echo 'memory: ', $test_memory, 'kb';
+				echo 'memory: ' . getUsedMemoryStr($test_memory);
 			}
 			echo '</div>';
 
@@ -827,13 +861,13 @@ class JudgementDetailsPrinter {
 				
 			echo '<div class="col-sm-3">';
 			if ($test_time >= 0) {
-				echo 'time: ', $test_time, 'ms';
+				echo 'time: ' . getUsedTimeStr($test_time);
 			}
 			echo '</div>';
 
 			echo '<div class="col-sm-3">';
 			if ($test_memory >= 0) {
-				echo 'memory: ', $test_memory, 'kb';
+				echo 'memory: ' . getUsedMemoryStr($test_memory);
 			}
 			echo '</div>';
 
