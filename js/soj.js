@@ -243,7 +243,7 @@ function getFileSizeStr(size) {
 		return (size / 1024).toFixed(1) + 'KiB';
 	if (size < 1024 * 1024 * 1024)
 		return (size / 1024 / 1024).toFixed(2) + 'MiB';
-	return (size / 1024 / 1024 / 1024).toFixed(3) . 'GiB';
+	return (size / 1024 / 1024 / 1024).toFixed(3) + 'GiB';
 }
 
 function replaceWithHighlightUsername() {
