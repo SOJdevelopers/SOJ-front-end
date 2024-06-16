@@ -17,7 +17,7 @@ return [
 	'all the announcements' => '所有公告……',
 	'help' => '帮助',
 	'search' => '搜索',
-	'search problem' => '按 标题 / ID / 标签 搜索',
+	'search problem' => '标题 / ID / 标签',
 	'top rated' => '比赛排行榜',
 	'top cutted' => '切题排行榜',
 	'top rated groups' => '组排行榜',
@@ -91,7 +91,7 @@ return [
 	'write new slide' => '写新幻灯片',
 	'write blog' => '写博客',
 	'write slide' => '写幻灯片',
-	'separated by comma' => '多个标签用逗号隔开',
+	'separated by comma' => '用逗号隔开',
 	'view blog' => '查看博客',
 	'blog visibility' => '博客可见性',
 	'private' => '未公开',
@@ -159,5 +159,8 @@ return [
 	'open source' => '开源项目',
 	'system groups' => '系统组',
 	'user groups' => '用户组',
-	'latest comment' => '最新评论'
+	'latest comment' => '最新评论',
+	'search problem contents' => '搜索题目内容',
+	'regexp' => '正则表达式',
+	'keyword' => '关键词'
 ];
