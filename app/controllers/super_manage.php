@@ -82,6 +82,8 @@ function showAnalytics() {
 	$analytics['public_problems_count'] = DB::selectCount('select count(*) from problems where is_hidden = 0');
 	$analytics['submissions_count'] = DB::selectCount('select count(*) from submissions');
 	$analytics['submissions_count_today'] = DB::selectCount('select count(*) from submissions where to_days(submit_time) = to_days(now())');
+	$analytics['judgements_count'] = DB::selectCount('select count(*) from submissions_history');
+	$analytics['judgements_count_today'] = DB::selectCount('select count(*) from submissions_history where to_days(judge_time) = to_days(now())');
 	$analytics['hack_count'] = DB::selectCount('select count(*) from hacks');
 	$analytics['hack_count_today'] = DB::selectCount('select count(*) from hacks where to_days(submit_time) = to_days(now())');
 	$analytics['user_count'] = DB::selectCount('select count(*) from user_info');
@@ -103,8 +105,10 @@ function showAnalytics() {
 			<tbody>
 				<tr><td>题目数量</td><td><?= $analytics['problems_count'] ?></td></tr>
 				<tr><td>公开题目数量</td><td><?= $analytics['public_problems_count'] ?></td></tr>
-				<tr><td>评测数量</td><td><?= $analytics['submissions_count'] ?></td></tr>
-				<tr><td>今日评测</td><td><?= $analytics['submissions_count_today'] ?></td></tr>
+				<tr><td>提交数量</td><td><?= $analytics['submissions_count'] ?></td></tr>
+				<tr><td>今日提交数量</td><td><?= $analytics['submissions_count_today'] ?></td></tr>
+				<tr><td>测评数量</td><td><?= $analytics['judgements_count'] ?></td></tr>
+				<tr><td>今日测评数量</td><td><?= $analytics['judgements_count_today'] ?></td></tr>
 				<tr><td>Hack 总数</td><td><?= $analytics['hack_count'] ?></td></tr>
 				<tr><td>今日 Hack 数</td><td><?= $analytics['hack_count_today'] ?></td></tr>
 				<tr><td>用户总数</td><td><?= $analytics['user_count'] ?></td></tr>
