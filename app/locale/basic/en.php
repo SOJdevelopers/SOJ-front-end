@@ -17,7 +17,7 @@ return [
 	'all the announcements' => 'All the Announcements……',
 	'help' => 'Help',
 	'search' => 'Search',
-	'search problem' => 'Search by title / ID / tags',
+	'search problem' => 'title / ID / tags',
 	'top rated' => 'Top rated',
 	'top cutted' => 'Top accepted',
 	'top rated groups' => 'Top rated groups',
@@ -91,7 +91,7 @@ return [
 	'write new slide' => 'Write a new slide',
 	'write blog' => 'Write blog',
 	'write slide' => 'Write slide',
-	'separated by comma' => 'Separate the tags by comma',
+	'separated by comma' => 'Separated by comma',
 	'view blog' => 'View blog',
 	'blog visibility' => 'Blog visibility',
 	'private' => 'Private',
@@ -159,5 +159,8 @@ return [
 	'open source' => 'OpenSource Project',
 	'system groups' => 'System Groups',
 	'user groups' => 'User Groups',
-	'latest comment' => 'Latest comment'
+	'latest comment' => 'Latest comment',
+	'search problem contents' => 'Search by content',
+	'regexp' => 'Regular expression',
+	'keyword' => 'Keyword'
 ];
