@@ -66,17 +66,42 @@ EOD;
 	$search_tag = null;
 	
 	$cur_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
-	if ($cur_tab == 'template') {
-		$search_tag = '模板题';
+	if (isset($_GET['tag'])) {
+		$search_tag = DB::escape($_GET['tag']);
 	}
 
-	if (isset($_GET['tag'])) {
-		$search_tag = $_GET['tag'];
+	if ($cur_tab == 'template') {
+		if ($search_tag) {
+			$search_tag.= ',模板题';
+		}
+		else {
+			$search_tag = ',模板题';
+		}
 	}
 
 	if ($search_tag) {
-		$esc_tag = DB::escape($search_tag);
-		$cond[] = "exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag = '{$esc_tag}')";
+		$tags_raw = explode(',', str_replace('，', ',', $search_tag));
+		if (count($tags_raw) > 10) {
+			$cond[] = '0';
+		}
+		else {
+			$tags = array();
+			foreach ($tags_raw as $tag) {
+				$tag = trim($tag);
+				if (strlen($tag) == 0) {
+					continue;
+				}
+				if (strlen($tag) > 30) {
+					$cond[] = '0';
+					break;
+				}
+				if (in_array($tag, $tags, true)) {
+					continue;
+				}
+				$tags[] = $tag;
+				$cond[] = "exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag = '{$tag}')";
+			}
+		}
 	}
 	
 	if ($cur_tab == 'contested') {
@@ -84,11 +109,13 @@ EOD;
 	}
 
 	if (isset($_GET['search'])) {
-		$esc_search = DB::escape($_GET['search']);
-		$cond[] = "(title like '%{$esc_search}%' or id like '%{$esc_search}%' or ".
-			"exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag like '%{$esc_search}%')".
-			((isset($_GET['content']) ? $_GET['content']=='true' : isset($_COOKIE['search_contents_mode']))
-			?" or exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md like '%{$esc_search}%')":'').')';
+		$esc_search = mb_substr(DB::escape($_GET['search']),0,128);
+		$cmp = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "regexp '{$esc_search}'" : "like '%{$esc_search}%'";
+		$cmp_id = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "or id regexp '{$esc_search}'" : (validateUInt($esc_search)?"or id = '{$esc_search}'":'');
+		$cond[] = '(title '.$cmp.' '.$cmp_id.' or '.
+			'exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag '.$cmp.')'.
+			((isset($_GET['content']) && $_GET['content']=='true')
+			?' or exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md '.$cmp.')':'').')';
 	}
 
 	if ($cond) {
@@ -137,23 +164,31 @@ EOD;
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
 <div class="row">
-	<div class="col-sm-4">
+	<div class="col-xs-6 col-sm-6">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 	</div>
-	<div class="col-sm-4 col-sm-push-4 checkbox text-right">
-		<label class="checkbox-inline" for="input-search_contents_mode"><input type="checkbox" id="input-search_contents_mode" <?= isset($_COOKIE['search_contents_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::search contents') ?></label>
+	<div class="col-xs-6 col-sm-6 checkbox text-right">
 		<label class="checkbox-inline" for="input-show_tags_mode"><input type="checkbox" id="input-show_tags_mode" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show tags') ?></label>
 		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
 	</div>
-	<div class="col-sm-4 col-sm-pull-4">
-		<form id="form-search" class="input-group form-group" method="get">
-		<input type="text" class="form-control" name="search" placeholder="<?= UOJLocale::get('search problem')?>" <?= isset($_GET['search']) ? 'value="' . HTML::escape($_GET['search']) . '" ' : '' ?>/>  
-			<span class="input-group-btn">
-				<button type="submit" class="btn btn-search btn-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button>  
-			</span>
-		</form>
-	</div>
 </div>
+<form id="form-search" class="form-horizontal" role="form" method="get">
+	<div class="form-group">
+		<label class="col-sm-1 control-label"><?= UOJLocale::get('tags')?></label>
+		<div class="col-sm-2">
+			<input type="text" class="form-control" name="tag" maxlength="128" placeholder="<?= UOJLocale::get('separated by comma')?>" <?= isset($_GET['tag']) ? 'value="' . HTML::escape($_GET['tag']) . '" ' : '' ?>/>
+		</div>
+		<div class="col-sm-3 text-right">
+			<label class="checkbox-inline"><input type="checkbox" name="content" value="true" <?= isset($_GET['content']) && $_GET['content']=='true' ? 'checked' : '' ?>/><?= UOJLocale::get('search problem contents')?></label>
+			<label class="checkbox-inline"><input type="checkbox" name="regexp" value="true" <?= isset($_GET['regexp']) && $_GET['regexp']=='true' ? 'checked' : '' ?>/><?= UOJLocale::get('regexp')?></label>
+		</div>
+		<label class="col-sm-1 control-label"><?= UOJLocale::get('keyword')?></label>
+		<div class="col-sm-4 input-group">
+			<input type="text" class="form-control" name="search" id="search" maxlength="128" placeholder="<?= UOJLocale::get('search problem')?>" <?= isset($_GET['search']) ? 'value="' . HTML::escape($_GET['search']) . '" ' : '' ?>/>
+			<span class="input-group-btn"><button type="submit" class="btn btn-search btn-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button></span>
+		</div>
+	</div>
+</form>
 <div class="row">
 	<div class="col-xs-10 col-xs-push-1 col-sm-6 col-sm-push-3 input-group">
 		<?php echo $pag->pagination(); ?>
@@ -166,29 +201,31 @@ EOD;
 ?>
 <div class="top-buffer-sm"></div>
 <script type="text/javascript">
-$('#input-search_contents_mode').click(function() {
-	if (this.checked) {
-		$.cookie('search_contents_mode', '', {path: '/problems'});
-	} else {
-		$.removeCookie('search_contents_mode', {path: '/problems'});
-	}
-});
-$('#input-show_tags_mode').click(function() {
-	if (this.checked) {
-		$.cookie('show_tags_mode', '', {path: '/problems'});
-	} else {
-		$.removeCookie('show_tags_mode', {path: '/problems'});
-	}
-	location.reload();
-});
-$('#input-show_submit_mode').click(function() {
-	if (this.checked) {
-		$.cookie('show_submit_mode', '', {path: '/problems'});
-	} else {
-		$.removeCookie('show_submit_mode', {path: '/problems'});
-	}
-	location.reload();
-});
+	document.addEventListener("keydown",function(event) {
+		if(event.keyCode===191&&document.activeElement.type!=="text") {
+			var obj=document.getElementById("search");
+			var pos=obj.value.length;
+			obj.setSelectionRange(pos,pos);
+			obj.focus();
+			event.preventDefault();
+		}
+	});
+	$('#input-show_tags_mode').click(function() {
+		if (this.checked) {
+			$.cookie('show_tags_mode', '', {path: '/problems'});
+		} else {
+			$.removeCookie('show_tags_mode', {path: '/problems'});
+		}
+		location.reload();
+	});
+	$('#input-show_submit_mode').click(function() {
+		if (this.checked) {
+			$.cookie('show_submit_mode', '', {path: '/problems'});
+		} else {
+			$.removeCookie('show_submit_mode', {path: '/problems'});
+		}
+		location.reload();
+	});
 </script>
 <?php
 	echo '<div class="', join($div_classes, ' '), '">';
