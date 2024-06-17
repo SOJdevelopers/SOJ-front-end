@@ -69,31 +69,35 @@ EOD;
 	if (isset($_GET['tag'])) {
 		$search_tag = DB::escape($_GET['tag']);
 	}
-
-	if ($cur_tab == 'template') {
-		if ($search_tag) {
-			$search_tag.= ',模板题';
+	
+	if ($search_tag) {
+		$tags_raw = explode(',', str_replace('，', ',', $search_tag));
+		foreach ($tags_raw as &$tag) {
+			$tag = trim($tag);
 		}
-		else {
-			$search_tag = ',模板题';
+	}
+	else
+		$tags_raw = array();
+
+	$validate_input = true;
+	if (count($tags_raw) > 10)
+		$validate_input = false;
+	foreach ($tags_raw as $tag) {
+		if (strlen($tag) > 30) {
+			$validate_input = false;
+			break;
 		}
 	}
 
-	if ($search_tag) {
-		$tags_raw = explode(',', str_replace('，', ',', $search_tag));
-		if (count($tags_raw) > 10) {
-			$cond[] = '0';
-		}
-		else {
+	if ($validate_input) {
+		if ($cur_tab == 'template')
+			$tags_raw[] = '模板题';
+	
+		if ($tags_raw) {
 			$tags = array();
 			foreach ($tags_raw as $tag) {
-				$tag = trim($tag);
 				if (strlen($tag) == 0) {
 					continue;
-				}
-				if (strlen($tag) > 30) {
-					$cond[] = '0';
-					break;
 				}
 				if (in_array($tag, $tags, true)) {
 					continue;
@@ -102,27 +106,36 @@ EOD;
 				$cond[] = "exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag = '{$tag}')";
 			}
 		}
-	}
+		
+		if ($cur_tab == 'contested') {
+			$cond[] = 'exists (select 1 from contests_problems where contests_problems.problem_id = problems.id)';
+		}
 	
-	if ($cur_tab == 'contested') {
-		$cond[] = 'exists (select 1 from contests_problems where contests_problems.problem_id = problems.id)';
+		if (isset($_GET['search'])) {
+			$esc_search = mb_substr(DB::escape($_GET['search']),0,128);
+			$cmp = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "regexp '{$esc_search}'" : "like '%{$esc_search}%'";
+			$cond_or = array();
+			if (isset($_GET['regexp']) && $_GET['regexp']=='true')
+				$cond_or[] = "id regexp '{$esc_search}'";
+			else
+				if(validateUInt($esc_search))
+					$cond_or[] = "id = '{$esc_search}'";
+			$cond_or[] = 'title ' . $cmp;
+			$cond_or[] = 'exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag '.$cmp.')';
+			if (isset($_GET['content']) && $_GET['content']=='true')
+			    $cond_or[] = 'exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md ' . $cmp . ')';
+			if ($cond_or)
+				$cond[] = '(' . join(' or ', $cond_or) . ')';
+		}
+	
+		if ($cond) {
+			$cond = join($cond, ' and ');
+		} else {
+			$cond = '1';
+		}
 	}
-
-	if (isset($_GET['search'])) {
-		$esc_search = mb_substr(DB::escape($_GET['search']),0,128);
-		$cmp = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "regexp '{$esc_search}'" : "like '%{$esc_search}%'";
-		$cmp_id = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "or id regexp '{$esc_search}'" : (validateUInt($esc_search)?"or id = '{$esc_search}'":'');
-		$cond[] = '(title '.$cmp.' '.$cmp_id.' or '.
-			'exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag '.$cmp.')'.
-			((isset($_GET['content']) && $_GET['content']=='true')
-			?' or exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md '.$cmp.')':'').')';
-	}
-
-	if ($cond) {
-		$cond = join($cond, ' and ');
-	} else {
-		$cond = '1';
-	}
+	else
+		$cond = '0';
 
 	$header = '<tr>';
 	$header .= '<th class="text-center" style="width: 5em">ID</th>';
