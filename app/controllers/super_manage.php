@@ -14,47 +14,47 @@
 
 	$tabs_info = array(
 		'analytics' => array(
-			'name' => '统计信息',
+			'name' => UOJLocale::get('analytics'),
 			'url' => '/super-manage/analytics',
 			'method' => 'showAnalytics'
 		),
 		'judgerinfo' => array(
-			'name' => '评测机信息',
+			'name' => UOJLocale::get('judger info'),
 			'url' => '/super-manage/judgerinfo',
 			'method' => 'showJudgerInfo'
 		),
 		'users' => array(
-			'name' => '用户操作',
+			'name' => UOJLocale::get('user management'),
 			'url' => '/super-manage/users',
 			'method' => 'showUserModification'
 		),
 		'groups' => array(
-			'name' => '组操作',
+			'name' => UOJLocale::get('group management'),
 			'url' => '/super-manage/groups',
 			'method' => 'showGroupModification'
 		),
 		'blogs' => array(
-			'name' => '博客管理',
+			'name' => UOJLocale::get('blog management'),
 			'url' => '/super-manage/blogs',
 			'method' => 'showBlogLinks'
 		),
 		'submissions' => array(
-			'name' => '提交记录',
+			'name' => UOJLocale::get('submissions'),
 			'url' => '/super-manage/submissions',
 			'method' => 'showSubmissions'
 		),
 		'custom-test' => array(
-			'name' => '自定义测试',
+			'name' => UOJLocale::get('problems::custom test'),
 			'url' => '/super-manage/custom-test',
 			'method' => 'showCustomTests'
 		),
 		'send-message' => array(
-			'name' => '发送公告',
+			'name' => UOJLocale::get('send message'),
 			'url' => '/super-manage/send-message',
 			'method' => 'showSystemMessages'
 		),
 		'links' => array(
-			'name' => '链接管理',
+			'name' => UOJLocale::get('link management'),
 			'url' => '/super-manage/links',
 			'method' => 'showFriendLinks'
 		)
@@ -65,7 +65,7 @@
 	}
 
 function printHeader() {
-	echoUOJPageHeader('系统管理');
+	echoUOJPageHeader(UOJLocale::get('system manage'));
 	global $tabs_info, $cur_tab;
 	?>
 	<div class="row">
