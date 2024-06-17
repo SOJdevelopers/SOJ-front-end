@@ -162,5 +162,11 @@ return [
 	'latest comment' => 'Latest comment',
 	'search problem contents' => 'Search by content',
 	'regexp' => 'Regular expression',
-	'keyword' => 'Keyword'
+	'keyword' => 'Keyword',
+	'analytics' => 'Analytics',
+	'user management' => 'User Management',
+	'group management' => 'Group Management',
+	'blog management' => 'Blog Management',
+	'send message' => 'Send Message',
+	'link management' => 'Link Management'
 ];
