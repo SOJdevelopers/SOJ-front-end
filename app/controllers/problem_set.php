@@ -72,8 +72,8 @@ EOD;
 	
 	if ($search_tag) {
 		$tags_raw = explode(',', str_replace('，', ',', $search_tag));
-		foreach ($tags_raw as &$tag) {
-			$tag = trim($tag);
+		foreach ($tags_raw as &$tag_ref) {
+			$tag_ref = trim($tag_ref);
 		}
 	}
 	else
