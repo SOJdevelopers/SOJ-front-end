@@ -14,47 +14,47 @@
 
 	$tabs_info = array(
 		'analytics' => array(
-			'name' => '统计信息',
+			'name' => UOJLocale::get('analytics'),
 			'url' => '/super-manage/analytics',
 			'method' => 'showAnalytics'
 		),
 		'judgerinfo' => array(
-			'name' => '评测机信息',
+			'name' => UOJLocale::get('judger info'),
 			'url' => '/super-manage/judgerinfo',
 			'method' => 'showJudgerInfo'
 		),
 		'users' => array(
-			'name' => '用户操作',
+			'name' => UOJLocale::get('user management'),
 			'url' => '/super-manage/users',
 			'method' => 'showUserModification'
 		),
 		'groups' => array(
-			'name' => '组操作',
+			'name' => UOJLocale::get('group management'),
 			'url' => '/super-manage/groups',
 			'method' => 'showGroupModification'
 		),
 		'blogs' => array(
-			'name' => '博客管理',
+			'name' => UOJLocale::get('blog management'),
 			'url' => '/super-manage/blogs',
 			'method' => 'showBlogLinks'
 		),
 		'submissions' => array(
-			'name' => '提交记录',
+			'name' => UOJLocale::get('submissions'),
 			'url' => '/super-manage/submissions',
 			'method' => 'showSubmissions'
 		),
 		'custom-test' => array(
-			'name' => '自定义测试',
+			'name' => UOJLocale::get('problems::custom test'),
 			'url' => '/super-manage/custom-test',
 			'method' => 'showCustomTests'
 		),
 		'send-message' => array(
-			'name' => '发送公告',
+			'name' => UOJLocale::get('send message'),
 			'url' => '/super-manage/send-message',
 			'method' => 'showSystemMessages'
 		),
 		'links' => array(
-			'name' => '链接管理',
+			'name' => UOJLocale::get('link management'),
 			'url' => '/super-manage/links',
 			'method' => 'showFriendLinks'
 		)
@@ -65,7 +65,7 @@
 	}
 
 function printHeader() {
-	echoUOJPageHeader('系统管理');
+	echoUOJPageHeader(UOJLocale::get('system manage'));
 	global $tabs_info, $cur_tab;
 	?>
 	<div class="row">
@@ -82,6 +82,8 @@ function showAnalytics() {
 	$analytics['public_problems_count'] = DB::selectCount('select count(*) from problems where is_hidden = 0');
 	$analytics['submissions_count'] = DB::selectCount('select count(*) from submissions');
 	$analytics['submissions_count_today'] = DB::selectCount('select count(*) from submissions where to_days(submit_time) = to_days(now())');
+	$analytics['judgements_count'] = DB::selectCount('select count(*) from submissions_history');
+	$analytics['judgements_count_today'] = DB::selectCount('select count(*) from submissions_history where to_days(judge_time) = to_days(now())');
 	$analytics['hack_count'] = DB::selectCount('select count(*) from hacks');
 	$analytics['hack_count_today'] = DB::selectCount('select count(*) from hacks where to_days(submit_time) = to_days(now())');
 	$analytics['user_count'] = DB::selectCount('select count(*) from user_info');
@@ -103,8 +105,10 @@ function showAnalytics() {
 			<tbody>
 				<tr><td>题目数量</td><td><?= $analytics['problems_count'] ?></td></tr>
 				<tr><td>公开题目数量</td><td><?= $analytics['public_problems_count'] ?></td></tr>
-				<tr><td>评测数量</td><td><?= $analytics['submissions_count'] ?></td></tr>
-				<tr><td>今日评测</td><td><?= $analytics['submissions_count_today'] ?></td></tr>
+				<tr><td>提交数量</td><td><?= $analytics['submissions_count'] ?></td></tr>
+				<tr><td>今日提交数量</td><td><?= $analytics['submissions_count_today'] ?></td></tr>
+				<tr><td>测评数量</td><td><?= $analytics['judgements_count'] ?></td></tr>
+				<tr><td>今日测评数量</td><td><?= $analytics['judgements_count_today'] ?></td></tr>
 				<tr><td>Hack 总数</td><td><?= $analytics['hack_count'] ?></td></tr>
 				<tr><td>今日 Hack 数</td><td><?= $analytics['hack_count_today'] ?></td></tr>
 				<tr><td>用户总数</td><td><?= $analytics['user_count'] ?></td></tr>

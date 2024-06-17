@@ -162,5 +162,11 @@ return [
 	'latest comment' => '最新评论',
 	'search problem contents' => '搜索题目内容',
 	'regexp' => '正则表达式',
-	'keyword' => '关键词'
+	'keyword' => '关键词',
+	'analytics' => '统计信息',
+	'user management' => '用户操作',
+	'group management' => '组操作',
+	'blog management' => '博客管理',
+	'send message' => '发送公告',
+	'link management' => '链接管理'
 ];
