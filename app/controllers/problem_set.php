@@ -170,6 +170,7 @@ EOD;
 	$pag_config['cond'] = $cond;
 	$pag_config['tail'] = 'order by id asc';
 	$pag_config['max_extend'] = 5;
+	$pag_config['timeout'] = 1000;
 	$pag = new Paginator($pag_config);
 
 	$div_classes = array('table-responsive');
