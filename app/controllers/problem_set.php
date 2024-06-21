@@ -204,7 +204,7 @@ EOD;
 	</div>
 </form>
 <div class="row">
-	<div class="col-xs-10 col-xs-push-1 col-sm-6 col-sm-push-3 input-group">
+	<div class="col-xs-12 col-sm-12 input-group">
 		<?php echo $pag->pagination(); ?>
 	</div>
 </div>
