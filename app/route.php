@@ -6,6 +6,8 @@ Route::pattern('contest_id', '[1-9][0-9]{0,9}');
 Route::pattern('tab', '\S{1,20}');
 Route::pattern('rand_str_id', '[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]{20}');
 Route::pattern('upgrade_name', '[a-zA-Z0-9_]{1,50}');
+Route::pattern('dir', '(pictures|uploads|utility)');
+Route::pattern('file', '[\/a-zA-Z0-9_\-\.%]{1,600}');
 
 Route::group([
 		'domain' => '('.UOJConfig::$data['web']['main']['host'].'|127.0.0.1'.')'
@@ -71,6 +73,8 @@ Route::group([
 		Route::any('/download.php', '/download.php');
 
 		Route::any('/click-zan', '/click_zan.php');
+		
+		Route::any('/{dir}/{file}', '/view_file.php');
 	}
 );
 
