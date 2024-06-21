@@ -21,5 +21,10 @@ RewriteRule ^(.*)/$ /$1 [L,R=301]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [L]
 
+RewriteCond %{REQUEST_URI} ^/(uploads|utility|pictures)/
+RewriteRule ^ index.php [L]
+
+RewriteRule ^\. - [F]
+
 ErrorDocument 403 /error.php
 ErrorDocument 404 /error.php
