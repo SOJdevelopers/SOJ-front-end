@@ -38,3 +38,4 @@
 	header("Content-type: {$mimetype}");
 	header('Content-Disposition: inline; filename=' . urldecode(basename($file)));
 	header('Content-Length: ' . filesize($file_name));
+	header('Cache-Control: no-cache');
