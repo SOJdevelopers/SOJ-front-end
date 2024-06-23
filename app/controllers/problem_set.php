@@ -64,7 +64,7 @@ EOD;
 	$cur_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
 	$search_form = new SOJForm();
 	$search_tag = $search_form->addText('tag', UOJLocale::get('tags').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('separated by comma').'"', validateLength(128));
-	$esc_search = $search_form->addTextSubmit('search', UOJLocale::get('keyword').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('search blog').'"', validateLength(128));
+	$esc_search = $search_form->addTextSubmit('search', UOJLocale::get('keyword').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('search problem').'"', validateLength(128));
 	$search_form->focusText('search', 191);
 	$content = $search_form->addCheckBox('content', UOJLocale::get('search problem contents'), 'true');
 	$regexp = $search_form->addCheckBox('regexp', UOJLocale::get('regexp'), 'true');
