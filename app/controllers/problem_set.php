@@ -61,20 +61,20 @@ EOD;
 		}
 	}
 	
-	$cond = array();
-	
-	$search_tag = null;
-	
 	$cur_tab = isset($_GET['tab']) ? $_GET['tab'] : 'all';
-	if (isset($_GET['tag'])) {
-		$search_tag = DB::escape($_GET['tag']);
-	}
+	$search_form = new SOJForm();
+	$search_tag = $search_form->addText('tag', UOJLocale::get('tags').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('separated by comma').'"', validateLength(128));
+	$esc_search = $search_form->addTextSubmit('search', UOJLocale::get('keyword').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('search blog').'"', validateLength(128));
+	$search_form->focusText('search', 191);
+	$content = $search_form->addCheckBox('content', UOJLocale::get('search problem contents'), 'true');
+	$regexp = $search_form->addCheckBox('regexp', UOJLocale::get('regexp'), 'true');
 	
 	if ($search_tag) {
-		$tags_raw = explode(',', str_replace('，', ',', $search_tag));
+		$tags_raw = explode(',', str_replace('，', ',', DB::escape($search_tag)));
 		foreach ($tags_raw as &$tag_ref) {
 			$tag_ref = trim($tag_ref);
 		}
+		unset($tag_ref);
 	}
 	else
 		$tags_raw = array();
@@ -90,6 +90,7 @@ EOD;
 	}
 
 	if ($validate_input) {
+		$cond = array();
 		if ($cur_tab == 'template')
 			$tags_raw[] = '模板题';
 	
@@ -111,18 +112,18 @@ EOD;
 			$cond[] = 'exists (select 1 from contests_problems where contests_problems.problem_id = problems.id)';
 		}
 	
-		if (isset($_GET['search'])) {
-			$esc_search = mb_substr(DB::escape($_GET['search']),0,128);
-			$cmp = (isset($_GET['regexp']) && $_GET['regexp']=='true') ? "regexp '{$esc_search}'" : "like '%{$esc_search}%'";
+		if ($esc_search) {
+			$esc_search = DB::escape($esc_search);
+			$cmp = $regexp ? "regexp '{$esc_search}'" : "like '%{$esc_search}%'";
 			$cond_or = array();
-			if (isset($_GET['regexp']) && $_GET['regexp']=='true')
+			if ($regexp)
 				$cond_or[] = "id regexp '{$esc_search}'";
 			else
 				if(validateUInt($esc_search))
 					$cond_or[] = "id = '{$esc_search}'";
 			$cond_or[] = 'title ' . $cmp;
 			$cond_or[] = 'exists (select 1 from problems_tags where problems_tags.problem_id = problems.id and problems_tags.tag '.$cmp.')';
-			if (isset($_GET['content']) && $_GET['content']=='true')
+			if ($content)
 			    $cond_or[] = 'exists (select 1 from problems_contents where problems_contents.id = problems.id and problems_contents.statement_md ' . $cmp . ')';
 			if ($cond_or)
 				$cond[] = '(' . join(' or ', $cond_or) . ')';
@@ -186,23 +187,9 @@ EOD;
 		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
 	</div>
 </div>
-<form id="form-search" class="form-horizontal" role="form" method="get">
-	<div class="form-group">
-		<label class="col-sm-1 control-label"><?= UOJLocale::get('tags')?></label>
-		<div class="col-sm-2">
-			<input type="text" class="form-control" name="tag" maxlength="128" placeholder="<?= UOJLocale::get('separated by comma')?>" <?= isset($_GET['tag']) ? 'value="' . HTML::escape($_GET['tag']) . '" ' : '' ?>/>
-		</div>
-		<div class="col-sm-3 text-right">
-			<label class="checkbox-inline"><input type="checkbox" name="content" value="true" <?= isset($_GET['content']) && $_GET['content']=='true' ? 'checked' : '' ?>/><?= UOJLocale::get('search problem contents')?></label>
-			<label class="checkbox-inline"><input type="checkbox" name="regexp" value="true" <?= isset($_GET['regexp']) && $_GET['regexp']=='true' ? 'checked' : '' ?>/><?= UOJLocale::get('regexp')?></label>
-		</div>
-		<label class="col-sm-1 control-label"><?= UOJLocale::get('keyword')?></label>
-		<div class="col-sm-4 input-group">
-			<input type="text" class="form-control" name="search" id="search" maxlength="128" placeholder="<?= UOJLocale::get('search problem')?>" <?= isset($_GET['search']) ? 'value="' . HTML::escape($_GET['search']) . '" ' : '' ?>/>
-			<span class="input-group-btn"><button type="submit" class="btn btn-search btn-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button></span>
-		</div>
-	</div>
-</form>
+<div class="top-buffer-sm"></div>
+<?php $search_form->printHTML('problems' . ($cur_tab == 'all' ? '' : '/' . $cur_tab)) ?>
+<div class="top-buffer-sm"></div>
 <div class="row">
 	<div class="col-xs-12 col-sm-12 input-group">
 		<?php echo $pag->pagination(); ?>
@@ -215,15 +202,6 @@ EOD;
 ?>
 <div class="top-buffer-sm"></div>
 <script type="text/javascript">
-	document.addEventListener("keydown",function(event) {
-		if(event.keyCode===191&&document.activeElement.type!=="text") {
-			var obj=document.getElementById("search");
-			var pos=obj.value.length;
-			obj.setSelectionRange(pos,pos);
-			obj.focus();
-			event.preventDefault();
-		}
-	});
 	$('#input-show_tags_mode').click(function() {
 		if (this.checked) {
 			$.cookie('show_tags_mode', '', {path: '/problems'});

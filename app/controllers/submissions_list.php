@@ -3,13 +3,19 @@
 		redirectToLogin();
 	}
 
-	$conds = array();
+	requirePHPLib('form');
 
-	$q_problem_id = isset($_GET['problem_id']) && validateUInt($_GET['problem_id']) ? $_GET['problem_id'] : null;
-	$q_submitter = isset($_GET['submitter']) && validateUsername($_GET['submitter']) ? $_GET['submitter'] : null;
-	$q_min_score = isset($_GET['min_score']) && validateUInt($_GET['min_score']) ? $_GET['min_score'] : null;
-	$q_max_score = isset($_GET['max_score']) && validateUInt($_GET['max_score']) ? $_GET['max_score'] : null;
-	$q_language = isset($_GET['language']) ? $_GET['language'] : null;
+
+	$search_form = new SOJForm();
+	$common = 'class="form-control input-sm" ';
+	$q_problem_id = $search_form->addText('problem_id', UOJLocale::get('problems::problem id').':', $common . 'maxlength="4" style="width:4em"', 'validateUInt');
+	$q_submitter = $search_form->addText('submitter', UOJLocale::get('username').':', $common . 'maxlength="20" style="width:10em"', 'validateUsername');
+	$q_min_score = $search_form->addText('min_score', UOJLocale::get('score range').':', $common . 'maxlength="5" style="width:4em" placeholder="0"', 'validateUInt');
+	$q_max_score = $search_form->addText('max_score', '~', $common . 'maxlength="5" style="width:4em" placeholder="inf"', 'validateUInt');
+	$q_language = $search_form->addText('language', UOJLocale::get('problems::language').':', $common . 'maxlength="10" style="width:8em"', validateLength(10));
+	$search_form->addSubmit(UOJLocale::get('search'));
+	
+	$conds = array();
 	if($q_problem_id != null) {
 		$conds[] = "problem_id = {$q_problem_id}";
 	}
@@ -26,8 +32,6 @@
 		$conds[] = 'language = \'' . DB::escape($q_language) . '\'';
 	}
 
-	$html_esc_q_language = htmlspecialchars($q_language);
-
 	if ($conds) {
 		$cond = join($conds, ' and ');
 	} else {
@@ -39,44 +43,7 @@
 	<div class="pull-right">
 		<a href="<?= HTML::url(UOJContext::requestURI(), array('params' => array('submitter' => Auth::id(), 'page' => null))) ?>" class="btn btn-primary btn-sm"><?= UOJLocale::get('problems::my submissions') ?></a>
 	</div>
-	<form id="form-search" class="form-inline" method="get">
-		<div id="form-group-problem_id" class="form-group">
-			<label for="input-problem_id" class="control-label"><?= UOJLocale::get('problems::problem id')?>:</label>
-			<input type="text" class="form-control input-sm" name="problem_id" id="input-problem_id" value="<?= $q_problem_id ?>" maxlength="4" style="width:4em" />
-		</div>
-		<div id="form-group-submitter" class="form-group">
-			<label for="input-submitter" class="control-label"><?= UOJLocale::get('username')?>:</label>
-			<input type="text" class="form-control input-sm" name="submitter" id="input-submitter" value="<?= $q_submitter ?>" maxlength="20" style="width:10em" />
-		</div>
-		<div id="form-group-score" class="form-group">
-			<label for="input-min_score" class="control-label"><?= UOJLocale::get('score range')?>:</label>
-			<input type="text" class="form-control input-sm" name="min_score" id="input-min_score" value="<?= $q_min_score ?>" maxlength="3" style="width:4em" placeholder="0" />
-			<label for="input-max_score" class="control-label">~</label>
-			<input type="text" class="form-control input-sm" name="max_score" id="input-max_score" value="<?= $q_max_score ?>" maxlength="3" style="width:4em" placeholder="100" />
-		</div>
-		<div id="form-group-language" class="form-group">
-			<label for="input-language" class="control-label"><?= UOJLocale::get('problems::language')?>:</label>
-			<input type="text" class="form-control input-sm" name="language" id="input-language" value="<?= $html_esc_q_language ?>" maxlength="10" style="width:8em" />
-		</div>
-		<button type="submit" id="submit-search" class="btn btn-default btn-sm"><?= UOJLocale::get('search')?></button>
-	</form>
-	<script type="text/javascript">
-		$('#form-search').submit(function(e) {
-			e.preventDefault();
-			
-			url = '/submissions';
-			qs = [];
-			$(['problem_id', 'submitter', 'min_score', 'max_score', 'language']).each(function () {
-				if ($('#input-' + this).val()) {
-					qs.push(this + '=' + encodeURIComponent($('#input-' + this).val()));
-				}
-			});
-			if (qs.length > 0) {
-				url += '?' + qs.join('&');
-			}
-			location.href = url;
-		});
-	</script>
+<?php $search_form->printHTML('submissions') ?>
 	<div class="top-buffer-sm"></div>
 </div>
 <?php
