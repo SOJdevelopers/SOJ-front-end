@@ -835,3 +835,133 @@ EOD;
 		};
 		return $form;
 	}
+
+	class SOJForm {
+		private $html = '';
+		private $js = '';
+		private $get_list = array();
+
+		public function addText($name, $label, $input_attribute, $validator) {
+			$this->get_list[] = "'{$name}'";
+			$get_value = null;
+			if (isset($_GET[$name]) && $validator($_GET[$name])) {
+				$get_value = $_GET[$name];
+				$input_attribute .= ' value="' . htmlspecialchars($get_value) . '"';
+			}
+			$this->html .= <<<EOD
+	<div id="form-group-{$name}" class="form-group">
+		<label for="input-{$name}" class="control-label">{$label}</label>
+		<input type="text" name="{$name}" id="input-{$name}" {$input_attribute} />
+	</div>
+EOD;
+			return $get_value;
+		}
+
+		public function addSelect($name, $label, $select_attribute, $options) {
+			$this->get_list[] = "'{$name}'";
+			$get_value = '';
+			if (isset($_GET[$name]) && isset($options[$_GET[$name]])) {
+				$get_value = $_GET[$name];
+			}
+			$option_str = '';
+			foreach ($options as $key => $value) {
+				$option_str .= '<option value="' . $key . '"';
+				if ($key == $get_value) {
+					$option_str .= ' selected="selected"';
+				}
+				$option_str .= '>' . $value . '</option>';
+			}
+			$this->html .= <<<EOD
+	<div id="form-group-{$name}" class="form-group">
+		<label for="input-{$name}" class="control-label">{$label}</label>
+		<select name="{$name}" id="input-{$name}" {$select_attribute} >
+			{$option_str}
+		</select>
+	</div>
+EOD;
+			return $get_value;
+		}
+
+		public function addCheckBox($name, $label, $truth_value) {
+			$this->get_list[] = "'{$name}'";
+			$get_value = false;
+			if (isset($_GET[$name]) && $_GET[$name] == $truth_value) {
+				$get_value = true;
+			}
+			$checked = $get_value?'checked':'';
+			$this->html .= <<<EOD
+	<div id="form-group-{$name}" class="form-group">
+		<label class="checkbox-inline"><input type="checkbox" name="{$name}" id="input-{$name}" value="{$truth_value}" {$checked}/>{$label}</label>
+	</div>
+EOD;
+			return $get_value;
+		}
+
+		public function addSubmit($label) {
+			$this->html .= <<<EOD
+	<button type="submit" id="submit-search" class="btn btn-default btn-sm">{$label}</button>
+EOD;
+		}
+
+		public function addTextSubmit($name, $label, $input_attribute, $validator) {
+			$this->get_list[] = "'{$name}'";
+			$get_value = null;
+			if (isset($_GET[$name]) && $validator($_GET[$name])) {
+				$get_value = $_GET[$name];
+				$input_attribute .= ' value="' . htmlspecialchars($get_value) . '"';
+			}
+			$this->html .= <<<EOD
+	<div id="form-group-{$name}" class="form-group">
+		<label for="input-{$name}" class="control-label">{$label}</label>
+		<div class="input-group">
+			<input type="text" name="{$name}" id="input-{$name}" {$input_attribute} />
+			<span class="input-group-btn"><button type="submit" class="btn btn-search btn-primary" id="submit-search"><span class="glyphicon glyphicon-search"></span></button></span>
+		</div>
+	</div>
+EOD;
+			return $get_value;
+		}
+
+	public function focusText($name, $keycode) {
+		$this->js .= <<<EOD
+	document.addEventListener("keydown", function (e) {
+		if (e.keyCode === {$keycode} && document.activeElement.type !== "text") {
+			var obj = document.getElementById("input-{$name}"), pos = obj.value.length;
+			obj.setSelectionRange(pos, pos);
+			obj.focus();
+			e.preventDefault();
+		}
+	});
+EOD;
+	}
+
+		public function printHTML($url) {
+			$get_list_str = join($this->get_list, ', ');
+			echo <<<EOD
+<form id="form-search" class="form-inline" method="get">
+{$this->html}
+</form>
+<script type="text/javascript">
+{$this->js}
+	$('#form-search').submit(function(e) {
+		e.preventDefault();
+		var url = '/{$url}', qs = [];
+		$([{$get_list_str}]).each(function () {
+			const ele = $('#input-' + this);
+			if (ele.get(0).type === 'checkbox' ? ele.get(0).checked : ele.val()) {
+				qs.push(this + '=' + encodeURIComponent(ele.val()));
+			}
+		});
+		if (qs.length > 0) {
+			url += '?' + qs.join('&');
+		}
+		location.href = url;
+	});
+</script>
+EOD;
+		}
+	}
+
+	function validateLength($len) {
+		return function($x) use ($len) {return mb_strlen($x) <= $len;};
+	}

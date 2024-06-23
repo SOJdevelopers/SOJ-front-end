@@ -33,10 +33,26 @@
 </div>
 <h3><?= UOJLocale::get('blog overview') ?></h3>
 <?php
+	$search_form = new SOJForm();
+	$search = $search_form->addTextSubmit('search', UOJLocale::get('keyword').':', 'class="form-control" maxlength="128" placeholder="'.UOJLocale::get('title').'"', validateLength(128));
+	$search_form->focusText('search', 191);
+	$tag = $search_form->addCheckBox('tag', UOJLocale::get('search blog tags'), 'true');
+	$regexp = $search_form->addCheckBox('regexp', UOJLocale::get('regexp'), 'true');
+	$search_form->printHTML('blogs');
+
 	$cond = 'is_hidden = 0';
 	if (!isSuperUser(Auth::user())) {
 		initBlogEnvironment(Auth::user());
 		$cond .= " and id in (select id from blog_t)";
+	}
+	if ($search) {
+		$search = DB::escape($search);
+		$cmp = $regexp ? "regexp '{$search}'" : "like '%{$search}%'";
+		$cond_or = "title {$cmp}";
+		if ($tag) {
+			$cond_or .= " or exists (select 1 from blogs_tags where blogs_tags.blog_id = blogs.id and blogs_tags.tag {$cmp})";
+		}
+		$cond .= " and ({$cond_or})";
 	}
 	echoLongTable(array('id', 'poster', 'title', 'post_time', 'zan', 'latest_comment', 'latest_commenter'), 'blogs', $cond, isset($_COOKIE['blogs_sortby']) ? 'order by latest_comment desc' : 'order by post_time desc', $header, 'echoBlogCell', $config);
 ?>

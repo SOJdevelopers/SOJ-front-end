@@ -84,7 +84,6 @@
 		become404Page();
 	}
 	finfo_close($finfo);
-	var_dump($mimetype);
 
 	header("X-Sendfile: {$file_name}");
 	header("Content-type: {$mimetype}");
