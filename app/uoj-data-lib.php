@@ -375,7 +375,7 @@
 		move_uploaded_file($output_file_name, "$cur_dir/$new_output_name");
 
 		if (dataSyncProblemData($problem, true) === '') {
-			rejudgeProblemAC($problem);
+			rejudgeProblemAC($problem, array('auto' => true));
 		} else {
 			error_log('hack successfully but sync failed.');
 		}
