@@ -374,9 +374,11 @@
 		move_uploaded_file($input_file_name, "$cur_dir/$new_input_name");
 		move_uploaded_file($output_file_name, "$cur_dir/$new_output_name");
 
+		insertAuditLog('problems', 'add extra_test', $id, 'successful hack', '', array('auto' => true));
 		if (dataSyncProblemData($problem, true) === '') {
 			rejudgeProblemAC($problem, array('auto' => true));
 		} else {
+			insertAuditLog('problems', 'add extra_test failed', $id, '', '', array('auto' => true));
 			error_log('hack successfully but sync failed.');
 		}
 	}
