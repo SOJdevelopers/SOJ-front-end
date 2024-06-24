@@ -166,16 +166,20 @@
 		return 'ex_' . getUOJConfVal($problem_conf, 'output_pre', 'output') . $num . '.' . getUOJConfVal($problem_conf, 'output_suf', 'txt');
 	}
 	
-	function rejudgeProblem($problem) {
+	function rejudgeProblem($problem, $log_config=array()) {
+		insertAuditLog('problems','rejudge',$problem['id'],isset($log_config['reason'])?$log_config['reason']:'',isset($log_config['details'])?$log_config['details']:'',$log_config);
 		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']}");
 	}
-	function rejudgeProblemAC($problem) {
+	function rejudgeProblemAC($problem, $log_config=array()) {
+		insertAuditLog('problems','rejudge AC',$problem['id'],isset($log_config['reason'])?$log_config['reason']:'',isset($log_config['details'])?$log_config['details']:'',$log_config);
 		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score = 100");
 	}
-	function rejudgeProblemGe97($problem) {
+	function rejudgeProblemGe97($problem, $log_config=array()) {
+		insertAuditLog('problems','rejudge Ge97',$problem['id'],isset($log_config['reason'])?$log_config['reason']:'',isset($log_config['details'])?$log_config['details']:'',$log_config);
 		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where problem_id = {$problem['id']} and score >= 97");
 	}
-	function rejudgeSubmission($submission) {
+	function rejudgeSubmission($submission, $log_config=array()) {
+		insertAuditLog('submissions','rejudge',$submission['id'],isset($log_config['reason'])?$log_config['reason']:'',isset($log_config['details'])?$log_config['details']:'',$log_config);
 		DB::update("update submissions set active_version_id = NULL , judge_time = NULL , judger_name = '' , result = '' , score = NULL , status = 'Waiting Rejudge' where id = {$submission['id']}");
 	}
 	function updateBestACSubmissions($username, $problem_id) {
