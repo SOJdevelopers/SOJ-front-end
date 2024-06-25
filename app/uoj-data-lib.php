@@ -356,7 +356,7 @@
 		return (new SyncProblemDataHandler($problem, $permission_level, array('no_compile' => '')))->handle();
 	}
 
-	function dataAddExtraTest($problem, $input_file_name, $output_file_name) {
+	function dataAddExtraTest($problem, $input_file_name, $output_file_name, $log_config=array()) {
 		$id = $problem['id'];
 		
 		$cur_dir = "/var/uoj_data/upload/$id";
@@ -374,7 +374,7 @@
 		move_uploaded_file($input_file_name, "$cur_dir/$new_input_name");
 		move_uploaded_file($output_file_name, "$cur_dir/$new_output_name");
 
-		insertAuditLog('problems', 'add extra_test', $id, 'successful hack', '', array('auto' => true));
+		insertAuditLog('problems', 'add extra_test', $id, isset($log_config['reason'])?$log_config['reason']:'', '', $log_config);
 		if (dataSyncProblemData($problem, true) === '') {
 			rejudgeProblemAC($problem, array('auto' => true));
 		} else {
