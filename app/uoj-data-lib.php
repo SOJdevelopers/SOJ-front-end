@@ -154,7 +154,7 @@
 			unlink("{$this->prepare_dir}/makefile_result.txt");
 		}
 		
-		public function handle() {
+		public function handle($log_config=array()) {
 			$id = $this->problem['id'];
 			if (!validateUInt($id)) {
 				error_log("dataSyncProblemData: hacker detected");
@@ -170,6 +170,9 @@
 			}
 
 			try {
+				insertAuditLog('problems','data preparing',$id,isset($log_config['reason'])?$log_config['reason']:'',json_encode(
+					array('permission_level' => $this->permission_level, 'sync_config' => $this->sync_config)
+				),$log_config);
 				$this->requirement = array();
 				$this->problem_extra_config = json_decode($this->problem['extra_config'], true);
 
@@ -324,6 +327,9 @@
 					DB::update("update problems set submission_requirement = '$esc_requirement' where id = $id");
 				}
 			} catch (Exception $e) {
+				insertAuditLog('problems','data preparing failed',$id,'',json_encode(
+					array('exception_message' => $e->getMessage())
+				), array('auto' => true));
 				exec("rm {$this->prepare_dir} -r");
 				return $e->getMessage();
 			}
@@ -346,14 +352,14 @@
 		DB::delete("delete from judger_data_sync where judger_name='$esc_judger_name' and problem_id=$problem_id");
 	}
 
-	function dataSyncProblemData($problem, $permission_level) {
+	function dataSyncProblemData($problem, $permission_level, $log_config=array()) {
 		clearJudgerData($problem["id"]);
-		return (new SyncProblemDataHandler($problem, $permission_level, array()))->handle();
+		return (new SyncProblemDataHandler($problem, $permission_level, array()))->handle($log_config);
 	}
 
-	function dataFastSyncProblemData($problem, $permission_level) {
+	function dataFastSyncProblemData($problem, $permission_level, $log_config=array()) {
 		clearJudgerData($problem["id"]);
-		return (new SyncProblemDataHandler($problem, $permission_level, array('no_compile' => '')))->handle();
+		return (new SyncProblemDataHandler($problem, $permission_level, array('no_compile' => '')))->handle($log_config);
 	}
 
 	function dataAddExtraTest($problem, $input_file_name, $output_file_name, $log_config=array()) {
@@ -365,6 +371,8 @@
 		if ($problem_conf == -1 || $problem_conf == -2) {
 			return $problem_conf;
 		}
+		insertAuditLog('problems', 'add extra_test', $id, isset($log_config['reason'])?$log_config['reason']:'', '', $log_config);
+		
 		$problem_conf['n_ex_tests'] = getUOJConfVal($problem_conf, 'n_ex_tests', 0) + 1;
 		
 		$new_input_name = getUOJProblemExtraInputFileName($problem_conf, $problem_conf['n_ex_tests']);
@@ -374,7 +382,6 @@
 		move_uploaded_file($input_file_name, "$cur_dir/$new_input_name");
 		move_uploaded_file($output_file_name, "$cur_dir/$new_output_name");
 
-		insertAuditLog('problems', 'add extra_test', $id, isset($log_config['reason'])?$log_config['reason']:'', '', $log_config);
 		if (dataSyncProblemData($problem, true) === '') {
 			rejudgeProblemAC($problem, array('auto' => true));
 		} else {
