@@ -88,7 +88,7 @@
 			if ($result['score']) {
 				list($problem_id) = DB::selectFirst("select problem_id from hacks where id = {$_POST['id']}", MYSQLI_NUM);
 				if (validateUploadedFile('hack_input') && validateUploadedFile('std_output')) {
-					dataAddExtraTest(queryProblemBrief($problem_id), $_FILES["hack_input"]["tmp_name"], $_FILES["std_output"]["tmp_name"], array('reason' => 'successful hack', 'auto' => true));
+					dataAddExtraTest(queryProblemBrief($problem_id), $_FILES["hack_input"]["tmp_name"], $_FILES["std_output"]["tmp_name"], array('reason' => 'successful hack', 'data_source' => array('source' => 'hack', 'hack_id' => $_POST['id']), 'auto' => true));
 				} else {
 					error_log("hack successfully but received no data. id: {$_POST['id']}");
 				}
