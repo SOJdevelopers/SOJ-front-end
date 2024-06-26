@@ -461,9 +461,15 @@ EOD
 		$hackable_form->handle = function() {
 			global $problem;
 			$problem['hackable'] = !$problem['hackable'];
+			insertAuditLog('problems','flip hackable-status',$id,'',json_encode(
+					array('hackable-status' => ($problem['hackable'] ? 1 : 0))
+				));
 			set_time_limit(600);
-			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()));
+			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()), array('reason' => 'flip hackable-status', 'auto' => true));
 			if ($ret) {
+				insertAuditLog('problems','flip hackable-status failed',$id,'',json_encode(
+					array('final hackable-status' => ($problem['hackable'] ? 0 : 1), 'exception_message' => $ret)
+				), array('auto' => true));
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
 			
@@ -582,6 +588,9 @@ EOD
 		$config['view_content_type'] = $_POST['view_content_type'];
 		$config['view_all_details_type'] = $_POST['view_all_details_type'];
 		$config['view_details_type'] = $_POST['view_details_type'];
+		insertAuditLog('problems','update extra_config',$id,'',json_encode(
+					array('config' => $config)
+				));
 		$esc_config = DB::escape(json_encode($config));
 		DB::update("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
 	};
@@ -645,6 +654,9 @@ EOD
 		global $problem;
 		$problem['data_locked'] = !$problem['data_locked'];
 		$hackable = $problem['data_locked'] ? 1 : 0;
+		insertAuditLog('problems','flip data-locked-status',$id,'',json_encode(
+					array('data-locked-status' => $hackable)
+				));
 		DB::update("update problems set data_locked = $hackable where id = {$problem['id']}");
 	};
 	$problem_lock_form->submit_button_config['class_str'] = 
