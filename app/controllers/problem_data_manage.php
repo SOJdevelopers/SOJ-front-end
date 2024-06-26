@@ -57,7 +57,7 @@
 				move_uploaded_file($_FILES['problem_data_file']['tmp_name'], $up_filename . '.zip');
 				$zip = new ZipArchive();
 				if ($zip->open($up_filename . '.zip') === true) {
-					insertAuditLog('problems','data uploading',$id,'','');
+					insertAuditLog('problems','data uploading',$problem['id'],'','');
 					$data_upload_dir = "/var/uoj_data/upload/{$problem['id']}";
 					is_dir($data_upload_dir) or mkdir($data_upload_dir, 0777, true);
 					$zip->extractTo($up_filename);
@@ -462,13 +462,13 @@ EOD
 		$hackable_form->handle = function() {
 			global $problem;
 			$problem['hackable'] = !$problem['hackable'];
-			insertAuditLog('problems','flip hackable-status',$id,'',json_encode(
+			insertAuditLog('problems','flip hackable-status',$problem['id'],'',json_encode(
 					array('hackable-status' => ($problem['hackable'] ? 1 : 0))
 				));
 			set_time_limit(600);
 			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()), array('reason' => 'flip hackable-status', 'auto' => true));
 			if ($ret) {
-				insertAuditLog('problems','flip hackable-status failed',$id,'',json_encode(
+				insertAuditLog('problems','flip hackable-status failed',$problem['id'],'',json_encode(
 					array('final hackable-status' => ($problem['hackable'] ? 0 : 1), 'exception_message' => $ret)
 				), array('auto' => true));
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
@@ -589,7 +589,7 @@ EOD
 		$config['view_content_type'] = $_POST['view_content_type'];
 		$config['view_all_details_type'] = $_POST['view_all_details_type'];
 		$config['view_details_type'] = $_POST['view_details_type'];
-		insertAuditLog('problems','update extra_config',$id,'',json_encode(
+		insertAuditLog('problems','update extra_config',$problem['id'],'',json_encode(
 					array('config' => $config)
 				));
 		$esc_config = DB::escape(json_encode($config));
@@ -655,7 +655,7 @@ EOD
 		global $problem;
 		$problem['data_locked'] = !$problem['data_locked'];
 		$hackable = $problem['data_locked'] ? 1 : 0;
-		insertAuditLog('problems','flip data-locked-status',$id,'',json_encode(
+		insertAuditLog('problems','flip data-locked-status',$problem['id'],'',json_encode(
 					array('data-locked-status' => $hackable)
 				));
 		DB::update("update problems set data_locked = $hackable where id = {$problem['id']}");
