@@ -372,7 +372,7 @@
 		if ($problem_conf == -1 || $problem_conf == -2) {
 			return $problem_conf;
 		}
-		insertAuditLog('problems', 'add extra_test', $id, isset($log_config['reason'])?$log_config['reason']:'', '', $log_config);
+		insertAuditLog('problems', 'add extra_test', $id, isset($log_config['reason'])?$log_config['reason']:'', isset($log_config['source'])?json_encode($log_config['source']):'', $log_config);
 		
 		$problem_conf['n_ex_tests'] = getUOJConfVal($problem_conf, 'n_ex_tests', 0) + 1;
 		
