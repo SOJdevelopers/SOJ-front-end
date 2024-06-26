@@ -20,13 +20,14 @@
 		}
 	}
 
-	function dataClearProblemData($problem) {
+	function dataClearProblemData($problem, $log_config=array()) {
 		$id = $problem['id'];
-		clearJudgerData($id);
 		if (!validateUInt($id)) {
 			error_log("dataClearProblemData: hacker detected");
 			return "invalid problem id";
 		}
+		insertAuditLog('problems', 'clear data', $id, isset($log_config['reason'])?$log_config['reason']:'', '', $log_config);
+		clearJudgerData($id);
 
 		exec("rm /var/uoj_data/upload/$id -r");
 		exec("rm /var/uoj_data/$id -r");
@@ -382,7 +383,7 @@
 		move_uploaded_file($input_file_name, "$cur_dir/$new_input_name");
 		move_uploaded_file($output_file_name, "$cur_dir/$new_output_name");
 
-		if (dataSyncProblemData($problem, true) === '') {
+		if (dataSyncProblemData($problem, true, array('reason' => 'add extra_test', 'auto' => true)) === '') {
 			rejudgeProblemAC($problem, array('auto' => true));
 		} else {
 			insertAuditLog('problems', 'add extra_test failed', $id, '', '', array('auto' => true));
