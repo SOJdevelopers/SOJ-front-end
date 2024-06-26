@@ -57,6 +57,7 @@
 				move_uploaded_file($_FILES['problem_data_file']['tmp_name'], $up_filename . '.zip');
 				$zip = new ZipArchive();
 				if ($zip->open($up_filename . '.zip') === true) {
+					insertAuditLog('problems','data uploading',$id,'','');
 					$data_upload_dir = "/var/uoj_data/upload/{$problem['id']}";
 					is_dir($data_upload_dir) or mkdir($data_upload_dir, 0777, true);
 					$zip->extractTo($up_filename);
