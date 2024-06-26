@@ -207,6 +207,8 @@ function sendSystemMsgToUsers($users, $title, $content) {
 }
 
 function insertAuditLog($scope, $type, $id_in_scope, $reason, $details, $config=array()) {
+	$scope = DB::escape($scope);
+	$type = DB::escape($type);
 	$reason = DB::escape($reason);
 	$details = DB::escape($details);
 	if (isset($config['auto'])) {
