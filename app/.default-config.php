@@ -3,7 +3,7 @@ return [
 	'profile' => [
 		'oj-name'  => 'Universal Online Judge',
 		'oj-name-short' => 'UOJ',
-		'oj-version' => '7.0-beta.2',
+		'oj-version' => '7.0-beta.3',
 		'administrator' => 'root',
 		'admin-email' => 'root@uoj',
 		'qq-group' => '1145141919810',
