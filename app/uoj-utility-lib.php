@@ -205,3 +205,24 @@ function sendSystemMsgToUsers($users, $title, $content) {
 	}
 	DB::insert("insert into user_system_msg (receiver, title, content, send_time) values " . $values);
 }
+
+function insertAuditLog($scope, $type, $id_in_scope, $reason, $details, $config=array()) {
+	$scope = DB::escape($scope);
+	$type = DB::escape($type);
+	$reason = DB::escape($reason);
+	$details = DB::escape($details);
+	if (isset($config['auto'])) {
+		$type .= ', auto';
+		$config['actor'] = '';
+		$config['actor_remote_addr'] = '';
+		$config['actor_http_x_forwarded_for'] = '';
+	}
+	else {
+		if (!isset($config['actor'])) {
+			$config['actor'] = Auth::id();
+			$config['actor_remote_addr'] = $_SERVER['REMOTE_ADDR'];
+			$config['actor_http_x_forwarded_for'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}
+	}
+	DB::insert("insert into audit_log (scope, type, id_in_scope, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details) values ('$scope', '$type', $id_in_scope, now(), '{$config['actor']}', '{$config['actor_remote_addr']}', '{$config['actor_http_x_forwarded_for']}', '$reason', '$details')");
+}
