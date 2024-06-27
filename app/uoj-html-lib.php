@@ -640,7 +640,7 @@ function echoSubmissionAuditLog($audit_log) {
 			if ($actor_link) {
 				if (!is_array($mes['title']))
 					$mes['title'] = array($mes['title']);
-				$mes['title'][] = "(by $actor_link)";
+				$mes['title'][] = "<span>(by $actor_link)</span>";
 			}
 			if ($actor_ip) {
 				$actor_ip = HTML::escape($actor_ip);
