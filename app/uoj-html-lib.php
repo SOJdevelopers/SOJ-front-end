@@ -623,20 +623,20 @@ function getSubmissionJudgementAuditLog($submission_id) {
 }
 
 function echoSubmissionTimeline($submission, $time_now) {
-	$messages = array();
-	$messages[] = array(
+	$audit_log = array();
+	$audit_log[] = array(
 		'time' => $time_now,
 		'type' => 'current_submission_status',
 		'submission_id' => $submission['id']
 	);
-	$messages = $messages + getSubmissionJudgementAuditLog($submission['id']);
-	$messages[] = array(
+	$audit_log = array_merge($audit_log, getSubmissionJudgementAuditLog($submission['id']));
+	$audit_log[] = array(
 		'time' => $submission['submit_time'],
 		'type' => 'submit',
 		'actor' => $submission['submitter'],
 		'submission_id' => $submission['id']
 	);
-	echoSubmissionAuditLog($messages);
+	echoSubmissionAuditLog($audit_log);
 }
 
 function echoSubmissionContent($submission, $requirement) {
