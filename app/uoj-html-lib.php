@@ -657,6 +657,8 @@ function getProblemRejudgeAuditLog($config = array()) {
 	$cond[] = "type like 'rejudge%'";
 	if (isset($config['problem_id']))
 		$cond[] = "id_in_scope = {$config['problem_id']}";
+	if (isset($config['start_time']))
+		$cond[] = "time >= {$config['start_time']}";
 	if ($cond)
 		$cond = join(' and ', $cond);
 	else
@@ -673,7 +675,7 @@ function getProblemRejudgeAuditLog($config = array()) {
 }
 
 function getSubmissionRejudgeAuditLog($submission) {
-	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id']));
+	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
 	$hiss = DB::select("select id, type, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}");
 	$audit_log = array();
 	while ($his = DB::fetch($hiss)) {
