@@ -658,7 +658,7 @@ function getProblemRejudgeAuditLog($config = array()) {
 	if (isset($config['problem_id']))
 		$cond[] = "id_in_scope = {$config['problem_id']}";
 	if (isset($config['start_time']))
-		$cond[] = "time >= {$config['start_time']}";
+		$cond[] = "time >= '{$config['start_time']}'";
 	if ($cond)
 		$cond = join(' and ', $cond);
 	else
