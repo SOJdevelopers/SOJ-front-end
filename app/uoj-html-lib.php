@@ -525,7 +525,7 @@ EOD;
 		}, $table_config);
 }
 
-function echoSubmissionMessages($messages) {
+function echoMessagesTimeline($messages) {
 	echo '<!-- credit to https://bootsnipp.com/snippets/xrKXW -->';
 	echo '<div class="list-group timeline">';
 	foreach ($messages as $mes) {
@@ -536,52 +536,28 @@ function echoSubmissionMessages($messages) {
 		if ($mes['time'])
 			$main_message .= "<strong>[{$mes['time']}]</strong>";
 		else
-			$main_message .= '<strong>[error]</strong>';
+			$main_message .= '<strong>[time not found]</strong>';
 		$main_message .= '</li>';
 		$extra = null;
-		switch($mes['message_type']){
-			case 'submit':
-				$main_message .= '<li>';
-				$main_message .= '提交';
-				$main_message .= '</li>';
-				break;
-			case 'judgement':
-				$main_message .= '<li>';
-				$main_message .= '评测';
-				$main_message .= '</li>';
-				break;
-			case 'current_submission_status':
-				$main_message .= '<li>';
-				$main_message .= '当前提交记录状态';
-				$main_message .= '</li>';
-				break;
+		if (isset($mes['title'])) {
+			if (is_array($mes['title']))
+				$mes['title'] = join('</li><li>', $mes['title']);
+			$mes['title'] = '<li>' . $mes['title'] . '</li>';
+			$main_message .= $mes['title'];
 		}
 		$main_message .= '</ul>';
-		switch($mes['message_type']){
-			case 'submit':
-				break;
-			case 'judgement':
-				$main_message .= '<ul class="list-group-item-text list-inline">';
+		if (isset($mes['previous_list'])) {
+			$main_message .= '<ul class="list-group-item-text list-inline">';
+			foreach ($mes['previous_list'] as $lst_item) {
 				$main_message .= '<li>';
-				$main_message .= '<strong>测评结果：</strong>';
-				$main_message .= getSubmissionJudgedStatusStr($mes['result_error'],$mes['score']);
+				$main_message .= $lst_item;
 				$main_message .= '</li>';
-				if (!isset($mes['result_error'])) {
-					$main_message .= '<li>';
-					$main_message .= '<strong>用时：</strong>';
-					$main_message .= getUsedTimeStr($mes['used_time']);
-					$main_message .= '</li>';
-					$main_message .= '<li>';
-					$main_message .= '<strong>内存：</strong>';
-					$main_message .= getUsedMemoryStr($mes['used_memory']);
-					$main_message .= '</li>';
-				}
-				$main_message .= '</ul>';
-				$extra = '<a href="' . getSubmissionUri($mes['submission_id'], $mes['judgement_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
-				break;
-			case 'current_submission_status':
-				$extra = '<a href="' . getSubmissionUri($mes['submission_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
-				break;
+			}
+			$main_message .= '</ul>';
+		}
+		$extra = null;
+		if (isset($mes['uri'])) {
+			$extra = '<a href="' . $mes['uri'] . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
 		}
 		echo '<div class="', $cls, '">';
 		if ($extra) {
@@ -601,6 +577,34 @@ function echoSubmissionMessages($messages) {
 		echo '</div>';
 	}
 	echo '</div>';
+}
+
+function echoSubmissionMessages($messages_info) {
+	$messages = array();
+	foreach ($messages_info as $mes) {
+		$mes_now = array();
+		switch($mes['message_type']){
+			case 'submit':
+				$mes_now['title'] = '提交';
+				break;
+			case 'judgement':
+				$mes_now['title'] = '评测';
+				$mes_now['previous_list'] = array();
+				$mes_now['previous_list'][] = '<strong>测评结果：</strong>' . getSubmissionJudgedStatusStr($mes['result_error'],$mes['score']);
+				if (!isset($mes['result_error'])) {
+					$mes_now['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($mes['used_time']);
+					$mes_now['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($mes['used_memory']);
+				}
+				$mes_now['uri'] = getSubmissionUri($mes['submission_id'], $mes['judgement_id']);
+				break;
+			case 'current_submission_status':
+				$mes_now['title'] = '当前提交记录状态';
+				$mes_now['uri'] = getSubmissionUri($mes['submission_id']);
+				break;
+		}
+		$messages[] = $mes_now;
+	}
+	echoMessagesTimeline($messages);
 }
 
 function echoSubmissionTimeline($submission, $time_now) {
