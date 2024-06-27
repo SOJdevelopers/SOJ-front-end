@@ -585,7 +585,7 @@ function echoSubmissionAuditLog($audit_log) {
 		$mes = array('time' => $log_now['time']);
 		$log_types = explode(', ', $log_now['type']);
 		$auto_type = ($log_types[count($log_types)-1] == 'auto');
-		if (isset($log_now['reason'])) {
+		if (isset($log_now['reason']) and $log_now['reason']) {
 			$mes['previous_list'] = array();
 			$mes['previous_list'][] = '<strong>原因：</strong>' . $log_now['reason'];
 		}
