@@ -623,6 +623,30 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $prefix . '重测' . $suffix;
 				break;
 		}
+		if (isSuperUser(Auth::user())) {
+			$actor_link = null;
+			$actor_ip = null;
+			if (isset($log_now['actor']))
+				$actor_link = getUserLink($log_now['actor']);
+			if (isset($log_now['actor_http_x_forwarded_for']))
+				$actor_ip = $log_now['actor_http_x_forwarded_for'];
+			else
+				if (isset($log_now['actor_remote_addr']))
+					$actor_ip = $log_now['actor_remote_addr'];
+			if ($auto_type)
+				$actor_link = "system", $actor_ip = null;
+			if ($actor_link) {
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "(by $actor_link)";
+			}
+			if ($actor_ip) {
+				$actor_ip = HTML::escape($actor_ip);
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "(from $actor_ip)";
+			}
+		}
 		$messages[] = $mes;
 	}
 	echoMessagesTimeline($messages);
