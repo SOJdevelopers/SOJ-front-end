@@ -633,8 +633,10 @@ function echoSubmissionAuditLog($audit_log) {
 			else
 				if (isset($log_now['actor_remote_addr']))
 					$actor_ip = $log_now['actor_remote_addr'];
-			if ($auto_type)
-				$actor_link = "system", $actor_ip = null;
+			if ($auto_type) {
+				$actor_link = "system";
+				$actor_ip = null;
+			}
 			if ($actor_link) {
 				if (!is_array($mes['title']))
 					$mes['title'] = array($mes['title']);
