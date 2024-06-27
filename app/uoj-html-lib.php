@@ -579,51 +579,64 @@ function echoMessagesTimeline($messages) {
 	echo '</div>';
 }
 
-function echoSubmissionMessages($messages_info) {
+function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
-	foreach ($messages_info as $mes) {
-		$mes_now = array('time' => $mes['time']);
-		switch($mes['message_type']){
+	foreach ($audit_log as $log_now) {
+		$mes = array('time' => $log_now['time']);
+		$log_types = explode(', ', $log_now['type']);
+		switch($log_types[0]){
 			case 'submit':
-				$mes_now['title'] = '提交';
+				$mes['title'] = '提交';
 				break;
 			case 'judgement':
-				$mes_now['title'] = '评测';
-				$mes_now['previous_list'] = array();
-				$mes_now['previous_list'][] = '<strong>测评结果：</strong>' . getSubmissionJudgedStatusStr($mes['result_error'],$mes['score']);
-				if (!isset($mes['result_error'])) {
-					$mes_now['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($mes['used_time']);
-					$mes_now['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($mes['used_memory']);
+				$mes['title'] = '评测';
+				$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>测评结果：</strong>' . getSubmissionJudgedStatusStr($log_now['details']['result_error'],$log_now['details']['score']);
+				if (!isset($log_now['details']['result_error'])) {
+					$mes['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($log_now['details']['used_time']);
+					$mes['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($log_now['details']['used_memory']);
 				}
-				$mes_now['uri'] = getSubmissionUri($mes['submission_id'], $mes['judgement_id']);
+				$mes['uri'] = getSubmissionUri($log_now['submission_id'], $log_now['details']['judgement_id']);
 				break;
 			case 'current_submission_status':
-				$mes_now['title'] = '当前提交记录状态';
-				$mes_now['uri'] = getSubmissionUri($mes['submission_id']);
+				$mes['title'] = '当前提交记录状态';
+				$mes['uri'] = getSubmissionUri($log_now['submission_id']);
 				break;
 		}
-		$messages[] = $mes_now;
+		$messages[] = $mes;
 	}
 	echoMessagesTimeline($messages);
 }
 
+function getSubmissionJudgementAuditLog($submission_id) {
+	$hiss = DB::select("select judge_time, id as judgement_id, judge_time, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission_id} order by judge_time desc");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$audit_log[] = array(
+			'time' => $his['judge_time'],
+			'type' => 'judgement, auto',
+			'submission_id' => $submission_id,
+			'details' => $his
+		);
+	}
+	return $audit_log;
+}
+
 function echoSubmissionTimeline($submission, $time_now) {
-	$hiss = DB::select("select judge_time as time, 'judgement' as message_type, submission_id, id as judgement_id, judge_time, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission['id']} order by judge_time desc");
 	$messages = array();
 	$messages[] = array(
 		'time' => $time_now,
-		'message_type' => 'current_submission_status',
+		'type' => 'current_submission_status',
 		'submission_id' => $submission['id']
 	);
-	while ($his = DB::fetch($hiss)) {
-		$messages[] = $his;
-	}
+	$messages = $messages + getSubmissionJudgementAuditLog($submission['id']);
 	$messages[] = array(
 		'time' => $submission['submit_time'],
-		'message_type' => 'submit',
+		'type' => 'submit',
+		'actor' => $submission['submitter'],
 		'submission_id' => $submission['id']
 	);
-	echoSubmissionMessages($messages);
+	echoSubmissionAuditLog($messages);
 }
 
 function echoSubmissionContent($submission, $requirement) {
