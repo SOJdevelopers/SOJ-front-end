@@ -602,6 +602,9 @@ function echoSubmissionAuditLog($audit_log) {
 					$mes['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($log_now['details']['used_time']);
 					$mes['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($log_now['details']['used_memory']);
 				}
+				if (hasViewJudgerInfoPermission(Auth::user())) {
+					$mes['previous_list'][] = '<strong>评测机名称：</strong>' . HTML::escape($log_now['details']['judger_name']);
+				}
 				$mes['uri'] = getSubmissionUri($log_now['submission_id'], $log_now['details']['judgement_id']);
 				break;
 			case 'current_submission_status':
