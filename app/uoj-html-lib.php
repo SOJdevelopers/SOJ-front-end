@@ -584,13 +584,19 @@ function echoSubmissionAuditLog($audit_log) {
 	foreach ($audit_log as $log_now) {
 		$mes = array('time' => $log_now['time']);
 		$log_types = explode(', ', $log_now['type']);
+		$auto_type = ($log_types[count($log_types)-1] == 'auto');
+		if (isset($log_now['reason'])) {
+			$mes['previous_list'] = array();
+			$mes['previous_list'][] = '<strong>原因：</strong>' . $log_now['reason'];
+		}
 		switch($log_types[0]){
 			case 'submit':
 				$mes['title'] = '提交';
 				break;
 			case 'judgement':
 				$mes['title'] = '评测';
-				$mes['previous_list'] = array();
+				if (!isset($mes['previous_list']))
+					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>测评结果：</strong>' . getSubmissionJudgedStatusStr($log_now['details']['result_error'],$log_now['details']['score']);
 				if (!isset($log_now['details']['result_error'])) {
 					$mes['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($log_now['details']['used_time']);
@@ -602,10 +608,33 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = '当前提交记录状态';
 				$mes['uri'] = getSubmissionUri($log_now['submission_id']);
 				break;
+			case 'rejudge':
+			case 'rejudge Ge97':
+			case 'rejudge AC':
+				$prefix = $auto_type ? '自动' : '管理员手动';
+				$suffix = isset($log_now['details']['problem_id']) ? '该题' : '该提交记录';
+				if ($log_types[0] == 'rejudge Ge97')
+					$suffix .= '不低于 97 分的程序';
+				if ($log_types[0] == 'rejudge AC')
+					$suffix .= '通过的程序';
+				$mes['title'] = $prefix . '重测' . $suffix;
+				break;
 		}
 		$messages[] = $mes;
 	}
 	echoMessagesTimeline($messages);
+}
+
+function sortAuditLogByTime(&$audit_log) {
+	usort($audit_log, function($a, $b) {
+		$time_a = new DateTime($a['time']);
+		$time_b = new DateTime($b['time']);
+		if ($time_a > $time_b)
+			return -1;
+		if ($time_b > $time_a)
+			return 1;
+		return 0;
+	});
 }
 
 function getSubmissionJudgementAuditLog($submission_id) {
@@ -622,21 +651,69 @@ function getSubmissionJudgementAuditLog($submission_id) {
 	return $audit_log;
 }
 
-function echoSubmissionTimeline($submission, $time_now) {
+function getProblemRejudgeAuditLog($config = array()) {
+	$cond = array();
+	$cond[] = "scope = 'problems'";
+	$cond[] = "type like 'rejudge%'";
+	if (isset($config['problem_id']))
+		$cond[] = "id_in_scope = {$config['problem_id']}";
+	if ($cond)
+		$cond = join(' and ', $cond);
+	else
+		$cond = '1';
+	$hiss = DB::select("select id, type, id_in_scope, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$his['problem_id'] = $his['id_in_scope'];
+		$his['id_in_scope'] = null;
+		$audit_log[] = $his;
+	}
+	return $audit_log;
+}
+
+function getSubmissionRejudgeAuditLog($submission) {
+	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id']));
+	$hiss = DB::select("select id, type, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$his['submission_id'] = $submission['id'];
+		$audit_log[] = $his;
+	}
+	foreach ($problem_log as $log_now) {
+		$log_now['submission_id'] = $submission['id'];
+		$log_now['details']['problem_id'] = $log_now['problem_id'];
+		$log_now['problem_id'] = null;
+		$audit_log[] = $his;
+	}
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getSubmissionHistoryAuditLog($submission) {
+	$audit_log = array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission['id']));
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getSubmissionAuditLog($submission, $time_now) {
 	$audit_log = array();
 	$audit_log[] = array(
 		'time' => $time_now,
 		'type' => 'current_submission_status',
 		'submission_id' => $submission['id']
 	);
-	$audit_log = array_merge($audit_log, getSubmissionJudgementAuditLog($submission['id']));
+	$audit_log = array_merge($audit_log, getSubmissionHistoryAuditLog($submission['id']));
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],
 		'type' => 'submit',
 		'actor' => $submission['submitter'],
 		'submission_id' => $submission['id']
 	);
-	echoSubmissionAuditLog($audit_log);
+	return $audit_log;
+}
+
+function echoSubmissionTimeline($submission, $time_now) {
+	echoSubmissionAuditLog(getSubmissionAuditLog($submission, $time_now));
 }
 
 function echoSubmissionContent($submission, $requirement) {
