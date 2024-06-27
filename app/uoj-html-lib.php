@@ -582,7 +582,7 @@ function echoMessagesTimeline($messages) {
 function echoSubmissionMessages($messages_info) {
 	$messages = array();
 	foreach ($messages_info as $mes) {
-		$mes_now = array();
+		$mes_now = array('time' => $mes['time']);
 		switch($mes['message_type']){
 			case 'submit':
 				$mes_now['title'] = '提交';
