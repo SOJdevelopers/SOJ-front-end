@@ -664,6 +664,7 @@ function getProblemRejudgeAuditLog($config = array()) {
 	$hiss = DB::select("select id, type, id_in_scope, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
 	$audit_log = array();
 	while ($his = DB::fetch($hiss)) {
+		$his['details'] = json_decode($his['details']);
 		$his['problem_id'] = $his['id_in_scope'];
 		$his['id_in_scope'] = null;
 		$audit_log[] = $his;
@@ -676,6 +677,7 @@ function getSubmissionRejudgeAuditLog($submission) {
 	$hiss = DB::select("select id, type, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}");
 	$audit_log = array();
 	while ($his = DB::fetch($hiss)) {
+		$his['details'] = json_decode($his['details']);
 		$his['submission_id'] = $submission['id'];
 		$audit_log[] = $his;
 	}
