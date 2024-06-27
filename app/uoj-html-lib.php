@@ -690,7 +690,7 @@ function getSubmissionRejudgeAuditLog($submission) {
 }
 
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission['id']));
+	$audit_log = array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission));
 	sortAuditLogByTime($audit_log);
 	return $audit_log;
 }
@@ -702,7 +702,7 @@ function getSubmissionAuditLog($submission, $time_now) {
 		'type' => 'current_submission_status',
 		'submission_id' => $submission['id']
 	);
-	$audit_log = array_merge($audit_log, getSubmissionHistoryAuditLog($submission['id']));
+	$audit_log = array_merge($audit_log, getSubmissionHistoryAuditLog($submission));
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],
 		'type' => 'submit',
