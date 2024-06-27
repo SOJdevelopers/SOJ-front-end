@@ -683,7 +683,7 @@ function getSubmissionRejudgeAuditLog($submission) {
 		$log_now['submission_id'] = $submission['id'];
 		$log_now['details']['problem_id'] = $log_now['problem_id'];
 		$log_now['problem_id'] = null;
-		$audit_log[] = $his;
+		$audit_log[] = $log_now;
 	}
 	sortAuditLogByTime($audit_log);
 	return $audit_log;
