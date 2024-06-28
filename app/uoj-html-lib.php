@@ -676,7 +676,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$prefix = '';
 				if ($auto_type) {
 					if ($log_now['reason'] == 'successful hack')
-						$prefix = 'Hack 成功, ';
+						$prefix = 'Hack 成功，';
 					$prefix .= '自动';
 				}
 				else {
