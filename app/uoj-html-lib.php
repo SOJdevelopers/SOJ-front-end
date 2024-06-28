@@ -525,7 +525,7 @@ EOD;
 		}, $table_config);
 }
 
-function echoSubmissionMessages($messages) {
+function echoMessagesTimeline($messages) {
 	echo '<!-- credit to https://bootsnipp.com/snippets/xrKXW -->';
 	echo '<div class="list-group timeline">';
 	foreach ($messages as $mes) {
@@ -536,52 +536,28 @@ function echoSubmissionMessages($messages) {
 		if ($mes['time'])
 			$main_message .= "<strong>[{$mes['time']}]</strong>";
 		else
-			$main_message .= '<strong>[error]</strong>';
+			$main_message .= '<strong>[time not found]</strong>';
 		$main_message .= '</li>';
 		$extra = null;
-		switch($mes['message_type']){
-			case 'submit':
-				$main_message .= '<li>';
-				$main_message .= '提交';
-				$main_message .= '</li>';
-				break;
-			case 'judgement':
-				$main_message .= '<li>';
-				$main_message .= '评测';
-				$main_message .= '</li>';
-				break;
-			case 'current_submission_status':
-				$main_message .= '<li>';
-				$main_message .= '当前提交记录状态';
-				$main_message .= '</li>';
-				break;
+		if (isset($mes['title'])) {
+			if (is_array($mes['title']))
+				$mes['title'] = join('</li><li>', $mes['title']);
+			$mes['title'] = '<li>' . $mes['title'] . '</li>';
+			$main_message .= $mes['title'];
 		}
 		$main_message .= '</ul>';
-		switch($mes['message_type']){
-			case 'submit':
-				break;
-			case 'judgement':
-				$main_message .= '<ul class="list-group-item-text list-inline">';
+		if (isset($mes['previous_list'])) {
+			$main_message .= '<ul class="list-group-item-text list-inline">';
+			foreach ($mes['previous_list'] as $lst_item) {
 				$main_message .= '<li>';
-				$main_message .= '<strong>测评结果：</strong>';
-				$main_message .= getSubmissionJudgedStatusStr($mes['result_error'],$mes['score']);
+				$main_message .= $lst_item;
 				$main_message .= '</li>';
-				if (!isset($mes['result_error'])) {
-					$main_message .= '<li>';
-					$main_message .= '<strong>用时：</strong>';
-					$main_message .= getUsedTimeStr($mes['used_time']);
-					$main_message .= '</li>';
-					$main_message .= '<li>';
-					$main_message .= '<strong>内存：</strong>';
-					$main_message .= getUsedMemoryStr($mes['used_memory']);
-					$main_message .= '</li>';
-				}
-				$main_message .= '</ul>';
-				$extra = '<a href="' . getSubmissionUri($mes['submission_id'], $mes['judgement_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
-				break;
-			case 'current_submission_status':
-				$extra = '<a href="' . getSubmissionUri($mes['submission_id']) . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
-				break;
+			}
+			$main_message .= '</ul>';
+		}
+		$extra = null;
+		if (isset($mes['uri'])) {
+			$extra = '<a href="' . $mes['uri'] . '"><span class="glyphicon glyphicon-info-sign"></span> 查看</a>';
 		}
 		echo '<div class="', $cls, '">';
 		if ($extra) {
@@ -603,23 +579,105 @@ function echoSubmissionMessages($messages) {
 	echo '</div>';
 }
 
-function echoSubmissionTimeline($submission, $time_now) {
-	$hiss = DB::select("select judge_time as time, 'judgement' as message_type, submission_id, id as judgement_id, judge_time, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission['id']} order by judge_time desc");
+function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
-	$messages[] = array(
-		'time' => $time_now,
-		'message_type' => 'current_submission_status',
-		'submission_id' => $submission['id']
-	);
-	while ($his = DB::fetch($hiss)) {
-		$messages[] = $his;
+	foreach ($audit_log as $log_now) {
+		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
+		if ($no_message)
+			continue;
+		$mes = array('time' => $log_now['time']);
+		$log_types = explode(', ', $log_now['type']);
+		$auto_type = ($log_types[count($log_types)-1] == 'auto');
+		$show_actor = isSuperUser(Auth::user());
+		$show_actor_ip = $show_actor;
+		if (isset($log_now['reason']) and $log_now['reason']) {
+			$mes['previous_list'] = array();
+			$mes['previous_list'][] = '<strong>原因：</strong>' . $log_now['reason'];
+		}
+		switch($log_types[0]){
+			case 'submit':
+				$mes['title'] = '提交';
+				break;
+			case 'judgement':
+				$mes['title'] = '评测';
+				if (!isset($mes['previous_list']))
+					$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>测评结果：</strong>' . getSubmissionJudgedStatusStr($log_now['details']['result_error'],$log_now['details']['score']);
+				if (!isset($log_now['details']['result_error'])) {
+					$mes['previous_list'][] = '<strong>用时：</strong>' . getUsedTimeStr($log_now['details']['used_time']);
+					$mes['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($log_now['details']['used_memory']);
+				}
+				if (hasViewJudgerInfoPermission(Auth::user())) {
+					$mes['previous_list'][] = '<strong>评测机名称：</strong>' . HTML::escape($log_now['details']['judger_name']);
+				}
+				$mes['uri'] = getSubmissionUri($log_now['submission_id'], $log_now['details']['judgement_id']);
+				break;
+			case 'current_submission_status':
+				$mes['title'] = '当前提交记录状态';
+				$mes['uri'] = getSubmissionUri($log_now['submission_id']);
+				break;
+			case 'rejudge':
+			case 'rejudge Ge97':
+			case 'rejudge AC':
+				$prefix = $auto_type ? '自动' : '管理员手动';
+				$suffix = isset($log_now['details']['problem_id']) ? '该题' : '该提交记录';
+				if ($log_types[0] == 'rejudge Ge97')
+					$suffix .= '不低于 97 分的程序';
+				if ($log_types[0] == 'rejudge AC')
+					$suffix .= '通过的程序';
+				$mes['title'] = $prefix . '重测' . $suffix;
+				break;
+			case 'hack judgement':
+				$mes['title'] = '被 Hack ' . ($log_now['details']['success'] ? '成功' : '失败');
+				if (!isset($mes['previous_list']))
+					$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
+				$mes['previous_list'][] = '<strong>Hacker：</strong>' . getUserLink($log_now['details']['hacker']);
+				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				break;
+			case 'hack submit':
+				$mes['title'] = '被尝试 Hack';
+				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				$show_actor = true;
+				break;
+			default:
+				$no_message = true;
+		}
+		if ($show_actor) {
+			$actor_link = null;
+			$actor_ip = null;
+			if (isset($log_now['actor']))
+				$actor_link = getUserLink($log_now['actor']);
+			if (isset($log_now['actor_http_x_forwarded_for']))
+				$actor_ip = $log_now['actor_http_x_forwarded_for'];
+			else
+				if (isset($log_now['actor_remote_addr']))
+					$actor_ip = $log_now['actor_remote_addr'];
+			if ($auto_type) {
+				$actor_link = "system";
+				$actor_ip = null;
+			}
+			if ($actor_link) {
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "<span>(by $actor_link)</span>";
+			}
+			if ($show_actor_ip and $actor_ip) {
+				$actor_ip = HTML::escape($actor_ip);
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "(from $actor_ip)";
+			}
+		}
+		if ($no_message)
+			continue;
+		$messages[] = $mes;
 	}
-	$messages[] = array(
-		'time' => $submission['submit_time'],
-		'message_type' => 'submit',
-		'submission_id' => $submission['id']
-	);
-	echoSubmissionMessages($messages);
+	echoMessagesTimeline($messages);
+}
+
+function echoSubmissionTimeline($submission, $time_now) {
+	echoSubmissionAuditLog(getSubmissionAuditLog($submission, $time_now));
 }
 
 function echoSubmissionContent($submission, $requirement) {
@@ -1033,12 +1091,32 @@ function echoHackDetails($hack_details, $name) {
 	echoJudgementDetails($hack_details, new HackDetailsStyler(), $name);
 }
 
+function getHackUri($id) {
+	return "/hack/{$id}";
+}
+
+function getHackJudgedStatusStr($success, $uri = null) {
+	if(isset($uri)){
+		$html_type = 'a';
+		$head = $html_type . ' href="' . $uri . '"';
+	}
+	else{
+		$html_type = 'span';
+		$head = $html_type;
+	}
+	if ($success) {
+		return '<' . $head . ' class="uoj-status" data-success="1"><strong>Success!</strong></' . $html_type . '>';
+	} else {
+		return '<' . $head . ' class="uoj-status" data-success="0"><strong>Failed.</strong></' . $html_type . '>';
+	}
+}
+
 function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
 	$hasProblemPermission = isProblemVisible($user, $problem);
 
-	$hack_id_str = "<a href=\"/hack/{$hack['id']}\">#{$hack['id']}</a>";
-	$submission_id_str = "<a href=\"/submission/{$hack['submission_id']}\">#{$hack['submission_id']}</a>";
+	$hack_id_str = '<a href="' . getHackUri($hack['id']) . "\">#{$hack['id']}</a>";
+	$submission_id_str = '<a href="' . getSubmissionUri($hack['submission_id']) . "\">#{$hack['submission_id']}</a>";
 	$problem_link_str = '/';
 	$hacker_link_str = '/';
 	$owner_link_str = '/';
@@ -1057,14 +1135,11 @@ function echoHack($hack, $config, $user) {
 		$owner_link_str = getUserOrGroupLink($hack['owner']);
 
 		if($hack['judge_time'] == null) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Waiting</a>";
+			$hack_status_str = '<a href="' . getHackUri($hack['id']) . "\">Waiting</a>";
 		} elseif ($hack['success'] == null) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Judging</a>";
-		} elseif ($hack['success']) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"1\"><strong>Success!</strong></a>";
-		} else {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"0\"><strong>Failed.</strong></a></td>";
-		}
+			$hack_status_str = '<a href="' . getHackUri($hack['id']) . "\">Judging</a>";
+		} else
+			$hack_status_str = getHackJudgedStatusStr($hack['success'], getHackUri($hack['id']));
 	}
 	echo '<tr>';
 	if (!isset($config['id_hidden']))
