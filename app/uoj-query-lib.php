@@ -316,6 +316,17 @@ function getProblemAuditLog($config = array()) {
 	return $audit_log;
 }
 
+function getProblemDataChangesAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'combine_by_or', 'word' => array(
+		array('type' => 'like', 'word' => 'clear data%'),
+		array('type' => 'like', 'word' => 'data preparing%'),//'data preparing failed'
+		array('type' => 'like', 'word' => 'add extra_test%')
+	));
+	return getProblemAuditLog($config);
+}
+
 function getProblemRejudgeAuditLog($config = array()) {
 	if (!isset($config['type']))
 		$config['type'] = array();
@@ -380,6 +391,12 @@ function getSubmissionHacksAuditLog($submission_id) {
 function getSubmissionHistoryAuditLog($submission) {
 	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission['id']));
 	sortAuditLogByTime($audit_log);
+	$audit_log[] = array(
+		'time' => $submission['submit_time'],
+		'type' => 'submit',
+		'actor' => $submission['submitter'],
+		'submission_id' => $submission['id']
+	);
 	return $audit_log;
 }
 
@@ -391,12 +408,7 @@ function getSubmissionAuditLog($submission, $time_now) {
 		'submission_id' => $submission['id']
 	);
 	$audit_log = array_merge($audit_log, getSubmissionHistoryAuditLog($submission));
-	$audit_log[] = array(
-		'time' => $submission['submit_time'],
-		'type' => 'submit',
-		'actor' => $submission['submitter'],
-		'submission_id' => $submission['id']
-	);
+	$audit_log = array_merge($audit_log, getProblemDataChangesAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time'])));
 	return $audit_log;
 }
 
