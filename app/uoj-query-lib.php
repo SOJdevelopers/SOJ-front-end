@@ -264,10 +264,39 @@ function getSubmissionJudgementAuditLog($submission_id) {
 	return $audit_log;
 }
 
-function getProblemRejudgeAuditLog($config = array()) {
+function getMatchCondition($config, $conjunction = 'and') {
+	if (!is_array($config))
+		return getMatchCondition(array($config), $conjunction);
+	$cond = array();
+	foreach ($config as $conf) {
+		switch ($conf['type']) {
+			case 'combine_by_or':
+				$cond[] = '(' . getMatchCondition($conf['word'], 'or') . ')';
+				break;
+			case 'combine_by_and':
+				$cond[] = '(' . getMatchCondition($conf['word'], 'and') . ')';
+				break;
+			case '=':
+				$cond[] = "type = '{$conf['word']}'";
+				break;
+			case 'like':
+				$cond[] = "type like '{$conf['word']}'";
+				break;
+			case 'regexp':
+				$cond[] = "type regexp '{$conf['word']}'";
+				break;
+		}
+	}
+	if ($cond)
+		return join(' ' . $conjunction . ' ', $cond);
+	return '1';
+}
+
+function getProblemAuditLog($config = array()) {
 	$cond = array();
 	$cond[] = "scope = 'problems'";
-	$cond[] = "type like 'rejudge%'";
+	if (isset($config['type']))
+		$cond[] = getMatchCondition($config['type']);
 	if (isset($config['problem_id']))
 		$cond[] = "id_in_scope = {$config['problem_id']}";
 	if (isset($config['start_time']))
@@ -285,6 +314,13 @@ function getProblemRejudgeAuditLog($config = array()) {
 		$audit_log[] = $his;
 	}
 	return $audit_log;
+}
+
+function getProblemRejudgeAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'like', 'word' => 'rejudge%');
+	return getProblemAuditLog($config);
 }
 
 function getSubmissionRejudgeAuditLog($submission) {
