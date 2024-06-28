@@ -625,6 +625,11 @@ function echoSubmissionAuditLog($audit_log) {
 					$suffix .= '通过的程序';
 				$mes['title'] = $prefix . '重测' . $suffix;
 				break;
+			case 'hack judgement':
+				$mes['title'] = '被 Hack ' . ($log_now['details']['success'] ? '成功' : '失败');
+				if (!isset($mes['previous_list']))
+					$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
 			default:
 				$no_message = true;
 		}
