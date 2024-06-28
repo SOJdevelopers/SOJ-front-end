@@ -588,6 +588,8 @@ function echoSubmissionAuditLog($audit_log) {
 		$mes = array('time' => $log_now['time']);
 		$log_types = explode(', ', $log_now['type']);
 		$auto_type = ($log_types[count($log_types)-1] == 'auto');
+		$show_actor = isSuperUser(Auth::user());
+		$show_actor_ip = $show_actor;
 		if (isset($log_now['reason']) and $log_now['reason']) {
 			$mes['previous_list'] = array();
 			$mes['previous_list'][] = '<strong>原因：</strong>' . $log_now['reason'];
@@ -630,11 +632,18 @@ function echoSubmissionAuditLog($audit_log) {
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
+				$mes['previous_list'][] = '<strong>Hacker：</strong>' . getHackJudgedStatusStr($log_now['details']['hacker']);
+				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				break;
+			case 'hack attempt':
+				$mes['title'] = '被尝试 Hack';
+				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				$show_actor = true;
 				break;
 			default:
 				$no_message = true;
 		}
-		if (isSuperUser(Auth::user())) {
+		if ($show_actor) {
 			$actor_link = null;
 			$actor_ip = null;
 			if (isset($log_now['actor']))
@@ -653,7 +662,7 @@ function echoSubmissionAuditLog($audit_log) {
 					$mes['title'] = array($mes['title']);
 				$mes['title'][] = "<span>(by $actor_link)</span>";
 			}
-			if ($actor_ip) {
+			if ($show_actor_ip and $actor_ip) {
 				$actor_ip = HTML::escape($actor_ip);
 				if (!is_array($mes['title']))
 					$mes['title'] = array($mes['title']);
