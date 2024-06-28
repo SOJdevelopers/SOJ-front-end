@@ -626,7 +626,8 @@ function echoSubmissionAuditLog($audit_log) {
 					$mes['previous_list'][] = '<strong>内存：</strong>' . getUsedMemoryStr($log_now['details']['used_memory']);
 				}
 				if (hasViewJudgerInfoPermission(Auth::user())) {
-					$mes['previous_list'][] = '<strong>评测机名称：</strong>' . HTML::escape($log_now['details']['judger_name']);
+					if ($log_now['details']['judger_name'])
+						$mes['previous_list'][] = '<strong>评测机名称：</strong>' . HTML::escape($log_now['details']['judger_name']);
 				}
 				$mes['uri'] = getSubmissionUri($log_now['submission_id'], $log_now['details']['judgement_id']);
 				break;
@@ -646,7 +647,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $prefix . '重测' . $suffix;
 				break;
 			case 'hack judgement':
-				$mes['title'] = '被 Hack ' . ($log_now['details']['success'] ? '成功' : '失败');
+				$mes['title'] = ($log_now['details']['success'] ? '' : '未') . '被成功 Hack';
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
