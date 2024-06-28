@@ -644,7 +644,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$show_actor = true;
 				break;
 			case 'data preparing':
-				$mes['title'] = '管理员对该题进行了数据预处理操作';
+				$mes['title'] = ($auto_type ? '自动' : '管理员手动') . '对该题进行了数据预处理操作';
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>类型：</strong>' . (isset($log_now['details']['sync_config']['no_compile']) ? '快速同步数据' : '完全同步数据');
