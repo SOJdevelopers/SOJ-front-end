@@ -630,6 +630,7 @@ function echoSubmissionAuditLog($audit_log) {
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
+				break;
 			default:
 				$no_message = true;
 		}
