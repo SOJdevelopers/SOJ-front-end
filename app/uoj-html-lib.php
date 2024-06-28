@@ -675,7 +675,7 @@ function echoSubmissionAuditLog($audit_log) {
 			case 'add extra_test':
 				$prefix = '';
 				if ($auto_type) {
-					if ($log_now['reason'] == 'add extra_test')
+					if ($log_now['reason'] == 'successful hack')
 						$prefix = 'Hack 成功, ';
 					$prefix .= '自动';
 				}
