@@ -525,9 +525,10 @@ EOD;
 		}, $table_config);
 }
 
-function echoMessagesTimeline($messages) {
+function echoMessagesTimeline($messages, $messages_head = '') {
 	echo '<!-- credit to https://bootsnipp.com/snippets/xrKXW -->';
 	echo '<div class="list-group timeline">';
+	echo $messages_head;
 	foreach ($messages as $mes) {
 		$cls = 'list-group-item';
 		$main_message = "";
@@ -581,6 +582,8 @@ function echoMessagesTimeline($messages) {
 
 function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
+	$messages_head = '';
+	$unrecognized_cnt = 0;
 	foreach ($audit_log as $log_now) {
 		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
 		if ($no_message)
@@ -641,6 +644,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$show_actor = true;
 				break;
 			default:
+				++$unrecognized_cnt;
 				$no_message = true;
 		}
 		if ($show_actor) {
@@ -673,7 +677,9 @@ function echoSubmissionAuditLog($audit_log) {
 			continue;
 		$messages[] = $mes;
 	}
-	echoMessagesTimeline($messages);
+	if ($unrecognized_cnt)
+		$messages_head = '<p>有 ' . $unrecognized_cnt . ' 条未成功识别类型的日志。</p>' . $messages_head;
+	echoMessagesTimeline($messages, $messages_head);
 }
 
 function echoSubmissionTimeline($submission, $time_now) {
