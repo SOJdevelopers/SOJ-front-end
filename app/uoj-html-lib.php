@@ -632,10 +632,10 @@ function echoSubmissionAuditLog($audit_log) {
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
-				$mes['previous_list'][] = '<strong>Hacker：</strong>' . getHackJudgedStatusStr($log_now['details']['hacker']);
+				$mes['previous_list'][] = '<strong>Hacker：</strong>' . getUserLink($log_now['details']['hacker']);
 				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				break;
-			case 'hack attempt':
+			case 'hack submit':
 				$mes['title'] = '被尝试 Hack';
 				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				$show_actor = true;
