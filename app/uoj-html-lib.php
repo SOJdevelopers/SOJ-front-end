@@ -595,7 +595,7 @@ function echoSubmissionAuditLog($audit_log) {
 		$show_actor_ip = $show_actor;
 		if (isset($log_now['reason']) and $log_now['reason']) {
 			$mes['previous_list'] = array();
-			$mes['previous_list'][] = '<strong>原因：</strong>' . $log_now['reason'];
+			$mes['previous_list'][] = '<strong>原因：</strong>' . HTML::escape($log_now['reason']);
 		}
 		switch($log_types[0]){
 			case 'submit':
@@ -654,7 +654,7 @@ function echoSubmissionAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<strong>错误信息：</strong>' . ($log_now['details']['exception_message']);
+					$mes['previous_list'][] = '<strong>错误信息：</strong>' . HTML::escape($log_now['details']['exception_message']);
 				}
 				break;
 			default:
