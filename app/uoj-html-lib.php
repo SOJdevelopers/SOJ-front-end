@@ -1100,8 +1100,8 @@ function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
 	$hasProblemPermission = isProblemVisible($user, $problem);
 
-	$hack_id_str = "<a href=\"/hack/{$hack['id']}\">#{$hack['id']}</a>";
-	$submission_id_str = "<a href=\"/submission/{$hack['submission_id']}\">#{$hack['submission_id']}</a>";
+	$hack_id_str = '<a href="' . getHackUri($hack['id']) . "\">#{$hack['id']}</a>";
+	$submission_id_str = '<a href="' . getSubmissionUri($hack['submission_id']) . "\">#{$hack['submission_id']}</a>";
 	$problem_link_str = '/';
 	$hacker_link_str = '/';
 	$owner_link_str = '/';
@@ -1120,11 +1120,11 @@ function echoHack($hack, $config, $user) {
 		$owner_link_str = getUserOrGroupLink($hack['owner']);
 
 		if($hack['judge_time'] == null) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Waiting</a>";
+			$hack_status_str = '<a href="' . getHackUri($hack['id']) . "\">Waiting</a>";
 		} elseif ($hack['success'] == null) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Judging</a>";
+			$hack_status_str = '<a href="' . getHackUri($hack['id']) . "\">Judging</a>";
 		} else
-			$hack_status_str = getHackJudgedStatusStr($hack['success'], getHackUri(hack['id']));
+			$hack_status_str = getHackJudgedStatusStr($hack['success'], getHackUri($hack['id']));
 	}
 	echo '<tr>';
 	if (!isset($config['id_hidden']))
