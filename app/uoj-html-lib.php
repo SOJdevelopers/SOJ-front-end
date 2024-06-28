@@ -1076,6 +1076,26 @@ function echoHackDetails($hack_details, $name) {
 	echoJudgementDetails($hack_details, new HackDetailsStyler(), $name);
 }
 
+function getHackUri($id) {
+	return "/hack/{$id}";
+}
+
+function getHackJudgedStatusStr($success, $uri = null) {
+	if(isset($uri)){
+		$html_type = 'a';
+		$head = $html_type . ' href="' . $uri . '"';
+	}
+	else{
+		$html_type = 'span';
+		$head = $html_type;
+	}
+	if ($hack['success']$hack_success) {
+		return '<' . $head . ' class="uoj-status" data-success="1"><strong>Success!</strong></' . $html_type . '>';
+	} else {
+		return '<' . $head . ' class="uoj-status" data-success="0"><strong>Failed.</strong></' . $html_type . '>';
+	}
+}
+
 function echoHack($hack, $config, $user) {
 	$problem = queryProblemBrief($hack['problem_id']);
 	$hasProblemPermission = isProblemVisible($user, $problem);
@@ -1103,11 +1123,8 @@ function echoHack($hack, $config, $user) {
 			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Waiting</a>";
 		} elseif ($hack['success'] == null) {
 			$hack_status_str = "<a href=\"/hack/{$hack['id']}\">Judging</a>";
-		} elseif ($hack['success']) {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"1\"><strong>Success!</strong></a>";
-		} else {
-			$hack_status_str = "<a href=\"/hack/{$hack['id']}\" class=\"uoj-status\" data-success=\"0\"><strong>Failed.</strong></a></td>";
-		}
+		} else
+			$hack_status_str = getHackJudgedStatusStr($hack['success'], getHackUri(hack['id']));
 	}
 	echo '<tr>';
 	if (!isset($config['id_hidden']))
