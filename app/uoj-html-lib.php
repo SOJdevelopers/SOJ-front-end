@@ -1089,7 +1089,7 @@ function getHackJudgedStatusStr($success, $uri = null) {
 		$html_type = 'span';
 		$head = $html_type;
 	}
-	if ($hack['success']$hack_success) {
+	if ($success) {
 		return '<' . $head . ' class="uoj-status" data-success="1"><strong>Success!</strong></' . $html_type . '>';
 	} else {
 		return '<' . $head . ' class="uoj-status" data-success="0"><strong>Failed.</strong></' . $html_type . '>';
