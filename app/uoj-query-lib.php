@@ -251,7 +251,7 @@ function sortAuditLogByTime(&$audit_log) {
 }
 
 function getSubmissionJudgementAuditLog($submission_id) {
-	$hiss = DB::select("select judge_time, id as judgement_id, judge_time, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission_id} order by judge_time desc");
+	$hiss = DB::select("select judge_time, id as judgement_id, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission_id} order by judge_time desc");
 	$audit_log = array();
 	while ($his = DB::fetch($hiss)) {
 		$audit_log[] = array(
@@ -306,8 +306,43 @@ function getSubmissionRejudgeAuditLog($submission) {
 	return $audit_log;
 }
 
+function getHacksAuditLog($config = array()) {
+	$cond = array();
+	if (isset($config['problem_id']))
+		$cond[] = "problem_id = {$config['problem_id']}";
+	if (isset($config['submission_id']))
+		$cond[] = "submission_id = {$config['submission_id']}";
+	if ($cond)
+		$cond = join(' and ', $cond);
+	else
+		$cond = '1';
+	$hiss = DB::select("select id as hack_id, problem_id, contest_id, submission_id, hacker, owner, input, input_type, submit_time, judge_time, judger_name, success from hacks where {$cond}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$audit_log[] = array(
+			'time' => $his['submit_time'],
+			'type' => 'hack submit',
+			'hack_id' => $his['hack_id'],
+			'actor' => $his['hacker'],
+			'details' => $his
+		);
+		$audit_log[] = array(
+			'time' => $his['judge_time'],
+			'type' => 'hack judgement, auto',
+			'hack_id' => $his['hack_id'],
+			'details' => $his
+		);
+	}
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getSubmissionHacksAuditLog($submission_id) {
+	return getHacksAuditLog(array('submission_id' => $submission_id));
+}
+
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission));
+	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission['id']));
 	sortAuditLogByTime($audit_log);
 	return $audit_log;
 }
