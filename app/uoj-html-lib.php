@@ -594,8 +594,23 @@ function echoSubmissionAuditLog($audit_log) {
 		$show_actor = isSuperUser(Auth::user());
 		$show_actor_ip = $show_actor;
 		if (isset($log_now['reason']) and $log_now['reason']) {
-			$mes['previous_list'] = array();
-			$mes['previous_list'][] = '<strong>原因：</strong>' . HTML::escape($log_now['reason']);
+			$display_reason = true;
+			if ($auto_type) {
+				switch ($log_types[0]) {
+					case 'data preparing':
+						if ($log_now['reason'] == 'add extra_test')
+							$no_message = true;
+						break;
+					case 'add extra_test':
+						if ($log_now['reason'] == 'successful hack')
+							$display_reason = false;
+						break;
+				}
+			}
+			if ($display_reason) {
+				$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>原因：</strong>' . HTML::escape($log_now['reason']);
+			}
 		}
 		switch($log_types[0]){
 			case 'submit':
@@ -656,6 +671,20 @@ function echoSubmissionAuditLog($audit_log) {
 						$mes['previous_list'] = array();
 					$mes['previous_list'][] = '<strong>错误信息：</strong>' . HTML::escape($log_now['details']['exception_message']);
 				}
+				break;
+			case 'add extra_test':
+				$prefix = '';
+				if ($auto_type) {
+					if ($log_now['reason'] == 'add extra_test')
+						$prefix = 'Hack 成功, ';
+					$prefix .= '自动';
+				}
+				else {
+					$prefix .= '管理员手动';
+				}
+				$mes['title'] = $prefix . '添加 extra test';
+				if ($log_now['details']['source'] == 'hack')
+					$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				break;
 			default:
 				++$unrecognized_cnt;
