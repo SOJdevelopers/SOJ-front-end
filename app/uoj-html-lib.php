@@ -582,6 +582,9 @@ function echoMessagesTimeline($messages) {
 function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
 	foreach ($audit_log as $log_now) {
+		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
+		if ($no_message)
+			continue;
 		$mes = array('time' => $log_now['time']);
 		$log_types = explode(', ', $log_now['type']);
 		$auto_type = ($log_types[count($log_types)-1] == 'auto');
@@ -622,6 +625,8 @@ function echoSubmissionAuditLog($audit_log) {
 					$suffix .= '通过的程序';
 				$mes['title'] = $prefix . '重测' . $suffix;
 				break;
+			default:
+				$no_message = true;
 		}
 		if (isSuperUser(Auth::user())) {
 			$actor_link = null;
@@ -649,6 +654,8 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'][] = "(from $actor_ip)";
 			}
 		}
+		if ($no_message)
+			continue;
 		$messages[] = $mes;
 	}
 	echoMessagesTimeline($messages);
