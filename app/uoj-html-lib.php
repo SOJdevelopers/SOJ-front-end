@@ -584,7 +584,6 @@ function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
 	$messages_head = '';
 	$unrecognized_cnt = 0;
-	$flip_hackable_status_type = null;
 	foreach ($audit_log as $log_now) {
 		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
 		if ($no_message)
@@ -605,8 +604,6 @@ function echoSubmissionAuditLog($audit_log) {
 								break;
 							case 'flip hackable-status':
 								$log_now['reason'] = '禁止/允许使用 hack';
-								if (isset($flip_hackable_status_type))
-									$log_now['reason'] = $flip_hackable_status_type ? '允许该题使用 hack' : '禁止该题使用 hack';
 								break;
 						}
 						break;
@@ -700,7 +697,6 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $title_author_prefix . '清空该题数据';
 				break;
 			case 'flip hackable-status':
-				$flip_hackable_status_type = $log_now['details']['hackable-status'];
 				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '允许该题使用 hack' : '禁止该题使用 hack');
 				break;
 			case 'flip hackable-status failed':
