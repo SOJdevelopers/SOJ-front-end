@@ -240,6 +240,9 @@ function queryRegisteredGroup($user, $contest, $silent = false) {
 
 function sortAuditLogByTime(&$audit_log) {
 	usort($audit_log, function($a, $b) {
+		if (isset($a['id']) and isset($b['id'])) {
+			return $b['id'] - $a['id'];
+		}
 		$time_a = new DateTime($a['time']);
 		$time_b = new DateTime($b['time']);
 		if ($time_a > $time_b)
