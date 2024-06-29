@@ -697,10 +697,10 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $title_author_prefix . '清空该题数据';
 				break;
 			case 'flip hackable-status':
-				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '禁止该题使用 Hack' : '允许该题使用 Hack');
+				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '允许该题使用 Hack' : '禁止该题使用 Hack');
 				break;
 			case 'flip hackable-status failed':
-				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '允许使用 Hack' : '禁止使用 Hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '禁止使用 Hack' : '允许使用 Hack');
+				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '禁止使用 Hack' : '允许使用 Hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '允许使用 Hack' : '禁止使用 Hack');
 				break;
 			default:
 				++$unrecognized_cnt;
