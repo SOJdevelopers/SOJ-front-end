@@ -334,6 +334,13 @@ function getProblemRejudgeAuditLog($config = array()) {
 	return getProblemAuditLog($config);
 }
 
+function getProblemHackableStatusAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'like', 'word' => 'flip hackable-status%');
+	return getProblemAuditLog($config);
+}
+
 function getSubmissionRejudgeAuditLog($submission) {
 	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
 	$hiss = DB::select("select id, type, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}");
@@ -384,12 +391,15 @@ function getHacksAuditLog($config = array()) {
 	return $audit_log;
 }
 
-function getSubmissionHacksAuditLog($submission_id) {
-	return getHacksAuditLog(array('submission_id' => $submission_id));
+function getSubmissionHacksAuditLog($submission) {
+	$audit_log = array_merge(getHacksAuditLog(array('submission_id' => $submission['id'])),
+				 getProblemHackableStatusAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time'])));
+	sortAuditLogByTime($audit_log);
+	return ;
 }
 
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission['id']));
+	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission));
 	sortAuditLogByTime($audit_log);
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],
