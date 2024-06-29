@@ -598,15 +598,17 @@ function echoSubmissionAuditLog($audit_log) {
 			if ($auto_type) {
 				switch ($log_types[0]) {
 					case 'data preparing':
-						if ($log_now['reason'] == 'add extra_test')
-							$no_message = true;
+						switch ($log_now['reason']) {
+							case 'add extra_test':
+								$no_message = true;
+								break;
+							case 'flip hackable-status':
+								$display_reason = false;
+								break;
+						}
 						break;
 					case 'add extra_test':
 						if ($log_now['reason'] == 'successful hack')
-							$display_reason = false;
-						break;
-					case 'data preparing':
-						if ($log_now['reason'] == 'flip hackable-status')
 							$display_reason = false;
 						break;
 				}
