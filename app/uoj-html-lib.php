@@ -684,6 +684,9 @@ function echoSubmissionAuditLog($audit_log) {
 				if ($log_now['details']['source'] == 'hack')
 					$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				break;
+			case 'add extra_test failed':
+				$mes['title'] = '该题此前的添加 extra test 操作失败';
+				break;
 			case 'clear data':
 				$mes['title'] = $title_author_prefix . '清空该题数据';
 				break;
