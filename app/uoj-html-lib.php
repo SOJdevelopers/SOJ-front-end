@@ -584,6 +584,7 @@ function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
 	$messages_head = '';
 	$unrecognized_cnt = 0;
+	$flip_hackable_status_type = null;
 	foreach ($audit_log as $log_now) {
 		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
 		if ($no_message)
@@ -603,7 +604,9 @@ function echoSubmissionAuditLog($audit_log) {
 								$no_message = true;
 								break;
 							case 'flip hackable-status':
-								$display_reason = false;
+								$log_now['reason'] = '禁止/允许使用 hack';
+								if (isset($flip_hackable_status_type))
+									$log_now['reason'] = $flip_hackable_status_type ? '允许该题使用 hack' : '禁止该题使用 hack';
 								break;
 						}
 						break;
@@ -653,7 +656,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $title_author_prefix . '重测' . $suffix;
 				break;
 			case 'hack judgement':
-				$mes['title'] = ($log_now['details']['success'] ? '' : '未') . '被成功 Hack';
+				$mes['title'] = ($log_now['details']['success'] ? '' : '未') . '被成功 hack';
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>Hack 结果：</strong>' . getHackJudgedStatusStr($log_now['details']['success']);
@@ -661,7 +664,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				break;
 			case 'hack submit':
-				$mes['title'] = '被尝试 Hack';
+				$mes['title'] = '被尝试 hack';
 				$mes['uri'] = getHackUri($log_now['details']['hack_id']);
 				$show_actor = true;
 				break;
@@ -697,10 +700,11 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['title'] = $title_author_prefix . '清空该题数据';
 				break;
 			case 'flip hackable-status':
-				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '允许该题使用 Hack' : '禁止该题使用 Hack');
+				$flip_hackable_status_type = $log_now['details']['hackable-status'];
+				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '允许该题使用 hack' : '禁止该题使用 hack');
 				break;
 			case 'flip hackable-status failed':
-				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '禁止使用 Hack' : '允许使用 Hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '允许使用 Hack' : '禁止使用 Hack');
+				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '禁止使用 hack' : '允许使用 hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '允许使用 hack' : '禁止使用 hack');
 				break;
 			default:
 				++$unrecognized_cnt;
