@@ -612,6 +612,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$mes['previous_list'][] = '<strong>原因：</strong>' . HTML::escape($log_now['reason']);
 			}
 		}
+		$title_author_prefix = $auto_type ? '自动' : '管理员手动';
 		switch($log_types[0]){
 			case 'submit':
 				$mes['title'] = '提交';
@@ -638,13 +639,12 @@ function echoSubmissionAuditLog($audit_log) {
 			case 'rejudge':
 			case 'rejudge Ge97':
 			case 'rejudge AC':
-				$prefix = $auto_type ? '自动' : '管理员手动';
 				$suffix = isset($log_now['details']['problem_id']) ? '该题' : '该提交记录';
 				if ($log_types[0] == 'rejudge Ge97')
 					$suffix .= '不低于 97 分的程序';
 				if ($log_types[0] == 'rejudge AC')
 					$suffix .= '通过的程序';
-				$mes['title'] = $prefix . '重测' . $suffix;
+				$mes['title'] = $title_author_prefix . '重测' . $suffix;
 				break;
 			case 'hack judgement':
 				$mes['title'] = ($log_now['details']['success'] ? '' : '未') . '被成功 Hack';
@@ -660,7 +660,7 @@ function echoSubmissionAuditLog($audit_log) {
 				$show_actor = true;
 				break;
 			case 'data preparing':
-				$mes['title'] = ($auto_type ? '自动' : '管理员手动') . '对该题进行了数据预处理操作';
+				$mes['title'] = $title_author_prefix . '对该题进行了数据预处理操作';
 				if (!isset($mes['previous_list']))
 					$mes['previous_list'] = array();
 				$mes['previous_list'][] = '<strong>类型：</strong>' . (isset($log_now['details']['sync_config']['no_compile']) ? '快速同步数据' : '完全同步数据');
@@ -678,14 +678,14 @@ function echoSubmissionAuditLog($audit_log) {
 				if ($auto_type) {
 					if ($log_now['reason'] == 'successful hack')
 						$prefix = 'Hack 成功，';
-					$prefix .= '自动';
 				}
-				else {
-					$prefix .= '管理员手动';
-				}
+				$prefix .= $title_author_prefix;
 				$mes['title'] = $prefix . '添加 extra test';
 				if ($log_now['details']['source'] == 'hack')
 					$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				break;
+			case 'clear data':
+				$mes['title'] = $title_author_prefix . '清空该题数据';
 				break;
 			default:
 				++$unrecognized_cnt;
