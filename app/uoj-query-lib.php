@@ -392,10 +392,16 @@ function getHacksAuditLog($config = array()) {
 }
 
 function getSubmissionHacksAuditLog($submission) {
-	$audit_log = array_merge(getHacksAuditLog(array('submission_id' => $submission['id'])),
-				 getProblemHackableStatusAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time'])));
+	$audit_log = getHacksAuditLog(array('submission_id' => $submission['id']));
+	$problem_hack_status_log = getProblemHackableStatusAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
+	foreach ($problem_hack_status_log as $log_now) {
+		$log_now['submission_id'] = $submission['id'];
+		$log_now['details']['problem_id'] = $log_now['problem_id'];
+		$log_now['problem_id'] = null;
+		$audit_log[] = $log_now;
+	}
 	sortAuditLogByTime($audit_log);
-	return ;
+	return $audit_log;
 }
 
 function getSubmissionHistoryAuditLog($submission) {
