@@ -238,6 +238,206 @@ function queryRegisteredGroup($user, $contest, $silent = false) {
 	return queryGroup($group['username']);
 }
 
+function queryAuditLog($config) {
+	$cond = '1';
+	if (isset($config['cond'])) {
+		$cond = $config['cond'];
+	}
+	$id_in_scope_name = 'id_in_scope';
+	if (isset($config['id_in_scope_name'])) {
+		$id_in_scope_name = $config['id_in_scope_name'];
+	}
+	$hiss = DB::select("select id, type, id_in_scope as {$id_in_scope_name}, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$his['details'] = json_decode($his['details'], true);
+		if (!$his['actor_http_x_forwarded_for'])
+			$his['actor_http_x_forwarded_for'] = null;
+		$audit_log[] = $his;
+	}
+	return $audit_log;
+}
+
+function sortAuditLogByTime(&$audit_log) {
+	usort($audit_log, function($a, $b) {
+		if (isset($a['id']) and isset($b['id'])) {
+			return $b['id'] - $a['id'];
+		}
+		$time_a = new DateTime($a['time']);
+		$time_b = new DateTime($b['time']);
+		if ($time_a > $time_b)
+			return -1;
+		if ($time_b > $time_a)
+			return 1;
+		return 0;
+	});
+}
+
+function getSubmissionJudgementAuditLog($submission_id) {
+	$hiss = DB::select("select judge_time, id as judgement_id, judger_name, status, result_error, score, used_time, used_memory from submissions_history where submission_id = {$submission_id} order by judge_time desc");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$audit_log[] = array(
+			'time' => $his['judge_time'],
+			'type' => 'judgement, auto',
+			'submission_id' => $submission_id,
+			'details' => $his
+		);
+	}
+	return $audit_log;
+}
+
+function getMatchCondition($config, $conjunction = 'and') {
+	if (!is_array($config))
+		return getMatchCondition(array($config), $conjunction);
+	$cond = array();
+	foreach ($config as $conf) {
+		switch ($conf['type']) {
+			case 'combine_by_or':
+				$cond[] = '(' . getMatchCondition($conf['word'], 'or') . ')';
+				break;
+			case 'combine_by_and':
+				$cond[] = '(' . getMatchCondition($conf['word'], 'and') . ')';
+				break;
+			case '=':
+				$cond[] = "type = '{$conf['word']}'";
+				break;
+			case 'like':
+				$cond[] = "type like '{$conf['word']}'";
+				break;
+			case 'regexp':
+				$cond[] = "type regexp '{$conf['word']}'";
+				break;
+		}
+	}
+	if ($cond)
+		return join(' ' . $conjunction . ' ', $cond);
+	return '1';
+}
+
+function getProblemAuditLog($config = array()) {
+	$cond = array();
+	$cond[] = "scope = 'problems'";
+	if (isset($config['type']))
+		$cond[] = getMatchCondition($config['type']);
+	if (isset($config['problem_id']))
+		$cond[] = "id_in_scope = {$config['problem_id']}";
+	if (isset($config['start_time']))
+		$cond[] = "time >= '{$config['start_time']}'";
+	if ($cond)
+		$cond = join(' and ', $cond);
+	else
+		$cond = '1';
+	return queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id'));
+}
+
+function getProblemDataChangesAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'combine_by_or', 'word' => array(
+		array('type' => 'like', 'word' => 'clear data%'),
+		array('type' => 'like', 'word' => 'data preparing%'),//'data preparing failed'
+		array('type' => 'like', 'word' => 'add extra_test%')
+	));
+	return getProblemAuditLog($config);
+}
+
+function getProblemRejudgeAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'like', 'word' => 'rejudge%');
+	return getProblemAuditLog($config);
+}
+
+function getProblemHackableStatusAuditLog($config = array()) {
+	if (!isset($config['type']))
+		$config['type'] = array();
+	$config['type'][] = array('type' => 'like', 'word' => 'flip hackable-status%');
+	return getProblemAuditLog($config);
+}
+
+function getSubmissionRejudgeAuditLog($submission) {
+	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
+	$audit_log = queryAuditLog(array('cond' => "scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}", 'id_in_scope_name' => 'submission_id'));
+	foreach ($problem_log as $log_now) {
+		$log_now['submission_id'] = $submission['id'];
+		$log_now['details']['problem_id'] = $log_now['problem_id'];
+		$log_now['problem_id'] = null;
+		$audit_log[] = $log_now;
+	}
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getHacksAuditLog($config = array()) {
+	$cond = array();
+	if (isset($config['problem_id']))
+		$cond[] = "problem_id = {$config['problem_id']}";
+	if (isset($config['submission_id']))
+		$cond[] = "submission_id = {$config['submission_id']}";
+	if ($cond)
+		$cond = join(' and ', $cond);
+	else
+		$cond = '1';
+	$hiss = DB::select("select id as hack_id, problem_id, contest_id, submission_id, hacker, owner, input, input_type, submit_time, judge_time, judger_name, success from hacks where {$cond}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$audit_log[] = array(
+			'time' => $his['submit_time'],
+			'type' => 'hack submit',
+			'hack_id' => $his['hack_id'],
+			'actor' => $his['hacker'],
+			'details' => $his
+		);
+		$audit_log[] = array(
+			'time' => $his['judge_time'],
+			'type' => 'hack judgement, auto',
+			'hack_id' => $his['hack_id'],
+			'details' => $his
+		);
+	}
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getSubmissionHacksAuditLog($submission) {
+	$audit_log = getHacksAuditLog(array('submission_id' => $submission['id']));
+	$problem_hack_status_log = getProblemHackableStatusAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
+	foreach ($problem_hack_status_log as $log_now) {
+		$log_now['submission_id'] = $submission['id'];
+		$log_now['details']['problem_id'] = $log_now['problem_id'];
+		$log_now['problem_id'] = null;
+		$audit_log[] = $log_now;
+	}
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
+function getSubmissionHistoryAuditLog($submission) {
+	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission));
+	sortAuditLogByTime($audit_log);
+	$audit_log[] = array(
+		'time' => $submission['submit_time'],
+		'type' => 'submit',
+		'actor' => $submission['submitter'],
+		'submission_id' => $submission['id']
+	);
+	return $audit_log;
+}
+
+function getSubmissionAuditLog($submission, $time_now) {
+	$audit_log = array();
+	$audit_log[] = array(
+		'time' => $time_now,
+		'type' => 'current_submission_status',
+		'submission_id' => $submission['id']
+	);
+	$audit_log = array_merge($audit_log, getSubmissionHistoryAuditLog($submission));
+	$audit_log = array_merge($audit_log, getProblemDataChangesAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time'])));
+	sortAuditLogByTime($audit_log);
+	return $audit_log;
+}
+
 function deleteBlog($id) {
 	if (!validateUInt($id)) {
 		return;
