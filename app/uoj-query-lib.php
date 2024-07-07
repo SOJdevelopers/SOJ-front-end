@@ -238,6 +238,26 @@ function queryRegisteredGroup($user, $contest, $silent = false) {
 	return queryGroup($group['username']);
 }
 
+function queryAuditLog($config) {
+	$cond = '1';
+	if (isset($config['cond'])) {
+		$cond = $config['cond'];
+	}
+	$id_in_scope_name = 'id_in_scope';
+	if (isset($config['id_in_scope_name'])) {
+		$id_in_scope_name = $config['id_in_scope_name'];
+	}
+	$hiss = DB::select("select id, type, id_in_scope as {$id_in_scope_name}, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
+	$audit_log = array();
+	while ($his = DB::fetch($hiss)) {
+		$his['details'] = json_decode($his['details'], true);
+		if (!$his['actor_http_x_forwarded_for'])
+			$his['actor_http_x_forwarded_for'] = null;
+		$audit_log[] = $his;
+	}
+	return $audit_log;
+}
+
 function sortAuditLogByTime(&$audit_log) {
 	usort($audit_log, function($a, $b) {
 		if (isset($a['id']) and isset($b['id'])) {
@@ -308,15 +328,7 @@ function getProblemAuditLog($config = array()) {
 		$cond = join(' and ', $cond);
 	else
 		$cond = '1';
-	$hiss = DB::select("select id, type, id_in_scope, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
-	$audit_log = array();
-	while ($his = DB::fetch($hiss)) {
-		$his['details'] = json_decode($his['details'], true);
-		$his['problem_id'] = $his['id_in_scope'];
-		$his['id_in_scope'] = null;
-		$audit_log[] = $his;
-	}
-	return $audit_log;
+	return queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id'));
 }
 
 function getProblemDataChangesAuditLog($config = array()) {
@@ -346,13 +358,7 @@ function getProblemHackableStatusAuditLog($config = array()) {
 
 function getSubmissionRejudgeAuditLog($submission) {
 	$problem_log = getProblemRejudgeAuditLog(array('problem_id' => $submission['problem_id'], 'start_time' => $submission['submit_time']));
-	$hiss = DB::select("select id, type, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}");
-	$audit_log = array();
-	while ($his = DB::fetch($hiss)) {
-		$his['details'] = json_decode($his['details'], true);
-		$his['submission_id'] = $submission['id'];
-		$audit_log[] = $his;
-	}
+	$audit_log = queryAuditLog(array('cond' => "scope = 'submissions' and type = 'rejudge' and id_in_scope = {$submission['id']}", 'id_in_scope_name' => 'submission_id'));
 	foreach ($problem_log as $log_now) {
 		$log_now['submission_id'] = $submission['id'];
 		$log_now['details']['problem_id'] = $log_now['problem_id'];
