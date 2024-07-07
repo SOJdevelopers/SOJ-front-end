@@ -169,5 +169,6 @@ return [
 	'blog management' => '博客管理',
 	'send message' => '发送公告',
 	'link management' => '链接管理',
-	'search blog tags' => '搜索博客标签'
+	'search blog tags' => '搜索博客标签',
+	'manageable' => '有权限',
 ];

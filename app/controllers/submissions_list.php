@@ -10,8 +10,8 @@
 	$common = 'class="form-control input-sm" ';
 	$q_problem_id = $search_form->addText('problem_id', UOJLocale::get('problems::problem id').':', $common . 'maxlength="4" style="width:4em"', 'validateUInt');
 	$q_submitter = $search_form->addText('submitter', UOJLocale::get('username').':', $common . 'maxlength="20" style="width:10em"', 'validateUsername');
-	$q_min_score = $search_form->addText('min_score', UOJLocale::get('score range').':', $common . 'maxlength="5" style="width:4em" placeholder="0"', 'validateUInt');
-	$q_max_score = $search_form->addText('max_score', '~', $common . 'maxlength="5" style="width:4em" placeholder="inf"', 'validateUInt');
+	$q_min_score = $search_form->addText('min_score', UOJLocale::get('score range').':', $common . 'maxlength="5" style="width:4em" placeholder="-∞"', 'validateInt');
+	$q_max_score = $search_form->addText('max_score', '~', $common . 'maxlength="5" style="width:4em" placeholder="+∞"', 'validateInt');
 	$q_language = $search_form->addText('language', UOJLocale::get('problems::language').':', $common . 'maxlength="10" style="width:8em"', validateLength(10));
 	$search_form->addSubmit(UOJLocale::get('search'));
 	

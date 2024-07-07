@@ -169,5 +169,6 @@ return [
 	'blog management' => 'Blog Management',
 	'send message' => 'Send Message',
 	'link management' => 'Link Management',
-	'search blog tags' => 'Search blogs by tags'
+	'search blog tags' => 'Search blogs by tags',
+	'manageable' => 'Manageable',
 ];

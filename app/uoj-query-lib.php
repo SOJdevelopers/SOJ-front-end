@@ -4,8 +4,12 @@ define('SUBMISSION_STATUS_LIMIT', 1);
 define('SUBMISSION_CODE_LIMIT', 2);
 define('SUBMISSION_ALL_LIMIT', SUBMISSION_STATUS_LIMIT | SUBMISSION_CODE_LIMIT);
 
+function hasBeenInProblemPermissions($user, $problem) {
+	return $user != null && DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}");
+}
+
 function hasProblemPermission($user, $problem) {
-	return $user != null && (isProblemManager($user) || DB::selectFirst("select * from problems_permissions where username = '{$user['username']}' and problem_id = {$problem['id']}"));
+	return $user != null && (isProblemManager($user) || hasBeenInProblemPermissions($user, $problem));
 }
 
 // 0 : not myself, not AC; 1 : myself, not AC; 2 : not myself, AC; 3 : myself, AC
