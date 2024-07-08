@@ -298,9 +298,11 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 		<?php $custom_test_form->printHTML(); ?>
 	</div>
 	<?php endif ?>
+	<div class="tab-pane" id="tab-logs">
 	<?php if (hasProblemPermission(Auth::user(), $problem)) { ?>
 		<div class="top-buffer-sm"></div>
 		<?php echoProblemTimeline($problem, $time_now); ?>
 	<?php } ?>
+	</div>
 </div>
 <?php echoUOJPageFooter() ?>
