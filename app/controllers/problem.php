@@ -6,6 +6,8 @@
 		become404Page();
 	}
 
+	$time_now = DB::query_time_now();
+
 	if (!Auth::check()) {
 		redirectToLogin();
 	}
@@ -265,6 +267,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 <?php if (hasProblemPermission(Auth::user(), $problem) or $statement_maintainable) { ?>
 	<li><a href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><?= UOJLocale::get('problems::manage') ?></a></li>
 <?php } ?>
+<?php if (hasProblemPermission(Auth::user(), $problem)) { ?>
+	<li><a href="#tab-logs" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::logs') ?></a></li>
+<?php } ?>
 <?php
 	if ($contest) {
 		if ($is_visible) {
@@ -293,5 +298,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 		<?php $custom_test_form->printHTML(); ?>
 	</div>
 	<?php endif ?>
+	<?php if (hasProblemPermission(Auth::user(), $problem)) { ?>
+		<div class="top-buffer-sm"></div>
+		<?php echoProblemTimeline($problem, $time_now); ?>
+	<?php } ?>
 </div>
 <?php echoUOJPageFooter() ?>
