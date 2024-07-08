@@ -6,7 +6,7 @@
 		redirectToLogin();
 	}
 
-	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
+	if (!validateUInt($_GET['id']) || !(($submission = querySubmission($_GET['id'])) || (isSuperUser(Auth::user()) && ($submission = queryRemovedSubmission($_GET['id']))))) {
 		become404Page();
 	}
 
