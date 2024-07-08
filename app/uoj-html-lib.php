@@ -702,6 +702,9 @@ function echoSubmissionAuditLog($audit_log) {
 			case 'flip hackable-status failed':
 				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '禁止使用 hack' : '允许使用 hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '允许使用 hack' : '禁止使用 hack');
 				break;
+			case 'remove':
+				$mes['title'] = $title_author_prefix . '删除该提交记录';
+				break;
 			default:
 				++$unrecognized_cnt;
 				$no_message = true;

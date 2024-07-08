@@ -105,6 +105,10 @@ function querySubmission($id) {
 	return DB::selectFirst("select * from submissions where id = $id", MYSQLI_ASSOC);
 }
 
+function queryRemovedSubmission($id) {
+	return DB::selectFirst("select * from removed_submissions where id = $id", MYSQLI_ASSOC);
+}
+
 function queryJudgement($id) {
 	return DB::selectFirst("select * from submissions_history where id = $id", MYSQLI_ASSOC);
 }
@@ -417,8 +421,12 @@ function getSubmissionHacksAuditLog($submission) {
 	return $audit_log;
 }
 
+function getSubmissionRemovedHistoryAuditLog($submission_id) {
+	return queryAuditLog(array('cond' => "scope = 'submissions' and type = 'remove' and id_in_scope = {$submission_id}", 'id_in_scope_name' => 'submission_id'));
+}
+
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission));
+	$audit_log = array_merge(array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission)), getSubmissionRemovedHistoryAuditLog($submission['id']));
 	sortAuditLogByTime($audit_log);
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],
@@ -470,9 +478,9 @@ function deleteBlogComment($id, $blog_id) {
 	}
 }
 
-function deleteSubmission($submission) {
-	$content = json_decode($submission['content'], true);
-	unlink(UOJContext::storagePath() . $content['file_name']);
+function deleteSubmission($submission, $log_config = array()) {
+	insertAuditLog('submissions','remove',$submission['id'],isset($log_config['reason'])?$log_config['reason']:'','',$log_config);
+	DB::insert("insert into removed_submissions select * from submissions where id = {$submission['id']}");
 	DB::delete("delete from submissions where id = {$submission['id']}");
 	updateBestACSubmissions($submission['submitter'], $submission['problem_id']);
 }
