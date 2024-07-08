@@ -580,6 +580,149 @@ function echoMessagesTimeline($messages, $messages_head = '') {
 	echo '</div>';
 }
 
+function echoProblemAuditLog($audit_log) {
+	$messages = array();
+	$messages_head = '';
+	$unrecognized_cnt = 0;
+	foreach ($audit_log as $log_now) {
+		$no_message = isset($log_now['no_message']) ? $log_now['no_message'] : false;
+		if ($no_message)
+			continue;
+		$mes = array('time' => $log_now['time']);
+		$log_types = explode(', ', $log_now['type']);
+		$auto_type = ($log_types[count($log_types)-1] == 'auto');
+		$show_actor = isSuperUser(Auth::user());
+		$show_actor_ip = $show_actor;
+		if (isset($log_now['reason']) and $log_now['reason']) {
+			$display_reason = true;
+			if ($auto_type) {
+				switch ($log_types[0]) {
+					case 'data preparing':
+						switch ($log_now['reason']) {
+							case 'add extra_test':
+								$no_message = true;
+								break;
+							case 'flip hackable-status':
+								$log_now['reason'] = '禁止/允许使用 hack';
+								break;
+						}
+						break;
+					case 'add extra_test':
+						if ($log_now['reason'] == 'successful hack')
+							$display_reason = false;
+						break;
+				}
+			}
+			if ($display_reason) {
+				$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>原因：</strong>' . HTML::escape($log_now['reason']);
+			}
+		}
+		$title_author_prefix = $auto_type ? '自动' : '管理员手动';
+		switch($log_types[0]){
+			case 'current_problem_status':
+				$mes['title'] = '当前题目状态';
+				// $mes['uri'] = ;
+				break;
+			case 'rejudge':
+			case 'rejudge Ge97':
+			case 'rejudge AC':
+				$suffix = '该题';
+				if ($log_types[0] == 'rejudge Ge97')
+					$suffix .= '不低于 97 分的程序';
+				if ($log_types[0] == 'rejudge AC')
+					$suffix .= '通过的程序';
+				$mes['title'] = $title_author_prefix . '重测' . $suffix;
+				break;
+			case 'data preparing':
+				$mes['title'] = $title_author_prefix . '对该题进行了数据预处理操作';
+				if (!isset($mes['previous_list']))
+					$mes['previous_list'] = array();
+				$mes['previous_list'][] = '<strong>类型：</strong>' . (isset($log_now['details']['sync_config']['no_compile']) ? '快速同步数据' : '完全同步数据');
+				break;
+			case 'data preparing failed':
+				$mes['title'] = '该题此前的数据预处理操作失败';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<strong>错误信息：</strong>' . HTML::escape($log_now['details']['exception_message']);
+				}
+				break;
+			case 'add extra_test':
+				$prefix = '';
+				if ($auto_type) {
+					if ($log_now['reason'] == 'successful hack')
+						$prefix = 'Hack 成功，';
+				}
+				$prefix .= $title_author_prefix;
+				$mes['title'] = $prefix . '添加 extra test';
+				if ($log_now['details']['source'] == 'hack')
+					$mes['uri'] = getHackUri($log_now['details']['hack_id']);
+				break;
+			case 'add extra_test failed':
+				$mes['title'] = '该题此前的添加 extra test 操作失败';
+				break;
+			case 'clear data':
+				$mes['title'] = $title_author_prefix . '清空该题数据';
+				break;
+			case 'flip hackable-status':
+				$mes['title'] = $title_author_prefix . ($log_now['details']['hackable-status'] ? '允许该题使用 hack' : '禁止该题使用 hack');
+				break;
+			case 'flip hackable-status failed':
+				$mes['title'] = '该题此前的' . ($log_now['details']['final hackable-status'] ? '禁止使用 hack' : '允许使用 hack') . '操作失败，该题当前' . ($log_now['details']['final hackable-status'] ? '允许使用 hack' : '禁止使用 hack');
+				break;
+			case 'data uploading':
+				$mes['title'] = $title_author_prefix . '上传该题数据';
+				break;
+			case 'update extra_config':
+				$mes['title'] = $title_author_prefix . '修改该题额外配置';
+				break;
+			case 'flip data-locked-status':
+				$mes['title'] = $title_author_prefix . ($log_now['details']['data-locked-status'] ? '锁定' : '解锁') . '该题数据';
+				break;
+			default:
+				++$unrecognized_cnt;
+				$no_message = true;
+		}
+		if ($show_actor) {
+			$actor_link = null;
+			$actor_ip = null;
+			if (isset($log_now['actor']))
+				$actor_link = getUserLink($log_now['actor']);
+			if (isset($log_now['actor_http_x_forwarded_for']))
+				$actor_ip = $log_now['actor_http_x_forwarded_for'] . ', ' . $log_now['actor_remote_addr'];
+			else
+				if (isset($log_now['actor_remote_addr']))
+					$actor_ip = $log_now['actor_remote_addr'];
+			if ($auto_type) {
+				$actor_link = "system";
+				$actor_ip = null;
+			}
+			if ($actor_link) {
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "<span>(by $actor_link)</span>";
+			}
+			if ($show_actor_ip and $actor_ip) {
+				$actor_ip = HTML::escape($actor_ip);
+				if (!is_array($mes['title']))
+					$mes['title'] = array($mes['title']);
+				$mes['title'][] = "(from $actor_ip)";
+			}
+		}
+		if ($no_message)
+			continue;
+		$messages[] = $mes;
+	}
+	if ($unrecognized_cnt)
+		$messages_head = '<p>有 ' . $unrecognized_cnt . ' 条未成功识别类型的日志。</p>' . $messages_head;
+	echoMessagesTimeline($messages, $messages_head);
+}
+
+function echoProblemTimeline($problem, $time_now) {
+	echoProblemAuditLog(getProblemAuditLog(array('problem_id' => $problem['id'], 'time_now' => $time_now)));
+}
+
 function echoSubmissionAuditLog($audit_log) {
 	$messages = array();
 	$messages_head = '';
