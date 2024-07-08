@@ -105,6 +105,10 @@ function querySubmission($id) {
 	return DB::selectFirst("select * from submissions where id = $id", MYSQLI_ASSOC);
 }
 
+function queryRemovedSubmission($id) {
+	return DB::selectFirst("select * from removed_submissions where id = $id", MYSQLI_ASSOC);
+}
+
 function queryJudgement($id) {
 	return DB::selectFirst("select * from submissions_history where id = $id", MYSQLI_ASSOC);
 }
