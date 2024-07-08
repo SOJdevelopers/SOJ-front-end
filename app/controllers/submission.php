@@ -96,11 +96,14 @@
 		$rejudge_form = new UOJForm('rejudge');
 		$rejudge_form->handle = function() {
 			global $submission;
-			rejudgeSubmission($submission);
+			global $action_reason;
+			rejudgeSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:'')));
 		};
 		$rejudge_form->submit_button_config['class_str'] = 'btn btn-primary';
 		$rejudge_form->submit_button_config['text'] = '重新测试';
 		$rejudge_form->submit_button_config['align'] = 'right';
+		$rejudge_form->submit_button_config['smart_confirm'] = '';
+		$rejudge_form->submit_button_config['reason'] = '';
 		$rejudge_form->runAtServer();
 	}
 	
@@ -108,12 +111,14 @@
 		$delete_form = new UOJForm('delete');
 		$delete_form->handle = function() {
 			global $submission;
-			deleteSubmission($submission);
+			global $action_reason;
+			deleteSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:'')));
 		};
 		$delete_form->submit_button_config['class_str'] = 'btn btn-danger';
 		$delete_form->submit_button_config['text'] = '删除此提交记录';
 		$delete_form->submit_button_config['align'] = 'right';
 		$delete_form->submit_button_config['smart_confirm'] = '';
+		$delete_form->submit_button_config['reason'] = '';
 		$delete_form->succ_href = '/submissions';
 		$delete_form->runAtServer();
 	}
