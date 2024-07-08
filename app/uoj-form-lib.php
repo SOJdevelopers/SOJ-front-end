@@ -395,6 +395,11 @@ EOD
 			$form_entype_str = $this->is_big ? ' enctype="multipart/form-data"' : '';
 			echo '<form action="', UOJContext::requestURI(), '" method="post" class="form-horizontal" id="form-', $this->form_name, '"', $form_entype_str, '>';
 			echo HTML::hiddenToken();
+			if (isset($this->submit_button_config['reason'])) {
+				echo <<<EOD
+<input type="hidden" id="form-{$this->form_name}-reason" name="{$this->form_name}-reason" value="" />
+EOD;
+			}
 			echo $this->main_html;
 			
 			if (!$this->no_submit) {
@@ -533,12 +538,27 @@ EOD;
 				$this->submit_button_config['confirm_text'] = '你真的要' . $this->submit_button_config['text'] . '吗？';
 			}
 			if (isset($this->submit_button_config['confirm_text'])) {
+				if (isset($this->submit_button_config['reason'])) {
+				echo <<<EOD
+		const res = prompt('{$this->submit_button_config['confirm_text']}\\n备注（选填）：');
+		if (res === null) {
+			ok = false;
+		}
+		else {
+			$('#form-{$this->form_name}-reason').get(0).value = res;
+			ok = true;
+		}
+
+EOD;
+				}
+				else {
 				echo <<<EOD
 		if (!confirm('{$this->submit_button_config['confirm_text']}')) {
 			ok = false;
 		}
 
 EOD;
+				}
 			}
 			if ($this->has_file) {
 				echo <<<EOD
@@ -606,6 +626,15 @@ EOD;
 		}
 		
 		public function runAtServer() {
+			if (isset($this->submit_button_config['reason'])) {
+				global $action_reason;
+				if (isset($_POST["{$this->form_name}-reason"])) {
+					$action_reason = substr($_POST["{$this->form_name}-reason"], 0, 100);
+				}
+				else {
+					$action_reason = null;
+				}
+			}
 			foreach ($this->run_at_server_handler as $type => $handler) {
 				if (isset($_POST[$type])) {
 					$handler();
