@@ -6,8 +6,13 @@
 		redirectToLogin();
 	}
 
-	if (!validateUInt($_GET['id']) || !(($submission = querySubmission($_GET['id'])) || (isSuperUser(Auth::user()) && ($submission = queryRemovedSubmission($_GET['id']))))) {
-		become404Page();
+	$removed = false;
+	if (!validateUInt($_GET['id']) || !($submission = querySubmission($_GET['id']))) {
+		if (isSuperUser(Auth::user()) && ($submission = queryRemovedSubmission($_GET['id']))) {
+			$removed = true;
+		}
+		else
+			become404Page();
 	}
 
 	$time_now = DB::query_time_now();
@@ -49,7 +54,7 @@
 		become403Page();
 	}
 
-	$active = !isset($judgement);
+	$active = !($removed || isset($judgement));
 
 	$hackable = $active && $submission['score'] == 100 && $problem['hackable'] == 1;
 	if ($contest != null && $contest['cur_progress'] < CONTEST_FINISHED) {
