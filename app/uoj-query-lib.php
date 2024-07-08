@@ -470,9 +470,9 @@ function deleteBlogComment($id, $blog_id) {
 	}
 }
 
-function deleteSubmission($submission) {
-	$content = json_decode($submission['content'], true);
-	unlink(UOJContext::storagePath() . $content['file_name']);
+function deleteSubmission($submission, $log_config = array()) {
+	insertAuditLog('submissions','remove',$submission['id'],isset($log_config['reason'])?$log_config['reason']:'','',$log_config);
+	DB::insert("insert into removed_submissions select * from submissions where id = {$submission['id']}");
 	DB::delete("delete from submissions where id = {$submission['id']}");
 	updateBestACSubmissions($submission['submitter'], $submission['problem_id']);
 }
