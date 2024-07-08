@@ -97,7 +97,7 @@
 		$rejudge_form->handle = function() {
 			global $submission;
 			global $action_reason;
-			rejudgeSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:'')));
+			rejudgeSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:null)));
 		};
 		$rejudge_form->submit_button_config['class_str'] = 'btn btn-primary';
 		$rejudge_form->submit_button_config['text'] = '重新测试';
@@ -112,7 +112,7 @@
 		$delete_form->handle = function() {
 			global $submission;
 			global $action_reason;
-			deleteSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:'')));
+			deleteSubmission($submission, array('reason' => (isset($action_reason)?$action_reason:null)));
 		};
 		$delete_form->submit_button_config['class_str'] = 'btn btn-danger';
 		$delete_form->submit_button_config['text'] = '删除此提交记录';
