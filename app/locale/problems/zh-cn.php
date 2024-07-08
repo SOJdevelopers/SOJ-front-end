@@ -13,6 +13,7 @@ return [
 	'statement' => '描述',
 	'custom test' => '自定义测试',
 	'manage' => '管理',
+	'logs' => '日志',
 	'submissions statistics' => '统计提交情况',
 	'statistics' => '统计',
 	'run' => '运行',
