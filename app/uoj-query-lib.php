@@ -421,8 +421,12 @@ function getSubmissionHacksAuditLog($submission) {
 	return $audit_log;
 }
 
+function getSubmissionRemovedHistoryAuditLog($submission_id) {
+	return queryAuditLog(array('cond' => "scope = 'submissions' and type = 'remove' and id_in_scope = {$submission_id}", 'id_in_scope_name' => 'submission_id'));
+}
+
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission));
+	$audit_log = array_merge(array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission)), getSubmissionRemovedHistoryAuditLog($submission['id']));
 	sortAuditLogByTime($audit_log);
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],
