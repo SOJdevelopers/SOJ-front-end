@@ -336,6 +336,12 @@ function getProblemAuditLog($config = array()) {
 		$cond = join(' and ', $cond);
 	else
 		$cond = '1';
+	if (isset($config['problem_id']) && isset($config['time_now']))
+		return array_merge(array(
+			'time' => $config['time_now'],
+			'type' => 'current_problem_status',
+			'problem_id' => $config['problem_id']
+		), queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id')));
 	return queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id'));
 }
 
