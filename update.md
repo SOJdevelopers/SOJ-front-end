@@ -194,3 +194,33 @@ CREATE TABLE `audit_log` (
   KEY `id_in_scope` (`scope`,`id_in_scope`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 ```
+
+### update JUL 08 16:00
+
+```sql
+ALTER TABLE submissions DROP COLUMN contest_final_version_id;
+
+CREATE TABLE `removed_submissions` (
+  `id` int(10) unsigned NOT NULL,
+  `problem_id` int(10) unsigned NOT NULL,
+  `contest_id` int(10) unsigned NOT NULL,
+  `active_version_id` int(10) unsigned DEFAULT NULL,
+  `submit_time` datetime NOT NULL,
+  `submitter` varchar(20) NOT NULL,
+  `content` text NOT NULL,
+  `language` varchar(15) NOT NULL,
+  `tot_size` int(11) NOT NULL,
+  `judge_time` datetime DEFAULT NULL,
+  `judger_name` varchar(50) NOT NULL DEFAULT '',
+  `result` mediumblob NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `result_error` varchar(20) DEFAULT NULL,
+  `score` int(11) DEFAULT NULL,
+  `used_time` int(11) NOT NULL DEFAULT '0',
+  `used_memory` int(11) NOT NULL DEFAULT '0',
+  `status_details` varchar(100) NOT NULL,
+  `estimate` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `contest_id` (`contest_id`,`problem_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
