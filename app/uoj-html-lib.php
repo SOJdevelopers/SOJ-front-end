@@ -712,7 +712,7 @@ function echoSubmissionAuditLog($audit_log) {
 			if (isset($log_now['actor']))
 				$actor_link = getUserLink($log_now['actor']);
 			if (isset($log_now['actor_http_x_forwarded_for']))
-				$actor_ip = $log_now['actor_http_x_forwarded_for'];
+				$actor_ip = $log_now['actor_http_x_forwarded_for'] . ', ' . $log_now['actor_remote_addr'];
 			else
 				if (isset($log_now['actor_remote_addr']))
 					$actor_ip = $log_now['actor_remote_addr'];

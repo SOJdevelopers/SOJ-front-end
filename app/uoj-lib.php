@@ -25,6 +25,9 @@
 	Session::init();
 	UOJTime::init();
 	DB::init();
+	if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && strlen($_SERVER['HTTP_X_FORWARDED_FOR'])>50) {
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = substr($_SERVER['HTTP_X_FORWARDED_FOR'], strlen($_SERVER['HTTP_X_FORWARDED_FOR'])-50);
+	}
 	Auth::init();
 	
 	if (isset($_GET['locale'])) {

@@ -37,6 +37,9 @@
 			if ($problem['is_hidden']) {
 				echo '<span class="text-danger">[', UOJLocale::get('hidden'), ']</span> ';
 			}
+			if (hasBeenInProblemPermissions(Auth::user(), $problem)) {
+				echo '<span class="text-success">[', UOJLocale::get('manageable'), ']</span> ';
+			}
 			echo '<a href="/problem/', $problem['id'], '">', $problem['title'], '</a>';
 			if (isset($_COOKIE['show_tags_mode'])) {
 				foreach (queryProblemTags($problem['id']) as $tag) {

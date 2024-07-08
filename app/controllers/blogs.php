@@ -25,6 +25,7 @@
 	$header .= '</tr>';
 	$config = array();
 	$config['table_classes'] = array('table', 'table-hover', 'table-vertical-middle');
+	$config['timeout'] = 1000;
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('blogs')) ?>
 <div class="pull-right btn-group">
