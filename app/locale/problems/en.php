@@ -49,5 +49,10 @@ return [
 	'estimate result' => 'Estimate Result',
 	'view problem' => 'View problem',
 	'problem visibility' => 'Problem visibility',
-	'back to list' => 'Go to problemset'
+	'back to list' => 'Go to problemset',
+	'attachments' => 'Attachments',
+	'output only' => 'Output only',
+	'interactive' => 'Interactive',
+	'custom checker' => 'Custom checker',
+	'custom judger' => 'Custom judger',
 ];

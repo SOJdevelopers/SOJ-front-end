@@ -62,6 +62,8 @@
 	$submission_requirement = json_decode($problem['submission_requirement'], true);
 	$problem_extra_config = getProblemExtraConfig($problem);
 	$custom_test_requirement = getProblemCustomTestRequirement($problem);
+	$data_dir = "/var/uoj_data/{$problem['id']}";
+	$problem_conf = getUOJConf("$data_dir/problem.conf");
 
 	if ($custom_test_requirement) {
 		$custom_test_submission = DB::selectFirst("select * from custom_test_submissions where submitter = '".Auth::id()."' and problem_id = {$problem['id']} order by id desc limit 1");
@@ -124,7 +126,6 @@
 		$result_json = json_encode($result);
 		
 		if ($is_in_contest) {
-			Cookie::set("estimate_{$problem['id']}", $estimate, time() + 60 * 60 * 24 * 365, '/');
 			DB::insert("insert into submissions (problem_id, contest_id, submit_time, submitter, content, language, tot_size, status, result, estimate) values ({$problem['id']}, {$contest['id']}, now(), '$agent', '$esc_content', '$esc_language', $tot_size, '{$result['status']}', '$result_json', $estimate)");
 		} else {
 			$username = Auth::id();
@@ -176,9 +177,8 @@
 
 	$estimate_config = array();
 	if ($is_in_contest) {
-		$estimate_config['default'] = Cookie::get("estimate_{$problem['id']}");
 		$estimate_config['max'] = isset($contest['extra_config']["full_score_{$problem['id']}"]) ? $contest['extra_config']["full_score_{$problem['id']}"] : 100;
-		if (!isset($estimate_config['default'])) $estimate_config['default'] = $estimate_config['max'];
+		$estimate_config['default'] = $estimate_config['max'];
 	}
 
 	if ($can_use_zip_upload) {
@@ -236,9 +236,6 @@ EOD
 	$REQUIRE_LIB['shjs'] = '';
 ?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
-<div class="pull-right">
-	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
-</div>
 
 <?php if ($contest): ?>
 <div class="page-header row">
@@ -254,7 +251,50 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </script>
 <?php endif ?>
 <?php else: ?>
-<h1 class="page-header text-center"><?= $problem['is_hidden'] ? '<span class="text-muted">[' . UOJLocale::get('hidden') . ']</span> ' : '' ?>#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
+<h1 class="page-header text-center" style="margin-bottom:0px;border-bottom:0px"><?= $problem['is_hidden'] ? '<span class="text-muted">[' . UOJLocale::get('hidden') . ']</span> ' : '' ?>#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
+<div class="row" style="margin-bottom:10px;border-bottom:1px">
+<div class="col-xs-9">
+<?php
+	if (is_array($problem_conf)) {
+	$tags = array();
+	if (getUOJConfVal($problem_conf, 'submit_answer', null) === 'on') {
+		$tags['type'] = UOJLocale::get('problems::output only');
+	}
+	else
+	{
+		if (getUOJConfVal($problem_conf, 'interaction_mode', null) === 'on' ||
+			getUOJConfVal($problem_conf, 'with_implementer', null) === 'on') {
+			$tags['type'] = UOJLocale::get('problems::interactive');
+		}
+		$time_suf = 's';
+		$memory_suf = 'MiB';
+		foreach ($problem_conf as $key => $val) {
+			if (preg_match('/^(subtask_)?time_limit_[1-9][0-9]*$/', $key)) {
+				$time_suf = 's*';
+			}
+			else if (preg_match('/^(subtask_)?memory_limit_[1-9][0-9]*$/', $key)) {
+				$memory_suf = 'MiB*';
+			}
+		}
+		$tags['time limit'] = getUOJConfVal($problem_conf, 'time_limit', 1) . $time_suf;
+		$tags['memory limit'] = getUOJConfVal($problem_conf, 'memory_limit', 256) . $memory_suf;
+	}
+	$tags['checker'] = getUOJConfVal($problem_conf, 'use_builtin_checker', UOJLocale::get('problems::custom checker'));
+	if (getUOJConfVal($problem_conf, 'use_builtin_judger', null) !== 'on') {
+		$tags['judger'] = UOJLocale::get('problems::custom judger');
+	}
+	echo '<ul class="list-group-item-text list-inline">';
+	foreach ($tags as $key => $val) {
+		echo "<li><span title='{$key}'><strong>{$val}</strong></span></li>";
+	}
+	echo '</ul>';
+}
+?>
+</div>
+<div class="col-xs-3 text-right">
+	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+</div>
+</div>
 <a role="button" class="btn btn-info pull-right" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
 <?php endif ?>
 
@@ -263,6 +303,9 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<li><a href="#tab-submit-answer" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-upload"></span> <?= UOJLocale::get('problems::submit') ?></a></li>
 <?php if ($custom_test_requirement) { ?>
 	<li><a href="#tab-custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
+<?php } ?>
+<?php if (file_exists("$data_dir/download.zip")) { ?>
+	<li><a href="/download.php?type=problem&id=<?= $problem['id'] ?>" role="tab"><span class="glyphicon glyphicon-download"></span> <?= UOJLocale::get('problems::attachments') ?></a></li>
 <?php } ?>
 <?php if (hasProblemPermission(Auth::user(), $problem) or $statement_maintainable) { ?>
 	<li><a href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><span class="glyphicon glyphicon-cog"></span> <?= UOJLocale::get('problems::manage') ?></a></li>

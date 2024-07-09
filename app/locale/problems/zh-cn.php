@@ -49,5 +49,10 @@ return [
 	'estimate result' => '预估结果',
 	'view problem' => '查看题目',
 	'problem visibility' => '题目可见性',
-	'back to list' => '转到题库'
+	'back to list' => '转到题库',
+	'attachments' => '下发文件',
+	'output only' => '答案提交题',
+	'interactive' => '交互式程序题',
+	'custom checker' => '自定义答案检查器',
+	'custom judger' => '自定义测评器',
 ];
