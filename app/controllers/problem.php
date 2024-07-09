@@ -265,10 +265,10 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 	<li><a href="#tab-custom-test" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::custom test') ?></a></li>
 <?php } ?>
 <?php if (hasProblemPermission(Auth::user(), $problem) or $statement_maintainable) { ?>
-	<li><a href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><?= UOJLocale::get('problems::manage') ?></a></li>
+	<li><a href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab"><span class="glyphicon glyphicon-cog"></span> <?= UOJLocale::get('problems::manage') ?></a></li>
 <?php } ?>
 <?php if (hasProblemPermission(Auth::user(), $problem)) { ?>
-	<li><a href="#tab-logs" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-console"></span> <?= UOJLocale::get('problems::logs') ?></a></li>
+	<li><a href="#tab-logs" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list"></span> <?= UOJLocale::get('problems::logs') ?></a></li>
 <?php } ?>
 <?php
 	if ($contest) {
