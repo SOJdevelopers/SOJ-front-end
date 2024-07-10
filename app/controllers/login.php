@@ -47,7 +47,7 @@
 	$REQUIRE_LIB['md5'] = '';
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('login')) ?>
-<h2 class="page-header"><?= UOJLocale::get('login') ?></h2>
+<h2><?= UOJLocale::get('login') ?></h2>
 <form id="form-login" class="form-horizontal" method="post">
   <div id="div-username" class="form-group">
     <label for="input-username" class="col-sm-2 control-label"><?= UOJLocale::get('username') ?></label>

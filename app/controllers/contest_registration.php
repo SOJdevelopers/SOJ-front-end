@@ -69,7 +69,7 @@
 	}
 ?>
 <?php echoUOJPageHeader(HTML::stripTags($contest['name']) . ' - 报名') ?>
-<h2 class="page-header">比赛规则</h2>
+<h2>比赛规则</h2>
 <ul>
 <?php if ($contest['extra_config']['standings_version'] === 5) { ?>
 	<li>比赛报名后不算正式参赛，报名后进了比赛页面也不算参赛，<strong>看了题目才算正式参赛</strong>。如果未正式参赛则不算 rating。</li>

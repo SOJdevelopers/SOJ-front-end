@@ -67,8 +67,12 @@ class HTML {
 			$param = array_merge($param, $config['params']);
 		}
 		
-		//$url = UOJConfig::$data['web'][$config['location']]['protocol'].'://'.UOJConfig::$data['web'][$config['location']]['host'];
-		$url = '';
+		if (isset($config['absolute'])) {
+			$url = UOJConfig::$data['web'][$config['location']]['protocol'].'://'.UOJConfig::$data['web'][$config['location']]['host'];
+		}
+		else {
+			$url = '';
+		}
 		if (UOJConfig::$data['web'][$config['location']]['port'] != 80) {
 			$url .= ':' . UOJConfig::$data['web'][$config['location']]['port'];
 		}

@@ -18,7 +18,7 @@
 		$user = queryUser($username);
 		if ($user == null) {
 			return '不明错误';
-	}
+		}
 		if ($check_code !== md5($user['username'] . '+' . $user['password'])) {
 			return '不明错误';
 		}
@@ -29,13 +29,27 @@
 	if (isset($_POST['reset'])) {
 		die(resetPassword());
 	}
+	list($username, $check_code) = explode('.', base64url_decode($_GET['p']));
+	if (!isset($username) || !validateUsername($username)) {
+		become404Page();
+	}
+	if (!isset($check_code)) {
+		become404Page();
+	}
+	$user = queryUser($username);
+	if ($user == null) {
+		become404Page();
+	}
+	if ($check_code !== md5($user['username'] . '+' . $user['password'])) {
+		become404Page();
+	}
 ?>
 <?php
 	$REQUIRE_LIB['dialog'] = '';
 	$REQUIRE_LIB['md5'] = '';
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('reset password')) ?>
-<h2 class="page-header"><?= UOJLocale::get('reset password') ?></h2>
+<h2><?= UOJLocale::get('reset password') ?></h2>
 <form id="form-reset" class="form-horizontal">
 	<div id="div-password" class="form-group">
 		<label for="input-password" class="col-sm-2 control-label"><?= UOJLocale::get('new password') ?></label>

@@ -1,7 +1,7 @@
 <?php echoUOJPageHeader(UOJLocale::get('help')) ?>
 <article>
 	<header>
-		<h2 class="page-header"><?= UOJLocale::get('faq') ?></h2>
+		<h2><?= UOJLocale::get('faq') ?></h2>
 	</header>
 	<section>
 		<header>

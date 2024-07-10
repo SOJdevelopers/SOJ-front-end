@@ -22,7 +22,7 @@
 		$oj_name = UOJConfig::$data['profile']['oj-name'];
 		$oj_name_short = UOJConfig::$data['profile']['oj-name-short'];
 		$sufs = base64url_encode($user['username'] . '.' . md5($user['username'] . '+' . $password));
-		$url = HTML::url('/reset-password', array('params' => array('p' => $sufs)));
+		$url = HTML::url('/reset-password', array('params' => array('p' => $sufs), 'absolute' => true));
 		error_log($user['username'] . ' : ' . $url);
 		$html = <<<EOD
 <base target="_blank" />
@@ -56,7 +56,7 @@ EOD;
 	$forgot_form->runAtServer();
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('retrieve password')) ?>
-<h2 class="page-header"><?= UOJLocale::get('retrieve password') ?></h2>
+<h2><?= UOJLocale::get('retrieve password') ?></h2>
 <h4><?= UOJLocale::get('enter username to password') ?>:</h4>
 <?php $forgot_form->printHTML(); ?>
 <?php echoUOJPageFooter() ?>

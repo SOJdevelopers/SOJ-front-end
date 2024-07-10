@@ -61,7 +61,7 @@
 	$REQUIRE_LIB['md5'] = '';
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('modify my profile')) ?>
-<h2 class="page-header"><?= UOJLocale::get('modify my profile') ?></h2>
+<h2><?= UOJLocale::get('modify my profile') ?></h2>
 <form id="form-update" class="form-horizontal">
 	<h4><?= UOJLocale::get('please enter your password for authorization') ?></h4>
 	<div id="div-old_password" class="form-group">

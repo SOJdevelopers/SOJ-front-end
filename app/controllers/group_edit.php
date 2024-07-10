@@ -105,7 +105,7 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('edit group')) ?>
 
-<h2 class="page-header"><?= UOJLocale::get('edit group') ?></h2>
+<h2><?= UOJLocale::get('edit group') ?></h2>
 
 <h3><?= UOJLocale::get('basic profile') ?></h3>
 

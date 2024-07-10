@@ -65,6 +65,36 @@
 	$data_dir = "/var/uoj_data/{$problem['id']}";
 	$problem_conf = getUOJConf("$data_dir/problem.conf");
 
+	if (is_array($problem_conf)) {
+		$tags = array();
+		if (getUOJConfVal($problem_conf, 'submit_answer', null) === 'on') {
+			$tags['type'] = UOJLocale::get('problems::output only');
+		}
+		else
+		{
+			if (getUOJConfVal($problem_conf, 'interaction_mode', null) === 'on' ||
+				getUOJConfVal($problem_conf, 'with_implementer', null) === 'on') {
+				$tags['type'] = UOJLocale::get('problems::interactive');
+			}
+			$time_suf = 's';
+			$memory_suf = 'MiB';
+			foreach ($problem_conf as $key => $val) {
+				if (preg_match('/^(subtask_)?time_limit_[1-9][0-9]*$/', $key)) {
+					$time_suf = 's*';
+				}
+				else if (preg_match('/^(subtask_)?memory_limit_[1-9][0-9]*$/', $key)) {
+					$memory_suf = 'MiB*';
+				}
+			}
+			$tags['time limit'] = getUOJConfVal($problem_conf, 'time_limit', 1) . $time_suf;
+			$tags['memory limit'] = getUOJConfVal($problem_conf, 'memory_limit', 256) . $memory_suf;
+		}
+		$tags['checker'] = getUOJConfVal($problem_conf, 'use_builtin_checker', UOJLocale::get('problems::custom checker'));
+		if (getUOJConfVal($problem_conf, 'use_builtin_judger', null) !== 'on') {
+			$tags['judger'] = UOJLocale::get('problems::custom judger');
+		}
+	}
+
 	if ($custom_test_requirement) {
 		$custom_test_submission = DB::selectFirst("select * from custom_test_submissions where submitter = '".Auth::id()."' and problem_id = {$problem['id']} order by id desc limit 1");
 		$custom_test_submission_result = json_decode($custom_test_submission['result'], true);
@@ -238,11 +268,33 @@ EOD
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::problem')) ?>
 
 <?php if ($contest): ?>
-<div class="page-header row">
-	<h1 class="col-md-3 text-left"><small><?= $contest['name'] ?></small></h1>
-	<h1 class="col-md-7 text-center"><?= $problem_letter ?>. <?= $problem['title'] ?></h1>
-	<div class="col-md-2 text-right" id="contest-countdown"></div>
+<div class="row">
+	<h1 class="col-md-3 text-left" style="margin-top:0px"><small><?= $contest['name'] ?></small></h1>
+	<h1 class="col-md-6 text-center" style="margin-top:0px"><?= $problem_letter ?>. <?= $problem['title'] ?></h1>
+	<div class="col-md-3 text-right" id="contest-countdown" style="margin-top:0px"></div>
 </div>
+<?php else: ?>
+<h1 class="text-center"><?= $problem['is_hidden'] ? '<span class="text-muted">[' . UOJLocale::get('hidden') . ']</span> ' : '' ?>#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
+<?php endif ?>
+
+<div class="row" style="margin-bottom:10px;border-bottom:1px">
+	<div class="col-xs-9">
+	<?php
+		if (is_array($problem_conf)) {
+			echo '<ul class="list-group-item-text list-inline">';
+			foreach ($tags as $key => $val) {
+				echo "<li><span title='{$key}' style='font-family:Consolas, monospace;'><strong><big>{$val}</big></strong></span></li>";
+			}
+			echo '</ul>';
+		}
+	?>
+	</div>
+	<div class="col-xs-3 text-right">
+		<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
+	</div>
+</div>
+
+<?php if ($contest): ?>
 <a role="button" class="btn btn-info pull-right" href="/contest/<?= $contest['id'] ?>/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
 <?php if ($contest['cur_progress'] <= CONTEST_IN_PROGRESS): ?>
 <script type="text/javascript">
@@ -251,50 +303,6 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </script>
 <?php endif ?>
 <?php else: ?>
-<h1 class="page-header text-center" style="margin-bottom:0px;border-bottom:0px"><?= $problem['is_hidden'] ? '<span class="text-muted">[' . UOJLocale::get('hidden') . ']</span> ' : '' ?>#<?= $problem['id']?>. <?= $problem['title'] ?></h1>
-<div class="row" style="margin-bottom:10px;border-bottom:1px">
-<div class="col-xs-9">
-<?php
-	if (is_array($problem_conf)) {
-	$tags = array();
-	if (getUOJConfVal($problem_conf, 'submit_answer', null) === 'on') {
-		$tags['type'] = UOJLocale::get('problems::output only');
-	}
-	else
-	{
-		if (getUOJConfVal($problem_conf, 'interaction_mode', null) === 'on' ||
-			getUOJConfVal($problem_conf, 'with_implementer', null) === 'on') {
-			$tags['type'] = UOJLocale::get('problems::interactive');
-		}
-		$time_suf = 's';
-		$memory_suf = 'MiB';
-		foreach ($problem_conf as $key => $val) {
-			if (preg_match('/^(subtask_)?time_limit_[1-9][0-9]*$/', $key)) {
-				$time_suf = 's*';
-			}
-			else if (preg_match('/^(subtask_)?memory_limit_[1-9][0-9]*$/', $key)) {
-				$memory_suf = 'MiB*';
-			}
-		}
-		$tags['time limit'] = getUOJConfVal($problem_conf, 'time_limit', 1) . $time_suf;
-		$tags['memory limit'] = getUOJConfVal($problem_conf, 'memory_limit', 256) . $memory_suf;
-	}
-	$tags['checker'] = getUOJConfVal($problem_conf, 'use_builtin_checker', UOJLocale::get('problems::custom checker'));
-	if (getUOJConfVal($problem_conf, 'use_builtin_judger', null) !== 'on') {
-		$tags['judger'] = UOJLocale::get('problems::custom judger');
-	}
-	echo '<ul class="list-group-item-text list-inline">';
-	foreach ($tags as $key => $val) {
-		echo "<li><span title='{$key}'><strong>{$val}</strong></span></li>";
-	}
-	echo '</ul>';
-}
-?>
-</div>
-<div class="col-xs-3 text-right">
-	<?= getClickZanBlock('P', $problem['id'], $problem['zan']) ?>
-</div>
-</div>
 <a role="button" class="btn btn-info pull-right" href="/problem/<?= $problem['id'] ?>/statistics"><span class="glyphicon glyphicon-stats"></span> <?= UOJLocale::get('problems::statistics') ?></a>
 <?php endif ?>
 

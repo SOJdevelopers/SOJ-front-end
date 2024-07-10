@@ -80,7 +80,7 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('private message')) ?>
 
-<h1 class="page-header"><?= UOJLocale::get('private message') ?></h1>
+<h1><?= UOJLocale::get('private message') ?></h1>
 
 <div id="conversations">
 </div>

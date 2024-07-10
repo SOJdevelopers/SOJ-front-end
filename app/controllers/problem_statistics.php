@@ -62,7 +62,7 @@
 ?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - ' . UOJLocale::get('problems::statistics')) ?>
 
-<h1 class="page-header text-center"><?= $problem['title'] ?> <?= UOJLocale::get('problems::statistics') ?></h1>
+<h1 class="text-center"><?= $problem['title'] ?> <?= UOJLocale::get('problems::statistics') ?></h1>
 
 <?php if ($contest && !hasContestPermission(Auth::user(), $contest) && $contest['cur_progress'] <= CONTEST_IN_PROGRESS) { ?>
 <h2 class="text-center text-muted">比赛尚未结束</h2>

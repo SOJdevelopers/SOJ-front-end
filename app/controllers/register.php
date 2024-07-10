@@ -80,7 +80,7 @@
 	$REQUIRE_LIB['dialog'] = '';
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('register')) ?>
-<h2 class="page-header"><?= UOJLocale::get('register') ?></h2>
+<h2><?= UOJLocale::get('register') ?></h2>
 <form id="form-register" class="form-horizontal">
 	<div id="div-username" class="form-group">
 		<label for="input-username" class="col-sm-2 control-label"><?= UOJLocale::get('username') ?></label>
