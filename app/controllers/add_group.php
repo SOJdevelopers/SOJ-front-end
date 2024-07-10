@@ -60,7 +60,7 @@
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('new group')) ?>
 
-<h2 class="page-header"><?= UOJLocale::get('new group') ?></h2>
+<h2><?= UOJLocale::get('new group') ?></h2>
 
 <?php $group_form->printHTML(); ?>
 

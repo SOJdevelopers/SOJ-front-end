@@ -214,7 +214,7 @@ EOD;
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('file upload')); ?>
 
-<h2 class="page-header"><?= UOJLocale::get('file upload') ?></h2>
+<h2><?= UOJLocale::get('file upload') ?></h2>
 
 <?php $upload_form->printHTML(); ?>
 

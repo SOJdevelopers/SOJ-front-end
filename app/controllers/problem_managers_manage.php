@@ -49,7 +49,7 @@
 	$visibility_form->runAtServer();
 ?>
 <?php echoUOJPageHeader(HTML::stripTags($problem['title']) . ' - 管理者 - 题目管理') ?>
-<h1 class="page-header" align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
+<h1 align="center">#<?=$problem['id']?> : <?=$problem['title']?> 管理</h1>
 <ul class="nav nav-tabs" role="tablist">
 	<li><a href="/problem/<?= $problem['id'] ?>/manage/statement" role="tab">编辑</a></li>
 	<li class="active"><a href="/problem/<?= $problem['id'] ?>/manage/managers" role="tab">管理者</a></li>
