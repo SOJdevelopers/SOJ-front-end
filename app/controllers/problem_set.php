@@ -7,9 +7,10 @@
 		redirectToLogin();
 	}
 
-	if (isProblemManager(Auth::user())) {
+	if (isProblemCreator(Auth::user())) {
 		$new_problem_form = new UOJForm('new_problem');
 		$new_problem_form->handle = function() {
+			insertAuditLog('problems','create',$problem['id'],'','');
 			DB::insert("insert into problems (title, is_hidden, submission_requirement) values ('New Problem', 1, '{}')");
 			$id = DB::insert_id();
 			DB::insert("insert into problems_contents (id, statement, statement_md) values ({$id}, '', '')");
