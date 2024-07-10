@@ -255,7 +255,7 @@ function queryAuditLog($config) {
 	if (isset($config['id_in_scope_name'])) {
 		$id_in_scope_name = $config['id_in_scope_name'];
 	}
-	$hiss = DB::select("select id, type, id_in_scope as {$id_in_scope_name}, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond}");
+	$hiss = DB::select("select id, type, id_in_scope as {$id_in_scope_name}, time, actor, actor_remote_addr, actor_http_x_forwarded_for, reason, details from audit_log where {$cond} order by id asc");
 	$audit_log = array();
 	while ($his = DB::fetch($hiss)) {
 		$his['details'] = json_decode($his['details'], true);
@@ -336,7 +336,15 @@ function getProblemAuditLog($config = array()) {
 		$cond = join(' and ', $cond);
 	else
 		$cond = '1';
-	return queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id'));
+	$audit_log = queryAuditLog(array('cond' => $cond, 'id_in_scope_name' => 'problem_id'));
+	if (isset($config['problem_id']) && isset($config['time_now'])){
+		$audit_log[] = array(
+			'time' => $config['time_now'],
+			'type' => 'current_problem_status',
+			'problem_id' => $config['problem_id']
+		);
+	}
+	return array_reverse($audit_log);
 }
 
 function getProblemDataChangesAuditLog($config = array()) {
@@ -422,7 +430,7 @@ function getSubmissionHacksAuditLog($submission) {
 }
 
 function getSubmissionRemovedHistoryAuditLog($submission_id) {
-	return queryAuditLog(array('cond' => "scope = 'submissions' and type = 'remove' and id_in_scope = {$submission_id}", 'id_in_scope_name' => 'submission_id'));
+	return array_reverse(queryAuditLog(array('cond' => "scope = 'submissions' and type = 'remove' and id_in_scope = {$submission_id}", 'id_in_scope_name' => 'submission_id')));
 }
 
 function getSubmissionHistoryAuditLog($submission) {
