@@ -374,12 +374,12 @@
 			insertAuditLog('problems','flip hackable-status failed',$problem['id'],'',json_encode(
 				array('final hackable-status' => ($problem['hackable'] ? 0 : 1), 'exception_message' => $ret)
 			), array('auto' => true));
-			return ret;
+			return $ret;
 		}
 		
 		$hackable = $problem['hackable'] ? 1 : 0;
 		DB::update("update problems set hackable = $hackable where id = {$problem['id']}");
-		return ret;
+		return $ret;
 	}
 
 	function dataFlipLockedStatus($problem, $log_config = array()) {
