@@ -1,6 +1,7 @@
 <?php
 	requirePHPLib('form');
 	requirePHPLib('data');
+	requirePHPLib('problem');
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
