@@ -1,5 +1,5 @@
 <?php
-	requirePHPLib('data');
+	// need `requirePHPLib('data');`
 
 	function addProblemPermission($problem_id, $username, $log_config = array()) {
 		insertAuditLog('problems','add permission',$problem_id,isset($log_config['reason'])?$log_config['reason']:'', json_encode(array('username' => $username)), $log_config);
