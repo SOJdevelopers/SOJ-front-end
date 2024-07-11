@@ -196,7 +196,7 @@ EOD;
 	</div>
 </div>
 <?php
-	if (isProblemManager(Auth::user())) {
+	if (isProblemCreator(Auth::user())) {
 		$new_problem_form->printHTML();
 	}
 ?>
