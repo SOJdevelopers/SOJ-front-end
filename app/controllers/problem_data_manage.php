@@ -162,7 +162,7 @@ EOD
 			function ($submission_requirement, &$vdata) {
 				$submission_requirement = json_decode($submission_requirement, true);
 				if ($submission_requirement === null) {
-					return '不是合法的JSON';
+					return '不是合法的 JSON';
 				}
 				$vdata['submission_requirement'] = json_encode($submission_requirement);
 			},
@@ -171,7 +171,7 @@ EOD
 			function ($extra_config, &$vdata) {
 				$extra_config = json_decode($extra_config, true);
 				if ($extra_config === null) {
-					return '不是合法的JSON';
+					return '不是合法的 JSON';
 				}
 				$vdata['extra_config'] = json_encode($extra_config);
 			},
@@ -183,6 +183,16 @@ EOD
 			if ($problem['data_locked']) {
 				becomeMsgPage('<div>Problem data locked.</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
+			insertAuditLog('problems','update submission_requirement',$problem['id'],'',
+				json_encode(
+					array('config' => $vdata['submission_requirement'])
+				)
+			);
+			insertAuditLog('problems','update extra_config',$problem['id'],'',
+				json_encode(
+					array('config' => $vdata['extra_config'])
+				)
+			);
 			$esc_submission_requirement = DB::escape($vdata['submission_requirement']);
 			$esc_extra_config = DB::escape($vdata['extra_config']);
 			DB::update("update problems set submission_requirement = '$esc_submission_requirement', extra_config = '$esc_extra_config' where id = {$problem['id']}");
@@ -444,22 +454,11 @@ EOD
 		$hackable_form->handle = function() {
 			global $problem;
 			global $action_reason;
-			$problem['hackable'] = !$problem['hackable'];
-			insertAuditLog('problems','flip hackable-status',$problem['id'],isset($action_reason)?$action_reason:'',
-				json_encode(
-					array('hackable-status' => ($problem['hackable'] ? 1 : 0))
-				));
 			set_time_limit(600);
-			$ret = dataSyncProblemData($problem, (bool)isSuperUser(Auth::user()), array('reason' => 'flip hackable-status', 'auto' => true));
+			$ret = dataFlipHackableStatus($problem, array('reason' => (isset($action_reason)?$action_reason:null)));
 			if ($ret) {
-				insertAuditLog('problems','flip hackable-status failed',$problem['id'],'',json_encode(
-					array('final hackable-status' => ($problem['hackable'] ? 0 : 1), 'exception_message' => $ret)
-				), array('auto' => true));
 				becomeMsgPage('<div>' . $ret . '</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
-			
-			$hackable = $problem['hackable'] ? 1 : 0;
-			DB::update("update problems set hackable = $hackable where id = {$problem['id']}");
 		};
 		$hackable_form->submit_button_config['class_str'] = 'btn btn-warning btn-block';
 		$hackable_form->submit_button_config['text'] = $problem['hackable'] ? '禁止使用 hack' : '允许使用 hack';
@@ -651,13 +650,7 @@ EOD
 	$problem_lock_form->handle = function() {
 		global $problem;
 		global $action_reason;
-		$problem['data_locked'] = !$problem['data_locked'];
-		$hackable = $problem['data_locked'] ? 1 : 0;
-		insertAuditLog('problems','flip data-locked-status',$problem['id'],isset($action_reason)?$action_reason:'',
-			json_encode(
-					array('data-locked-status' => $hackable)
-				));
-		DB::update("update problems set data_locked = $hackable where id = {$problem['id']}");
+		dataFlipLockedStatus($problem, array('reason' => (isset($action_reason)?$action_reason:null)));
 	};
 	$problem_lock_form->submit_button_config['reason'] = '';
 	$problem_lock_form->submit_button_config['class_str'] = 
@@ -745,9 +738,9 @@ EOD
 	<div class="col-md-2 top-buffer-sm">
 		<div class="top-buffer-md">
 <?php if ($problem['hackable']) { ?>
-				<span class="glyphicon glyphicon-ok"></span> hack功能已启用
+				<span class="glyphicon glyphicon-ok"></span> hack 功能已启用
 <?php } else { ?>
-				<span class="glyphicon glyphicon-remove"></span> hack功能已禁止
+				<span class="glyphicon glyphicon-remove"></span> hack 功能已禁止
 <?php }
 	if (!$problem['data_locked']) {
 		$hackable_form->printHTML();
@@ -767,6 +760,9 @@ EOD
 		</div>
 <?php if (!$problem['data_locked']) { ?>
 		<div class="top-buffer-md">
+			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
+		</div>
+		<div class="top-buffer-md">
 			<?php $data_form->printHTML(); ?>
 		</div>
 		<div class="top-buffer-md">
@@ -783,9 +779,6 @@ EOD
 		</div>
 		<div class="top-buffer-md">
 			<?php $rejudgeac_form->printHTML(); ?>
-		</div>
-		<div class="top-buffer-md">
-			<button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#UploadDataModal">上传数据</button>
 		</div>
 <?php } ?>
 		<div class="top-buffer-md">
