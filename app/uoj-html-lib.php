@@ -624,6 +624,41 @@ function echoProblemAuditLog($audit_log) {
 				$mes['title'] = '当前题目状态';
 				// $mes['uri'] = ;
 				break;
+			case 'create':
+				$mes['title'] = '新建该题';
+				break;
+			case 'add permission':
+				$mes['title'] = $title_author_prefix . '添加了一个管理者';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>;
+				}
+				break;
+			case 'delete permission':
+				$mes['title'] = $title_author_prefix . '删除了一个管理者';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>;
+				}
+				break;
+			case 'add view permission':
+				$mes['title'] = $title_author_prefix . '添加了一个可见组';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>;
+				}
+				break;
+			case 'delete view permission':
+				$mes['title'] = $title_author_prefix . '删除了一个可见组';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>;
+				}
+				break;
 			case 'rejudge':
 			case 'rejudge Ge97':
 			case 'rejudge AC':
@@ -673,6 +708,9 @@ function echoProblemAuditLog($audit_log) {
 				break;
 			case 'data uploading':
 				$mes['title'] = $title_author_prefix . '上传该题数据';
+				break;
+			case 'update submission_requirement':
+				$mes['title'] = $title_author_prefix . '修改该题提交文件配置';
 				break;
 			case 'update extra_config':
 				$mes['title'] = $title_author_prefix . '修改该题额外配置';
