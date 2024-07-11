@@ -632,7 +632,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>;
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>';
 				}
 				break;
 			case 'delete permission':
@@ -640,7 +640,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>;
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>';
 				}
 				break;
 			case 'add view permission':
@@ -648,7 +648,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>;
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>';
 				}
 				break;
 			case 'delete view permission':
@@ -656,7 +656,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>;
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>';
 				}
 				break;
 			case 'rejudge':
