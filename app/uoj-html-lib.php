@@ -722,6 +722,18 @@ function echoProblemAuditLog($audit_log) {
 			case 'flip data-locked-status':
 				$mes['title'] = $title_author_prefix . ($log_now['details']['data-locked-status'] ? '锁定' : '解锁') . '该题数据';
 				break;
+			case 'download attachments':
+				if (isSuperUser(Auth::user()))
+					$mes['title'] = '下载下发文件';
+				else
+					$no_message = true;
+				break;
+			case 'download data':
+				if (isSuperUser(Auth::user()))
+					$mes['title'] = '下载数据';
+				else
+					$no_message = true;
+				break;
 			default:
 				++$unrecognized_cnt;
 				$no_message = true;
