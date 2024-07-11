@@ -611,6 +611,10 @@ function echoProblemAuditLog($audit_log) {
 						if ($log_now['reason'] == 'successful hack')
 							$display_reason = false;
 						break;
+					case 'add permission':
+						if ($log_now['reason'] == 'create problem without manage permission')
+							$log_now['reason'] = '无管理权限用户添加新题';
+						break;
 				}
 			}
 			if ($display_reason) {
