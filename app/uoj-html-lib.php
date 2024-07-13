@@ -715,9 +715,19 @@ function echoProblemAuditLog($audit_log) {
 				break;
 			case 'update submission_requirement':
 				$mes['title'] = $title_author_prefix . '修改该题提交文件配置';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
+				}
 				break;
 			case 'update extra_config':
 				$mes['title'] = $title_author_prefix . '修改该题额外配置';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
+				}
 				break;
 			case 'flip data-locked-status':
 				$mes['title'] = $title_author_prefix . ($log_now['details']['data-locked-status'] ? '锁定' : '解锁') . '该题数据';
