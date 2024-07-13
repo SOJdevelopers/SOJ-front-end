@@ -185,12 +185,12 @@ EOD
 			}
 			insertAuditLog('problems','update submission_requirement',$problem['id'],'',
 				json_encode(
-					array('config' => $vdata['submission_requirement'])
+					array('config' => json_decode($vdata['submission_requirement'], true))
 				)
 			);
 			insertAuditLog('problems','update extra_config',$problem['id'],'',
 				json_encode(
-					array('config' => $vdata['extra_config'])
+					array('config' => json_decode($vdata['extra_config'], true))
 				)
 			);
 			$esc_submission_requirement = DB::escape($vdata['submission_requirement']);
