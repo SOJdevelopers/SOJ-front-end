@@ -33,6 +33,15 @@
 		exec("rm /var/uoj_data/$id -r");
 		dataNewProblem($id);
 	}
+
+	function dataUpdateSubmissionRequirement($problem_id, $config_json, $log_config) {
+		insertAuditLog('problems', 'update submission_requirement', $problem_id, isset($log_config['reason'])?$log_config['reason']:'',
+			json_encode(
+				array('config' => json_decode($config_json, true))
+			),
+		$log_config);
+		DB::update("update problems set submission_requirement = '" . DB::escape($config_json) . "' where id = $problem_id");
+	}
 	
 	class SyncProblemDataHandler {
 		private $problem, $permission_level, $sync_config;
@@ -324,8 +333,7 @@
 
 				$orig_requirement = json_decode($this->problem['submission_requirement'], true);
 				if (!$orig_requirement) {
-					$esc_requirement = DB::escape(json_encode($this->requirement));
-					DB::update("update problems set submission_requirement = '$esc_requirement' where id = $id");
+					dataUpdateSubmissionRequirement($id, json_encode($this->requirement), array('reason' => 'data preparing', 'auto' => true));
 				}
 			} catch (Exception $e) {
 				insertAuditLog('problems','data preparing failed',$id,'',json_encode(
