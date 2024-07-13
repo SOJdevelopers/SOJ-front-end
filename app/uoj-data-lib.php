@@ -34,7 +34,7 @@
 		dataNewProblem($id);
 	}
 
-	function dataUpdateSubmissionRequirement($problem_id, $config_json, $log_config) {
+	function dataUpdateSubmissionRequirement($problem_id, $config_json, $log_config = array()) {
 		insertAuditLog('problems', 'update submission_requirement', $problem_id, isset($log_config['reason'])?$log_config['reason']:'',
 			json_encode(
 				array('config' => json_decode($config_json, true))
