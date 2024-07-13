@@ -718,7 +718,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape($log_now['details']['config']);
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
 				}
 				break;
 			case 'update extra_config':
@@ -726,7 +726,7 @@ function echoProblemAuditLog($audit_log) {
 				if (isSuperUser(Auth::user())) {
 					if (!isset($mes['previous_list']))
 						$mes['previous_list'] = array();
-					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape($log_now['details']['config']);
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
 				}
 				break;
 			case 'flip data-locked-status':
