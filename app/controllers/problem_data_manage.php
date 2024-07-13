@@ -183,19 +183,8 @@ EOD
 			if ($problem['data_locked']) {
 				becomeMsgPage('<div>Problem data locked.</div><a href="/problem/' . $problem['id'] . '/manage/data">返回</a>');
 			}
-			insertAuditLog('problems','update submission_requirement',$problem['id'],'',
-				json_encode(
-					array('config' => json_decode($vdata['submission_requirement'], true))
-				)
-			);
-			insertAuditLog('problems','update extra_config',$problem['id'],'',
-				json_encode(
-					array('config' => json_decode($vdata['extra_config'], true))
-				)
-			);
-			$esc_submission_requirement = DB::escape($vdata['submission_requirement']);
-			$esc_extra_config = DB::escape($vdata['extra_config']);
-			DB::update("update problems set submission_requirement = '$esc_submission_requirement', extra_config = '$esc_extra_config' where id = {$problem['id']}");
+			dataUpdateSubmissionRequirement($problem['id'], $vdata['submission_requirement']);
+			updateProblemExtraConfig($problem['id'], $vdata['extra_config']);
 		};
 	}
 	class DataDisplayer {
