@@ -575,11 +575,7 @@ EOD
 		$config['view_content_type'] = $_POST['view_content_type'];
 		$config['view_all_details_type'] = $_POST['view_all_details_type'];
 		$config['view_details_type'] = $_POST['view_details_type'];
-		insertAuditLog('problems','update extra_config',$problem['id'],'',json_encode(
-					array('config' => $config)
-				));
-		$esc_config = DB::escape(json_encode($config));
-		DB::update("update problems set extra_config = '$esc_config' where id = '{$problem['id']}'");
+		updateProblemExtraConfig($problem['id'], json_encode($config));
 	};
 	$view_type_form->submit_button_config['class_str'] = 'btn btn-warning btn-block top-buffer-sm';
 	
