@@ -35,7 +35,7 @@
 			}
 
 			$id = $_GET['id'];
-			insertAuditLog('problems','download attachments',$id,isset($_GET['reason'])?substr($_GET['reason'], 0, 100):'','');
+			insertAuditLog('problems','download attachments',$id,isset($_GET['reason'])?mb_substr($_GET['reason'], 0, 100):'','');
 			
 			$file_name = "/var/uoj_data/{$id}/download.zip";
 			$download_name = "problem_{$id}.zip";
@@ -73,7 +73,7 @@
 			}
 
 			$id = $_GET['id'];
-			insertAuditLog('problems','download data',$id,isset($_GET['reason'])?$_GET['reason']:'','');
+			insertAuditLog('problems','download data',$id,isset($_GET['reason'])?mb_substr($_GET['reason'], 0, 100):'','');
 			$file_name = "/var/uoj_data/{$id}.zip";
 			$download_name = "data_{$id}.zip";
 			break;
