@@ -633,7 +633,7 @@ EOD;
 			if (isset($this->submit_button_config['reason'])) {
 				global $action_reason;
 				if (isset($_POST["{$this->form_name}-reason"])) {
-					$action_reason = substr($_POST["{$this->form_name}-reason"], 0, 100);
+					$action_reason = mb_substr($_POST["{$this->form_name}-reason"], 0, 100);
 				}
 				else {
 					$action_reason = null;
