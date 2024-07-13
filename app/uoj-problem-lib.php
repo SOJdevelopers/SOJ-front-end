@@ -32,3 +32,12 @@
 		dataNewProblem($id);
 		return $id;
 	}
+
+	function updateProblemExtraConfig($problem_id, $config_json, $log_config = array()) {
+		insertAuditLog('problems', 'update extra_config', $problem_id, isset($log_config['reason'])?$log_config['reason']:'',
+			json_encode(
+				array('config' => json_decode($config_json, true))
+			),
+		$log_config);
+		DB::update("update problems set extra_config = '" . DB::escape($config_json) . "' where id = $problem_id");
+	}
