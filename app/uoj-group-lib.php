@@ -21,6 +21,10 @@ function isProblemManager($user) {
 	return isSuperUser($user) or isGroupMember($user, array('group_name' => 'problem_manager'));
 }
 
+function isProblemCreator($user) {
+	return isProblemManager($user) or isGroupMember($user, array('group_name' => 'problem_creator'));
+}
+
 function isStatementMaintainer($user) {
 	return isGroupMember($user, array('group_name' => 'statement_maintainer'));
 }

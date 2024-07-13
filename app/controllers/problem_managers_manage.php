@@ -1,6 +1,7 @@
 <?php
 	requirePHPLib('form');
 	requirePHPLib('data');
+	requirePHPLib('problem');
 
 	if (!validateUInt($_GET['id']) || !($problem = queryProblemBrief($_GET['id']))) {
 		become404Page();
@@ -20,9 +21,9 @@
 		function($type, $username) {
 			global $problem;
 			if ($type === '+') {
-				DB::insert("insert into problems_permissions (problem_id, username) values ({$problem['id']}, '$username')");
+				addProblemPermission($problem['id'], $username);
 			} else if ($type === '-') {
-				DB::delete("delete from problems_permissions where problem_id = {$problem['id']} and username = '$username'");
+				deleteProblemPermission($problem['id'], $username);
 			}
 		}
 	);
@@ -39,9 +40,9 @@
 		function($type, $groupname) {
 			global $problem;
 			if ($type === '+') {
-				DB::insert("insert into problems_visibility (problem_id, group_name) values ({$problem['id']}, '$groupname')");
+				addProblemViewPermission($problem['id'], $groupname);
 			} else if ($type === '-') {
-				DB::delete("delete from problems_visibility where problem_id = {$problem['id']} and group_name = '$groupname'");
+				deleteProblemViewPermission($problem['id'], $groupname);
 			}
 		}
 	);

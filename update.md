@@ -224,3 +224,9 @@ CREATE TABLE `removed_submissions` (
   KEY `contest_id` (`contest_id`,`problem_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 ```
+
+### update JUL 10 21:40
+
+```sql
+update group_info set group_type='S' where group_name='problem_creator';
+```

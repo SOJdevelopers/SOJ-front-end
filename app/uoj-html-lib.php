@@ -611,6 +611,14 @@ function echoProblemAuditLog($audit_log) {
 						if ($log_now['reason'] == 'successful hack')
 							$display_reason = false;
 						break;
+					case 'add permission':
+						if ($log_now['reason'] == 'create problem without manage permission')
+							$log_now['reason'] = '无管理权限用户添加新题';
+						break;
+					case 'update submission_requirement':
+						if ($log_now['reason'] == 'data preparing')
+							$log_now['reason'] = '数据预处理操作';
+						break;
 				}
 			}
 			if ($display_reason) {
@@ -623,6 +631,41 @@ function echoProblemAuditLog($audit_log) {
 			case 'current_problem_status':
 				$mes['title'] = '当前题目状态';
 				// $mes['uri'] = ;
+				break;
+			case 'create':
+				$mes['title'] = '新建该题';
+				break;
+			case 'add permission':
+				$mes['title'] = $title_author_prefix . '添加了一个管理者';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>';
+				}
+				break;
+			case 'delete permission':
+				$mes['title'] = $title_author_prefix . '删除了一个管理者';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getUserLink($log_now['details']['username']) . '</span>';
+				}
+				break;
+			case 'add view permission':
+				$mes['title'] = $title_author_prefix . '添加了一个可见组';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>';
+				}
+				break;
+			case 'delete view permission':
+				$mes['title'] = $title_author_prefix . '删除了一个可见组';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<span><strong>操作对象：</strong>' . getGroupLink($log_now['details']['groupname']) . '</span>';
+				}
 				break;
 			case 'rejudge':
 			case 'rejudge Ge97':
@@ -674,11 +717,36 @@ function echoProblemAuditLog($audit_log) {
 			case 'data uploading':
 				$mes['title'] = $title_author_prefix . '上传该题数据';
 				break;
+			case 'update submission_requirement':
+				$mes['title'] = $title_author_prefix . '修改该题提交文件配置';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
+				}
+				break;
 			case 'update extra_config':
 				$mes['title'] = $title_author_prefix . '修改该题额外配置';
+				if (isSuperUser(Auth::user())) {
+					if (!isset($mes['previous_list']))
+						$mes['previous_list'] = array();
+					$mes['previous_list'][] = '<strong>配置：</strong>' . HTML::escape(json_encode($log_now['details']['config']));
+				}
 				break;
 			case 'flip data-locked-status':
 				$mes['title'] = $title_author_prefix . ($log_now['details']['data-locked-status'] ? '锁定' : '解锁') . '该题数据';
+				break;
+			case 'download attachments':
+				if (isSuperUser(Auth::user()))
+					$mes['title'] = '下载下发文件';
+				else
+					$no_message = true;
+				break;
+			case 'download data':
+				if (isSuperUser(Auth::user()))
+					$mes['title'] = '下载数据';
+				else
+					$no_message = true;
 				break;
 			default:
 				++$unrecognized_cnt;
