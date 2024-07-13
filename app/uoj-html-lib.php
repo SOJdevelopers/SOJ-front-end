@@ -615,6 +615,10 @@ function echoProblemAuditLog($audit_log) {
 						if ($log_now['reason'] == 'create problem without manage permission')
 							$log_now['reason'] = '无管理权限用户添加新题';
 						break;
+					case 'update submission_requirement':
+						if ($log_now['reason'] == 'data preparing')
+							$log_now['reason'] = '数据预处理操作';
+						break;
 				}
 			}
 			if ($display_reason) {
