@@ -540,8 +540,12 @@ EOD;
 			if (isset($this->submit_button_config['confirm_text'])) {
 				if (isset($this->submit_button_config['reason'])) {
 				echo <<<EOD
-		const res = prompt('{$this->submit_button_config['confirm_text']}\\n备注（选填）：');
+		const res = prompt('{$this->submit_button_config['confirm_text']}\\n原因（选填，不超过 100 字）：');
 		if (res === null) {
+			ok = false;
+		}
+		else  if (res.length > 100) {
+			alert('原因过长！');
 			ok = false;
 		}
 		else {
