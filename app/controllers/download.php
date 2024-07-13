@@ -35,7 +35,7 @@
 			}
 
 			$id = $_GET['id'];
-			insertAuditLog('problems','download attachments',$id,isset($_GET['reason'])?$_GET['reason']:'','');
+			insertAuditLog('problems','download attachments',$id,isset($_GET['reason'])?substr($_GET['reason'], 0, 100):'','');
 			
 			$file_name = "/var/uoj_data/{$id}/download.zip";
 			$download_name = "problem_{$id}.zip";
