@@ -441,7 +441,7 @@ function showSubmissions() {
 }
 
 function showCustomTests() {
-	$custom_test_deleter = new UOJForm('custom_test_deleter');
+	/*$custom_test_deleter = new UOJForm('custom_test_deleter');
 	$custom_test_deleter->addInput('last', 'text', '删除最新记录', '5',
 		function ($x, &$vdata) {
 			if (!validateUInt($x)) {
@@ -460,10 +460,10 @@ function showCustomTests() {
 		}
 		DB::delete("delete from custom_test_submissions order by id desc limit {$vdata['last']}");
 	};
-	$custom_test_deleter->runAtServer();
+	$custom_test_deleter->runAtServer();*/
 
 	printHeader();
-	$custom_test_deleter->printHTML();
+	// $custom_test_deleter->printHTML();
 
 	$submissions_pag = new Paginator(array(
 		'col_names' => array('*'),
