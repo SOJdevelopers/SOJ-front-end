@@ -441,8 +441,8 @@ function showSubmissions() {
 }
 
 function showCustomTests() {
-	$custom_test_deleter = new UOJForm('custom_test_deleter');
-	$custom_test_deleter->addInput('last', 'text', '删除末尾记录', '5',
+	/*$custom_test_deleter = new UOJForm('custom_test_deleter');
+	$custom_test_deleter->addInput('last', 'text', '删除最新记录', '5',
 		function ($x, &$vdata) {
 			if (!validateUInt($x)) {
 				return '不合法';
@@ -453,23 +453,23 @@ function showCustomTests() {
 		null
 	);
 	$custom_test_deleter->handle = function(&$vdata) {
-		$all = DB::selectAll("select * from custom_test_submissions order by id asc limit {$vdata['last']}");
+		$all = DB::selectAll("select * from custom_test_submissions order by id desc limit {$vdata['last']}");
 		foreach ($all as $submission) {
 			$content = json_decode($submission['content'], true);
 			unlink(UOJContext::storagePath().$content['file_name']);
 		}
-		DB::delete("delete from custom_test_submissions order by id asc limit {$vdata['last']}");
+		DB::delete("delete from custom_test_submissions order by id desc limit {$vdata['last']}");
 	};
-	$custom_test_deleter->runAtServer();
+	$custom_test_deleter->runAtServer();*/
 
 	printHeader();
-	$custom_test_deleter->printHTML();
+	// $custom_test_deleter->printHTML();
 
 	$submissions_pag = new Paginator(array(
 		'col_names' => array('*'),
 		'table_name' => 'custom_test_submissions',
 		'cond' => '1',
-		'tail' => 'order by id asc',
+		'tail' => 'order by id desc',
 		'page_len' => 5
 	));
 	foreach ($submissions_pag->get() as $submission)
