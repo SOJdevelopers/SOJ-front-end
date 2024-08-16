@@ -26,7 +26,7 @@
 			$content['config'] = $content['first_test_config'];
 			unset($content['first_test_config']);
 			$esc_content = DB::escape(json_encode($content));
-			DB::insert("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory) values ({$submission['id']}, '{$submission['judge_time']}', '{$submission['judger_name']}', '$esc_result', 'Judged', " . (isset($submission['result_error'])?'null':"'{$submission['result_error']}'") . ", {$submission['score']}, {$submission['used_time']}, {$submission['used_memory']})");
+			DB::insert("insert into submissions_history (submission_id, judge_time, judger_name, result, status, result_error, score, used_time, used_memory) values ({$submission['id']}, '{$submission['judge_time']}', '{$submission['judger_name']}', '$esc_result', 'Judged', " . (isset($submission['result_error'])?"'{$submission['result_error']}'":'null') . ", {$submission['score']}, {$submission['used_time']}, {$submission['used_memory']})");
 			$history_id = DB::insert_id();
 			DB::update("update submissions set active_version_id = $history_id, status = 'Judged', result = '$esc_result', content = '$esc_content' where id = {$_POST['id']}");
 		} else {
