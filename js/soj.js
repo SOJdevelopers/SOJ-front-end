@@ -707,9 +707,12 @@ function get_codemirror_mode(lang) {
 		case 'C++11':
 		case 'C++14':
 		case 'C++17':
+		case 'C++20':
+		case 'C++23':
 			return 'text/x-c++src';
 		case 'C99':
 		case 'C11':
+		case 'C17':
 			return 'text/x-csrc';
 		case 'Python2':
 		case 'Python3':

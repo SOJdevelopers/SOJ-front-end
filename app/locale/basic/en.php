@@ -171,4 +171,6 @@ return [
 	'link management' => 'Link Management',
 	'search blog tags' => 'Search blogs by tags',
 	'manageable' => 'Manageable',
+	'log out all' => 'Log out on all devices',
+	'cut off time' => 'Cut-off time',
 ];

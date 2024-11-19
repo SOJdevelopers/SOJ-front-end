@@ -10,6 +10,12 @@
 		die('ok');
 	}
 
+	if (isset($_POST['logout_all'])) {
+		$username = Auth::id();
+		DB::update("INSERT INTO user_logout_all (username, logout_all_time) VALUES ('{$username}', NOW()) ON DUPLICATE KEY UPDATE logout_all_time = NOW(); ");
+		die('ok');
+	}
+
 	function handlePost() {
 		$username = Auth::id();
 		if (!isset($_POST['old_password']))

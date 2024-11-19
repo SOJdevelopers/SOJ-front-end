@@ -86,6 +86,7 @@
 			<?php } else { ?>
 			<a type="button" class="btn btn-info btn-sm" href="/user/modify-profile"><span class="glyphicon glyphicon-pencil"></span> <?= UOJLocale::get('modify my profile') ?></a>
 			<a type="button" class="btn btn-warning btn-sm" href="javascript:void(0);" onclick="regenerateAPIPassword();"><span class="glyphicon glyphicon-refresh"></span> <?= UOJLocale::get('regenerate api password') ?></a>
+			<a type="button" class="btn btn-danger btn-sm" href="javascript:void(0);" onclick="logoutAll();"><span class="glyphicon glyphicon-log-out"></span> <?= UOJLocale::get('log out all') ?></a>
 			<?php } ?>
 
 			<a type="button" class="btn btn-success btn-sm" href="<?= HTML::blog_url($user['username'], '/') ?>"><span class="glyphicon glyphicon-arrow-right"></span> <?= UOJLocale::get('visit his blog', $user['username']) ?></a>
@@ -125,6 +126,18 @@ function regenerateAPIPassword() {
 			window.location.reload();
 		} else {
 			alert('修改失败：' + msg);
+		}
+	});
+}
+function logoutAll() {
+	$.post('/user/modify-profile', {
+		'logout_all': ''
+	}, function(msg) {
+		if (msg == 'ok') {
+			alert('登出成功');
+			window.location.reload();
+		} else {
+			alert('登出失败：' + msg);
 		}
 	});
 }
