@@ -171,4 +171,6 @@ return [
 	'link management' => '链接管理',
 	'search blog tags' => '搜索博客标签',
 	'manageable' => '有权限',
+	'log out all' => '在所有设备登出',
+	'cut off time' => '截止时间',
 ];

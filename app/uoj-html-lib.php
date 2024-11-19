@@ -916,6 +916,9 @@ function echoSubmissionAuditLog($audit_log) {
 			case 'remove':
 				$mes['title'] = $title_author_prefix . '删除该提交记录';
 				break;
+			case 'important system update':
+				$mes['title'] = '<a href="/blog/' .$log_now['blog_id']. '"> '. $log_now['title'] . '</a>';
+				break;
 			default:
 				++$unrecognized_cnt;
 				$no_message = true;
@@ -980,6 +983,8 @@ function echoSubmissionContent($submission, $requirement) {
 				case 'C++11':
 				case 'C++14':
 				case 'C++17':
+				case 'C++20':
+				case 'C++23':
 					$sh_class = 'sh_cpp';
 					break;
 				case 'Python2':
@@ -992,6 +997,7 @@ function echoSubmissionContent($submission, $requirement) {
 					break;
 				case 'C99':
 				case 'C11':
+				case 'C17':
 					$sh_class = 'sh_c';
 					break;
 				case 'Pascal':

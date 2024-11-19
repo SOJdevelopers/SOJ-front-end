@@ -18,6 +18,7 @@ class Auth {
 			return;
 		}
 		$_SESSION['username'] = $username;
+		$_SESSION['login_time'] = date('Y-m-d H:i:s');
 		if ($remember) {
 			$remember_token = DB::selectFirst("select remember_token from user_info where username = '$username'")['remember_token'];
 			if ($remember_token == '') {
@@ -74,6 +75,27 @@ class Auth {
 			if (isBannedUser($myUser))
 				$myUser = null;
 		}
+
+		if ($myUser) {
+			if (!$_SESSION['login_time'])
+				$myUser = null;
+		}
+
+		if ($myUser) {
+			$login_time = $_SESSION['login_time'];
+			$logout_all_time = DB::selectFirst("select logout_all_time from user_logout_all where username='{$_SESSION['username']}'")['logout_all_time'];
+			if (!$login_time) {
+				$login_time = '2024-09-15 08:00:00';
+			}
+			if (!$logout_all_time) {
+				$logout_all_time = '2024-09-15 10:00:00';
+			}
+			$login_time = new DateTime($login_time);
+			$logout_all_time = new DateTime($logout_all_time);
+			if ($login_time <= $logout_all_time)
+				$myUser = null;
+		}
+
 		if ($myUser) {
 			DB::update("update user_info set remote_addr = '" . DB::escape($_SERVER['REMOTE_ADDR']) . "', http_x_forwarded_for = '" . DB::escape($_SERVER['HTTP_X_FORWARDED_FOR']) . "', latest_login = now() where username = '" . DB::escape($myUser['username']) . "'");
 			$_SESSION['last_visited'] = time();

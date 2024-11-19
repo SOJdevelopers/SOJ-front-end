@@ -20,9 +20,9 @@
 		<header>
 			<h4>3．<?= UOJConfig::$data['profile']['oj-name-short'] ?> 的测评环境</h4>
 		</header>
-		<p>测评环境是 Ubuntu Linux 14.04 LTS x64。</p>
-		<p>C++ 的编译器是 g++ 7.5.0，编译命令：<code>g++ code.cpp -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=c++XX</code>。</p>
-		<p>C 的编译器是 gcc 7.5.0，编译命令：<code>gcc code.c -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=cXX</code>。</p>
+		<p>测评环境是 Ubuntu 18.04 LTS x64。</p>
+		<p>C++ 的编译器是 g++ 13.1.0，编译命令：<code>g++ code.cpp -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=c++XX</code>。</p>
+		<p>C 的编译器是 gcc 13.1.0，编译命令：<code>gcc code.c -o code -lm -O2 -DONLINE_JUDGE</code>。对应标准会在编译命令后面添加<code>-std=cXX</code>。</p>
 		<p>Pascal 的编译器是 fpc 3.0.4，编译命令：<code>fpc code.pas -O2</code>。</p>
 		<p>Java 采用 OpenJDK，Java8 为 1.8.0_282，Java11 为 11.0.10，编译命令：<code>javac code.java</code>。</p>
 		<p>Python 会先编译为优化过的字节码 <samp>.pyo</samp> 文件。支持的 Python 版本分别为 Python 2.7.17 和 3.6.9。</p>

@@ -433,8 +433,21 @@ function getSubmissionRemovedHistoryAuditLog($submission_id) {
 	return array_reverse(queryAuditLog(array('cond' => "scope = 'submissions' and type = 'remove' and id_in_scope = {$submission_id}", 'id_in_scope_name' => 'submission_id')));
 }
 
+function getImportantSystemUpdateAuditLog($submission) {
+	$hiss = DB::select("select * from important_system_updates where update_time >= '{$submission['submit_time']}'");
+	for($audit_log = array(); $his = DB::fetch($hiss, MYSQLI_ASSOC); ) {
+		$audit_log[] = array(
+			'type' => 'important system update',
+			'time' => $his['update_time'],
+			'title' => $his['title'],
+			'blog_id' => $his['blog_id'],
+		);
+	}
+	return $audit_log;
+}
+
 function getSubmissionHistoryAuditLog($submission) {
-	$audit_log = array_merge(array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission)), getSubmissionRemovedHistoryAuditLog($submission['id']));
+	$audit_log = array_merge(array_merge(array_merge(array_merge(getSubmissionJudgementAuditLog($submission['id']), getSubmissionRejudgeAuditLog($submission)), getSubmissionHacksAuditLog($submission)), getSubmissionRemovedHistoryAuditLog($submission['id'])), getImportantSystemUpdateAuditLog($submission));
 	sortAuditLogByTime($audit_log);
 	$audit_log[] = array(
 		'time' => $submission['submit_time'],

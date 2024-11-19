@@ -429,6 +429,60 @@ EOD
 	}
 
 	$data_disp = getDataDisplayer();
+	$data_disp->addDisplayer('uploaded file list', function($self) {
+			global $problem;
+			global $data_dir;
+			$upload_dir = "/var/uoj_data/upload/{$problem['id']}";
+			$files = scandir($upload_dir);
+
+			$last_sync = 0;
+			if(is_dir($data_dir)) {
+				$last_sync = stat($data_dir)['mtime'];
+				echo sprintf("<h4>last sync: %s</h4>", date("Y-m-d H:i:s", $last_sync));
+			}
+
+			if(count($files) <= 2) { // "." and ".."
+				echo "<h4>no file uploaded.</h4>";
+				return;
+			}
+
+			echo "<pre>";
+			function formatSize($bytes) {
+				$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+				$i = 0;
+				while ($bytes >= 1024 && $i < count($units) - 1) {
+					$bytes /= 1024;
+					$i++;
+				}
+				return round($bytes, 2) . ' ' . $units[$i];
+			}
+
+			natsort($files);
+
+			foreach ($files as $file) {
+				if ($file !== '.' && $file !== '..') {
+					$filePath = $upload_dir . '/' . $file;
+					$fileInfo = stat($filePath);
+
+					if (is_dir($filePath)) {
+						$size = 'Directory';
+					} else {
+						$size = formatSize($fileInfo['size']);
+					}
+
+					$mtime = $fileInfo['mtime'];
+					if($mtime > $last_sync) {
+						$mtime = "<strong style='color:red'>".date("Y-m-d H:i:s", $fileInfo['mtime'])."</strong>";
+					} else {
+						$mtime = date("Y-m-d H:i:s", $fileInfo['mtime']);
+					}
+					
+					echo sprintf("%-34s %-14s %s\n", $file, $size, $mtime);
+				}
+			}
+			echo "</pre>";
+		}
+	);
 
 	if (isset($_GET['display_file'])) {
 		if (!isset($_GET['file_name'])) {

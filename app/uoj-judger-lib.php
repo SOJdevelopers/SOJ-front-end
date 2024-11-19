@@ -1,8 +1,8 @@
 <?php
 	global $uojSupportedLanguages, $uojMainJudgerWorkPath;
 	$uojSupportedLanguages = array(
-		'C++98', 'C++11', 'C++14', 'C++17',
-		'C99', 'C11',
+		'C++98', 'C++11', 'C++14', 'C++17', 'C++20', 'C++23',
+		'C99', 'C11', 'C17',
 		'Python2', 'Python3',
 		'Java8', 'Java11',
 		'Pascal'
