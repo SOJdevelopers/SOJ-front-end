@@ -99,6 +99,7 @@
 		);
 
 		$append_form->handle = function() {
+			global $owner;
 			$id = $_POST['id'];
 			if ($id[0] == '-') {
 				$id = substr($id, 1);
