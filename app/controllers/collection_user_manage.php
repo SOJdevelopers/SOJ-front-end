@@ -38,7 +38,7 @@
 
 	$cur_tab = isset($_GET['type']) ? $_GET['type'] : 'null';
 
-	$cond = "1";
+	$cond = "owner = '$owner'";
 
 	$header = '<tr>';
 	$header .= '<th class="text-center" style="width: 5em">ID</th>';
@@ -49,7 +49,7 @@
 	$pag_config = array('page_len' => 10000);
 	$pag_config['col_names'] = array('*');
 	$username = Auth::id();
-	$pag_config['table_name'] = "collection";
+	$pag_config['table_name'] = "collection_user";
 	$pag_config['cond'] = $cond;
 	$pag_config['tail'] = 'order by id asc';
 	$pag_config['max_extend'] = 5;
