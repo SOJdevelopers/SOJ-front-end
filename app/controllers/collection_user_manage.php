@@ -125,7 +125,7 @@
 			if($tag == '-') {
 				DB::delete("delete from collection_user_tags where collection_id='$id' and owner = '$owner'");
 			}
-			else if($tag != '' && DB::selectCount("select count(*) from collection_user_tags where id = '$id' and owner = '$owner'")) {
+			else if($tag != '' && DB::selectCount("select count(*) from collection_user where id = '$id' and owner = '$owner'")) {
 				DB::insert("insert ignore into collection_user_tags (owner, collection_id, tag) values ('$owner', '$id', '$tag')");
 			}
 		};
