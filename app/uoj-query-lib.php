@@ -100,6 +100,12 @@ function queryCollectionTags($id) {
 	return $tags;
 }
 
+function queryUserCollectionTags($owner, $id) {
+	$result = DB::select("select tag from collection_tags where collection_id = '$id' and owner='$owner' order by id");
+	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
+	return $tags;
+}
+
 function queryContestProblemRank($contest, $problem) {
 	if (!DB::selectFirst("select * from contests_problems where contest_id = {$contest['id']} and problem_id = {$problem['id']}")) {
 		return null;

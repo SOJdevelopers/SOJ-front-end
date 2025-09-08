@@ -19,13 +19,14 @@
 	}
 
 	function echoProblem($problem) {
+		global $owner;
 		if (isBlogAllowedUser(Auth::user())) {
 			echo '<tr class="text-center">';
 			echo '<td>';
 			echo $problem['id'], '</td>';
 			echo '<td class="text-left">';
 			echo '<a href="', $problem['url'], '">', $problem['title'], '</a>';
-			foreach (queryCollectionTags($problem['id']) as $tag) {
+			foreach (queryUserCollectionTags($owner, $problem['id']) as $tag) {
 				echo '<a class="uoj-collection-tag">', '<span class="badge">', HTML::escape($tag), '</span>', '</a>';
 			}
 			echo '</td>';
