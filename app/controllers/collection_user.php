@@ -84,7 +84,7 @@
 function changeProblemState(state, id) {
 	title = document.getElementById('problem-' + id).children[1].children[0].children[0].textContent;
 	if(!confirm(id + ' - ' + title + '\n' + ['Unsolved', 'Uncertain', 'Solved'][state] + '?')) return;
-	$.post('/collection_user', {
+	$.post('/collection_user/<?= $owner ?>', {
 		'state': state,
 		'id': id,
 	}, function(msg) {

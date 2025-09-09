@@ -26,9 +26,8 @@ Route::group([
 		Route::any('/collection', '/collection.php');
 		Route::any('/collection/propose', '/collection_propose.php');
 		Route::any('/collection/manage', '/collection_manage.php');
-
-		Route::any('/collection/{username}', '/collection_user.php');
-		Route::any('/collection/{username}/manage', '/collection_user_manage.php');
+//		Route::any('/collection/{username}', '/collection_user.php');
+//		Route::any('/collection/{username}/manage', '/collection_user_manage.php');
 
 		Route::any('/contests', '/contests.php');
 		Route::any('/contest/new', '/add_contest.php');
