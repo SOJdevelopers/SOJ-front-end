@@ -101,7 +101,7 @@ function queryCollectionTags($id) {
 }
 
 function queryUserCollectionTags($owner, $id) {
-	$result = DB::select("select tag from collection_tags where collection_id = '$id' and owner='$owner' order by id");
+	$result = DB::select("select tag from collection_user_tags where collection_id = '$id' and owner='$owner' order by id");
 	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
 	return $tags;
 }
