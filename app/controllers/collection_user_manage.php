@@ -184,4 +184,5 @@
 	
 	echo $pag->pagination();
 ?>
+<script src="/js/soj_collection_id2url.js"></script>
 <?php echoUOJPageFooter() ?>
