@@ -8,10 +8,10 @@ document.getElementById('input-id').addEventListener('input', function(e) {
 	}
 
 	// 1. Codeforces 常规题目 (cf1a 或 1a)
-	if (input.startsWith('cf') || /^\d{1,5}[a-zA-Z]$/.test(input)) {
+	if (input.startsWith('cf') || /^\d{1,5}[a-zA-Z]\d{0,1}$/.test(input)) {
 		let problemId = input.startsWith('cf') ? input.substring(2) : input;
 		
-		const cfMatch = problemId.match(/^(\d{1,5})([a-zA-Z])$/);
+		const cfMatch = problemId.match(/^(\d{1,5})([a-zA-Z]\d{0,1})$/);
 		if (cfMatch) {
 			const contestId = cfMatch[1];
 			const problemLetter = cfMatch[2].toUpperCase(); // 注意：大写字母
@@ -85,6 +85,6 @@ document.getElementById('input-id').addEventListener('input', function(e) {
 		}
 	}
 
-	// 如果不是已知格式，清空输出
-	outputElement.value = '';
+	// 如果不是已知格式，不改变输出
+	// outputElement.value = '';
 });
