@@ -21,6 +21,7 @@
 		if(!isValidProblemId($id)) die('invalid id');
 		if(!($state >= 0 && $state <= 2)) die('invalid state');
 		$username = Auth::id();
+		die("insert into collection_state (id, username, state) values ('$id', '$username', $state) on duplicate key update state = $state");
 		DB::insert("insert into collection_state (id, username, state) values ('$id', '$username', $state) on duplicate key update state = $state");
 		die('ok');
 	}
