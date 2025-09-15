@@ -8,10 +8,10 @@ document.getElementById('input-id').addEventListener('input', function(e) {
 	}
 
 	// 1. Codeforces 常规题目 (cf1a 或 1a)
-	if (input.startsWith('cf') || /^\d{1,5}[a-zA-Z]\d{0,1}$/.test(input)) {
+	if (input.startsWith('cf') || /^\d{1,5}[a-z]\d{0,1}$/.test(input)) {
 		let problemId = input.startsWith('cf') ? input.substring(2) : input;
 		
-		const cfMatch = problemId.match(/^(\d{1,5})([a-zA-Z]\d{0,1})$/);
+		const cfMatch = problemId.match(/^(\d{1,5})([a-z]\d{0,1})$/);
 		if (cfMatch) {
 			const contestId = cfMatch[1];
 			const problemLetter = cfMatch[2].toUpperCase(); // 注意：大写字母
@@ -21,7 +21,7 @@ document.getElementById('input-id').addEventListener('input', function(e) {
 	}
 
 	// 2. AtCoder 格式 (abc/arc/agc + 数字 + 字母)
-	const atcoderMatch = input.match(/^(a[bgc]r?c)(\d+)([a-zA-Z])$/i);
+	const atcoderMatch = input.match(/^(a[brg]c)(\d+)([a-z])$/i);
 	if (atcoderMatch) {
 		const contestType = atcoderMatch[1].toLowerCase();
 		const contestNumber = atcoderMatch[2];
@@ -73,10 +73,10 @@ document.getElementById('input-id').addEventListener('input', function(e) {
 	}
 
 	// 8. Codeforces Gym 题目 (cf123456a 或 123456a，6位以上数字)
-	if (input.startsWith('cf') || /^\d{6,}[a-zA-Z]$/.test(input)) {
+	if (input.startsWith('cf') || /^\d{6,}[a-z]$/.test(input)) {
 		let problemId = input.startsWith('cf') ? input.substring(2) : input;
 		
-		const cfGymMatch = problemId.match(/^(\d{6,})([a-zA-Z])$/);
+		const cfGymMatch = problemId.match(/^(\d{6,})([a-z])$/);
 		if (cfGymMatch) {
 			const contestId = cfGymMatch[1];
 			const problemLetter = cfGymMatch[2].toUpperCase(); // 注意：大写字母
