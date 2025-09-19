@@ -27,7 +27,7 @@
 			echo '<td class="text-left">';
 			echo '<a href="', $problem['url'], '">', $problem['title'], '</a>';
 			foreach (queryUserCollectionTags($owner, $problem['id']) as $tag) {
-				echo '<a class="uoj-collection-tag">', '<span class="badge">', HTML::escape($tag), '</span>', '</a>';
+				echo '<a class="uoj-collection-tag" data-owner="',$owner,'">', '<span class="badge">', HTML::escape($tag), '</span>', '</a>';
 			}
 			echo '</td>';
 			echo '<td class="text-left">';

@@ -397,7 +397,10 @@ $.fn.uoj_blog_tag = function() {
 
 $.fn.uoj_collection_tag = function() {
 	return this.each(function() {
-		$(this).attr('href', '/collection?type=' + encodeURIComponent($(this).text()));
+		var owner = $(this).data('owner');
+		var path_owner = '';
+		if(owner) path_owner = '/' + owner;
+		$(this).attr('href', '/collection' + path_owner + '?type=' + encodeURIComponent($(this).text()));
 	});
 }
 
