@@ -710,19 +710,19 @@ InlineLexer.prototype.outputLink = function(cap, link) {
   if (cap[0][0] !== '!') {
     
     if (link.href[0] == '%') {
-	  link.href = link.href.substring(1);
-	  return '<a class="soj_iframe_doc" href="'
-		+ escape(link.href)
-		+ '"'
-		+ (link.title
-		? ' title="'
-		+ escape(link.title)
-		+ '"'
-		: '')
-		+ '>'
-		+ this.output(cap[1])
-		+ '</a>';
-	}
+      link.href = link.href.substring(1);
+      return '<a class="soj_iframe_doc" href="'
+        + escape(link.href)
+        + '"'
+        + (link.title
+        ? ' title="'
+        + escape(link.title)
+        + '"'
+        : '')
+        + '>'
+        + this.output(cap[1])
+        + '</a>';
+    }
 
     if (link.href[0] == ':') {
       var ret = this.extractProperties(link.rest);
@@ -937,7 +937,7 @@ Parser.prototype.tok = function() {
       
       if (this.options.getLangClass && this.token.lang == 'copyable') {
         return '<pre class="soj_copyable">' + this.token.text + '</pre>';
-	  } else if (this.options.getLangClass && this.token.lang != undefined) {
+      } else if (this.options.getLangClass && this.token.lang != undefined) {
         return '<pre><code class="'
         + escape(this.options.getLangClass(this.token.lang), true)
         + '">'

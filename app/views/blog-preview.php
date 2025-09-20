@@ -30,6 +30,7 @@
 				iframe.title = anchor.textContent;
 				iframe.width = "100%";
 				iframe.height = "700px";
+				iframe.allow = "autoplay";
 				anchor.parentNode.replaceChild(iframe, anchor);
 			});
 		</script>
