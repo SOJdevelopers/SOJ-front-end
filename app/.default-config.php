@@ -58,7 +58,7 @@ return [
 		'web-analytics' => false,
 		'blog-use-subdomain' => false
 	],
-	'gravatar' => '//cn.gravatar.com/avatar/',
+	'gravatar' => 'https://cn.cravatar.com/avatar/',
 	'public-files' => [
 		'pictures\/SOJ(\.ico|\.png|_big\.png|_grayscale\.ico|_small\.png)',
 		'pictures\/earth_man\.png',
