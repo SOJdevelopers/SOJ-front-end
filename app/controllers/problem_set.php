@@ -179,10 +179,13 @@ EOD;
 ?>
 <?php echoUOJPageHeader(UOJLocale::get('problems')) ?>
 <div class="row">
-	<div class="col-xs-6 col-sm-6">
+	<div class="col-xs-4 col-sm-4">
 		<?= HTML::tablist($tabs_info, $cur_tab, 'nav-pills') ?>
 	</div>
-	<div class="col-xs-6 col-sm-6 checkbox text-right">
+	<div class="col-xs-4 col-sm-4">
+		<ul class="nav nav-pills" role="tablist"><li><a href="/collection"><span class="glyphicon glyphicon-tasks"></span>  <?= UOJLocale::get('problem collection') ?></a></li></ul>
+	</div>
+	<div class="col-xs-4 col-sm-4 checkbox text-right">
 		<label class="checkbox-inline" for="input-show_tags_mode"><input type="checkbox" id="input-show_tags_mode" <?= isset($_COOKIE['show_tags_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show tags') ?></label>
 		<label class="checkbox-inline" for="input-show_submit_mode"><input type="checkbox" id="input-show_submit_mode" <?= isset($_COOKIE['show_submit_mode']) ? 'checked="checked" ': ''?>/> <?= UOJLocale::get('problems::show statistics') ?></label>
 	</div>

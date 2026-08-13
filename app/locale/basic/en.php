@@ -173,4 +173,8 @@ return [
 	'manageable' => 'Manageable',
 	'log out all' => 'Log out on all devices',
 	'cut off time' => 'Cut-off time',
+	'problem collection' => 'Collection',
+	'manage' => 'Manage',
+	'propose' => 'Propose',
+	'note' => 'Note',
 ];

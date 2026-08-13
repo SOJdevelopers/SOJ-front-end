@@ -17,10 +17,17 @@ Route::group([
 		Route::any('/problems/template', '/problem_set.php?tab=template');
 		Route::any('/problems/contested', '/problem_set.php?tab=contested');
 		Route::any('/problem/{id}', '/problem.php');
+		Route::any('/problem/{id}/statement.md', '/problem_statement_md.php');
 		Route::any('/problem/{id}/statistics', '/problem_statistics.php');
 		Route::any('/problem/{id}/manage/statement', '/problem_statement_manage.php');
 		Route::any('/problem/{id}/manage/managers', '/problem_managers_manage.php');
 		Route::any('/problem/{id}/manage/data', '/problem_data_manage.php');
+
+		Route::any('/collection', '/collection.php');
+		Route::any('/collection/propose', '/collection_propose.php');
+		Route::any('/collection/manage', '/collection_manage.php');
+		Route::any('/collection/{username}', '/collection_user.php');
+		Route::any('/collection/{username}/manage', '/collection_user_manage.php');
 
 		Route::any('/contests', '/contests.php');
 		Route::any('/contest/new', '/add_contest.php');

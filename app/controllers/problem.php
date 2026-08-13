@@ -86,8 +86,24 @@
 					$memory_suf = 'MiB*';
 				}
 			}
-			$tags['time limit'] = getUOJConfVal($problem_conf, 'time_limit', 1) . $time_suf;
-			$tags['memory limit'] = getUOJConfVal($problem_conf, 'memory_limit', 256) . $memory_suf;
+			$time_limit = getUOJConfVal($problem_conf, 'time_limit', 1);
+			$memory_limit = getUOJConfVal($problem_conf, 'memory_limit', 256);
+			$time_style = "";
+			if($time_limit < 0.5) {
+				$time_style = "color:red";
+			}
+			if($time_limit > 5) {
+				$time_style = "color:blue";
+			}
+			$memory_style = "";
+			if($memory_limit < 128) {
+				$memory_style = "color:red";
+			}
+			if($memory_limit > 1024) {
+				$memory_style = "color:blue";
+			}
+			$tags['time limit'] = "<span style='". $time_style ."'>" . $time_limit . $time_suf . "</span>";
+			$tags['memory limit'] = "<span style='". $memory_style ."'>" . $memory_limit . $memory_suf . "</span>";
 		}
 		$tags['checker'] = getUOJConfVal($problem_conf, 'use_builtin_checker', UOJLocale::get('problems::custom checker'));
 		if (getUOJConfVal($problem_conf, 'use_builtin_judger', null) !== 'on') {
@@ -332,7 +348,47 @@ $('#contest-countdown').countdown(<?= $contest['end_time']->getTimestamp() - UOJ
 </ul>
 <div class="tab-content">
 	<div class="tab-pane active" id="tab-statement">
-		<article class="top-buffer-md"><?= $problem_content['statement'] ?></article>
+		<article class="top-buffer-md">
+		<?= $problem_content['statement'] ?>
+		<script>
+			const copyableElements = document.querySelectorAll('pre.soj_copyable');
+
+			copyableElements.forEach(element => {
+				const copyButton = document.createElement('button');
+				copyButton.innerText = 'Copy';
+
+				copyButton.onclick = function() {
+					const textToCopy = element.innerText + "\n";
+					const textArea = document.createElement('textarea');
+					textArea.value = textToCopy;
+					document.body.appendChild(textArea);
+					textArea.select();
+					document.execCommand('copy');
+					document.body.removeChild(textArea);
+					copyButton.innerText = 'Copied!';
+					setTimeout(() => {
+						copyButton.innerText = 'Copy';
+					}, 500);
+				};
+				
+				copyButton.style.fontWeight = 'normal';
+				copyButton.style.marginLeft = '7px';
+				copyButton.style.padding = '3px';
+				copyButton.style.fontSize = '13px';
+
+				element.previousElementSibling.appendChild(copyButton);
+			});
+
+			document.querySelectorAll('a.soj_iframe_doc').forEach(anchor => {
+				const iframe = document.createElement('iframe');
+				iframe.src = anchor.getAttribute('href');
+				iframe.title = anchor.textContent;
+				iframe.width = "100%";
+				iframe.height = "700px";
+				anchor.parentNode.replaceChild(iframe, anchor);
+			});
+		</script>
+		</article>
 	</div>
 	<div class="tab-pane" id="tab-submit-answer">
 		<div class="top-buffer-sm"></div>

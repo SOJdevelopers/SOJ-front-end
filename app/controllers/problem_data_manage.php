@@ -313,12 +313,12 @@ EOD
 			return function() use($name, $allow_files) {
 				$src_name = $name . '.cpp';
 				if (isset($allow_files[$src_name])) {
-					echoFilePre($src_name);
+					echoFilePre($src_name, 100 * 1024);
 				} else {
 					echoFileNotFound($src_name);
 				}
 				if (isset($allow_files[$name])) {
-					echoFilePre($name);
+					echoFilePre($name, 100 * 1024);
 				} else {
 					echoFileNotFound($name);
 				}

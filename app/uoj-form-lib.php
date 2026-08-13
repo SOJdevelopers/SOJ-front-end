@@ -998,3 +998,7 @@ EOD;
 	function validateLength($len) {
 		return function($x) use ($len) {return mb_strlen($x) <= $len;};
 	}
+
+	function validateTime($time) {
+		return is_string($time) && (preg_match('/^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])( (0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]))?$/', $time));
+	}

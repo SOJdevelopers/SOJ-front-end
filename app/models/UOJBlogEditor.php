@@ -41,6 +41,11 @@ class UOJBlogEditor {
 				if (strlen($content_md) > 1000000) {
 					return '内容过长';
 				}
+				foreach (UOJConfig::$data['profile']['oj-address'] as $address) {
+					if (strpos($content_md, $address) !== false) {
+						return 'Warning: 使用相对链接';
+					}
+				}
 				return '';
 			},
 			'tags' => function(&$tags) {
@@ -78,10 +83,15 @@ class UOJBlogEditor {
 	}
 	private function receivePostData() {
 		$errors = array();
+		$warnings = array();
 		foreach (array('title', 'content_md', 'tags') as $name) {
 			$cur_err = $this->validate($name);
 			if ($cur_err) {
-				$errors[$name] = $cur_err;
+				if (substr($cur_err, 0, 7) == 'Warning') {
+					$warnings[$name] = $cur_err;
+				} else {
+					$errors[$name] = $cur_err;
+				}
 			}
 		}
 		if ($errors) {
@@ -188,11 +198,12 @@ EOD
 			}
 			$this->post_data['content'] = json_encode($config) . "\n" . $this->post_data['content'];
 		}
+		return $warnings;
 	}
 	
 	public function handleSave() {
 		$save = $this->save;
-		$this->receivePostData();
+		$warnings = $this->receivePostData();
 		$ret = $save($this->post_data);
 		if (!$ret) {
 			$ret = array();
@@ -218,6 +229,8 @@ EOD
 			$ret['html'] = ob_get_contents();
 			ob_end_clean();
 		}
+
+		$ret['warnings'] = $warnings;
 		
 		die(json_encode($ret));
 	}

@@ -184,6 +184,9 @@ function blog_editor_init(name, editor_config) {
 				$(['title', 'content_md', 'tags']).each(function() {
 					ok &= showErrorHelp(name + '_' + this, data[this]);
 				});
+				$(['title', 'content_md', 'tags']).each(function() {
+					showWarningHelp(name + '_' + this, data['warnings'][this]);
+				});
 				if (data.extra !== undefined) {
 					alert(data.extra);
 					ok = false;

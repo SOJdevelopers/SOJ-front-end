@@ -94,6 +94,18 @@ function queryProblemTags($id) {
 	return $tags;
 }
 
+function queryCollectionTags($id) {
+	$result = DB::select("select tag from collection_tags where collection_id = '$id' order by id");
+	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
+	return $tags;
+}
+
+function queryUserCollectionTags($owner, $id) {
+	$result = DB::select("select tag from collection_user_tags where collection_id = '$id' and owner='$owner' order by id");
+	for ($tags = array(); $row = DB::fetch($result, MYSQLI_NUM); $tags[] = $row[0]);
+	return $tags;
+}
+
 function queryContestProblemRank($contest, $problem) {
 	if (!DB::selectFirst("select * from contests_problems where contest_id = {$contest['id']} and problem_id = {$problem['id']}")) {
 		return null;
@@ -405,12 +417,14 @@ function getHacksAuditLog($config = array()) {
 			'actor' => $his['hacker'],
 			'details' => $his
 		);
-		$audit_log[] = array(
-			'time' => $his['judge_time'],
-			'type' => 'hack judgement, auto',
-			'hack_id' => $his['hack_id'],
-			'details' => $his
-		);
+		if($his['success'] != null) {
+			$audit_log[] = array(
+				'time' => $his['judge_time'],
+				'type' => 'hack judgement, auto',
+				'hack_id' => $his['hack_id'],
+				'details' => $his
+			);
+		}
 	}
 	sortAuditLogByTime($audit_log);
 	return $audit_log;

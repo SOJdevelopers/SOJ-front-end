@@ -1,5 +1,5 @@
 /**
- * marked - a markdown parser
+ * Modified from marked - a markdown parser
  * Copyright (c) 2011-2013, Christopher Jeffrey. (MIT Licensed)
  * https://github.com/chjj/marked
  */
@@ -363,7 +363,8 @@ Lexer.prototype.token = function(src, top) {
       src = src.substring(cap[0].length);
       this.tokens.links[cap[1].toLowerCase()] = {
         href: cap[2],
-        title: cap[3]
+        title: cap[3],
+        rest: ''
       };
       continue;
     }
@@ -452,11 +453,14 @@ var inline = {
   math: /^\$((?:[^\\]|\\\\|\\[^\\]+?)+?)\$|^\$\$((?:[^\\]|\\\\|\\[^\\]+?)+?)\$\$|^\\begin{[^}]+}((?:[^\\]|\\\\|\\[^\\]+?)+?)\\end{[^}]+}/,
   br: /^ {2,}\n(?!\s*$)/,
   del: noop,
-  text: /^[\s\S]+?(?=[\\<!\[_*`\$]| {2,}\n|$)/
+  text: /^[\s\S]+?(?=[\\<!\[_*`\$]| {2,}\n|$)/,
+  
+  property_num: /(?:^|\s)\.(w|h|rating)=(\d+)\s*$/,
+  property_bool: /(?:^|\s)\.(keep|left|right|center|inline)\s*$/
 };
 
 inline._inside = /(?:\[[^\]]*\]|[^\]]|\](?=[^\[]*\]))*/;
-inline._href = /\s*<?([^\s]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+inline._href = /\s*<?([^\s)]*?)>?(?:\s+['"]([^)]*?)['"])?(\s*(?:\s\.[\w=]+\s*)*)/;
 
 inline.link = replace(inline.link)
   ('inside', inline._inside)
@@ -618,7 +622,8 @@ InlineLexer.prototype.output = function(src) {
       src = src.substring(cap[0].length);
       out += this.outputLink(cap, {
         href: cap[2],
-        title: cap[3]
+        title: cap[3],
+        rest: cap[4]
       });
       continue;
     }
@@ -703,6 +708,31 @@ InlineLexer.prototype.output = function(src) {
 
 InlineLexer.prototype.outputLink = function(cap, link) {
   if (cap[0][0] !== '!') {
+    
+    if (link.href[0] == '%') {
+      link.href = link.href.substring(1);
+      return '<a class="soj_iframe_doc" href="'
+        + escape(link.href)
+        + '"'
+        + (link.title
+        ? ' title="'
+        + escape(link.title)
+        + '"'
+        : '')
+        + '>'
+        + this.output(cap[1])
+        + '</a>';
+    }
+
+    if (link.href[0] == ':') {
+      var ret = this.extractProperties(link.rest);
+      if (link.href == ':user' && ret[1].rating !== undefined) {
+        return '<span class="uoj-username" data-rating="' + ret[1].rating + '">' + escape(cap[1]) + '</span>';
+      } else {
+        return '<span class="text-danger">{errors occur in processing ' + escape(link.href) + '}</span>';
+      }
+    }
+    
     return '<a href="'
       + escape(link.href)
       + '"'
@@ -715,18 +745,71 @@ InlineLexer.prototype.outputLink = function(cap, link) {
       + this.output(cap[1])
       + '</a>';
   } else {
+    var ret = this.extractProperties(link.rest)
+      , style = ''
+      , cls;
+    
+    if (ret[1].h !== undefined) {
+      style += "height:" + ret[1].h + "px;";
+    }
+    if (ret[1].w !== undefined) {
+      style += "width:" + ret[1].w + "px;";
+    }
+    if (ret[1].left) {
+      cls = 'img-responsive';
+    } else if (ret[1].right) {
+      cls = 'img-responsive';
+      style += "margin-left: auto;";
+    } else if (ret[1].inline) {
+      cls = '';
+    } else {
+      cls = 'img-responsive center-block';
+    }
+    
     return '<img src="'
       + escape(link.href)
       + '" alt="'
       + escape(cap[1])
       + '"'
-      + (link.title
-      ? ' title="'
-      + escape(link.title)
-      + '"'
-      : '')
+      + (link.title ? ' title="' + escape(link.title) + '"' : '')
+      + (cls ? ' class="' + cls + '"' : '')
+      + (style ? ' style="' + style + '"' : '')
       + '>';
   }
+};
+
+/**
+ * Extract Properties
+ */
+
+InlineLexer.prototype.extractProperties = function(src) {
+  var props = {}
+    , cap;
+  
+  if (!src) {
+    return ['', props];
+  }
+  while (src) {
+    // width, height, rating
+    if (cap = this.rules.property_num.exec(src)) {
+      src = src.substring(0, src.length - cap[0].length);
+      if (!(cap[1] in props)) {
+        props[cap[1]] = cap[2];
+      }
+      continue;
+    }
+
+    // keep, left, right, center
+    if (cap = this.rules.property_bool.exec(src)) {
+      src = src.substring(0, src.length - cap[0].length);
+      props[cap[1]] = true;
+      continue;
+    }
+    
+    break;
+  }
+  
+  return [src, props];
 };
 
 /**
@@ -820,8 +903,8 @@ Parser.prototype.parseText = function() {
  */
 
 Parser.prototype.tok = function() {
-  var tok_class = this.options.getElementClass == null ? null : this.options.getElementClass(this.token);
-  tok_class = tok_class == null ? '' : ' class="' + tok_class + '"';
+  var inner_tok_class = this.options.getElementClass == null ? null : this.options.getElementClass(this.token);
+  tok_class = inner_tok_class == null ? '' : ' class="' + inner_tok_class + '"';
   switch (this.token.type) {
     case 'space': {
       return '';
@@ -851,16 +934,18 @@ Parser.prototype.tok = function() {
       if (!this.token.escaped) {
         this.token.text = escape(this.token.text, true);
       }
-
-      return '<pre><code'
-        + (this.options.getLangClass && this.token.lang != undefined
-        ? ' class="'
+      
+      if (this.options.getLangClass && this.token.lang == 'copyable') {
+        return '<pre class="soj_copyable">' + this.token.text + '</pre>';
+      } else if (this.options.getLangClass && this.token.lang != undefined) {
+        return '<pre><code class="'
         + escape(this.options.getLangClass(this.token.lang), true)
-        + '"'
-        : '')
-        + '>'
+        + '">'
         + this.token.text
         + '</code></pre>\n';
+      } else {
+        return '<pre>' + this.token.text + '</pre>';
+      }
     }
     case 'table': {
       var body = ''
@@ -868,15 +953,32 @@ Parser.prototype.tok = function() {
         , i
         , row
         , cell
+        , attr
         , j;
+
+      var rowspan = false;
 
       // header
       body += '<thead>\n<tr>\n';
       for (i = 0; i < this.token.header.length; i++) {
-        heading = this.inline.output(this.token.header[i]);
-        body += this.token.align[i]
-          ? '<th align="' + this.token.align[i] + '">' + heading + '</th>\n'
-          : '<th>' + heading + '</th>\n';
+        if (!this.token.header[i]) {
+          continue;
+        }
+        
+        heading = this.inline.extractProperties(this.token.header[i]);
+        heading[0] = this.inline.output(heading[0]);
+        attr = '';
+        if (this.token.align[i]) {
+          attr += ' style="text-align:' + this.token.align[i] + '"';
+        }
+        if (heading[1].w !== undefined) {
+          attr += ' colspan="' + cell[1].w + '"';
+        }
+        if (heading[1].h !== undefined) {
+          attr += ' rowspan="' + cell[1].h + '"';
+          rowspan = true;
+        }
+        body += '<th' + attr + '>' + heading[0] + '</th>\n';
       }
       body += '</tr>\n</thead>\n';
 
@@ -886,18 +988,39 @@ Parser.prototype.tok = function() {
         row = this.token.cells[i];
         body += '<tr>\n';
         for (j = 0; j < row.length; j++) {
-          cell = this.inline.output(row[j]);
-          body += this.token.align[j]
-            ? '<td align="' + this.token.align[j] + '">' + cell + '</td>\n'
-            : '<td>' + cell + '</td>\n';
+          if (!row[j]) {
+            continue;
+          }
+          
+          cell = this.inline.extractProperties(row[j]);
+          cell[0] = this.inline.output(cell[0]);
+          attr = '';
+          if (this.token.align[j]) {
+            attr += ' style="text-align:' + this.token.align[j] + '"';
+          }
+          if (cell[1].w !== undefined) {
+            attr += ' colspan="' + cell[1].w + '"';
+          }
+          if (cell[1].h !== undefined) {
+            attr += ' rowspan="' + cell[1].h + '"';
+            rowspan = true;
+          }
+          body += '<td' + attr + '>' + cell[0] + '</td>\n';
         }
         body += '</tr>\n';
       }
       body += '</tbody>\n';
 
-      return '<table' + tok_class + '>\n'
+      if (!rowspan) {
+        if (inner_tok_class != null) {
+          inner_tok_class += ' table-striped';
+        }
+        tok_class = inner_tok_class == null ? '' : ' class="' + inner_tok_class + '"';
+      }
+
+      return '<div class="table-responsive">\n' + '<table' + tok_class + '>\n'
         + body
-        + '</table>\n';
+        + '</table>\n</div>\n';
     }
     case 'blockquote_start': {
       var body = '';
@@ -953,6 +1076,9 @@ Parser.prototype.tok = function() {
     }
     case 'html': {
       return this.token.text;
+      /*return !this.token.pre && !this.options.pedantic
+        ? this.inline.output(this.token.text)
+        : this.token.text;*/
     }
     case 'paragraph': {
       return '<p' + tok_class + '>'
@@ -1051,18 +1177,21 @@ marked.defaults = {
   silent: false,
   highlight: null,
   getLangClass: function(lang) {
-		lang = lang.toLowerCase();
-		switch (lang) {
-			case 'c': return 'sh_c';
-			case 'c++': return 'sh_cpp';
-			case 'pascal': return 'sh_pascal';
-			default: return 'sh_' + lang;
-		}
+    lang = lang.toLowerCase();
+    switch (lang) {
+      case 'c': return 'sh_c';
+      case 'c++': return 'sh_cpp';
+      case 'pascal': return 'sh_pascal';
+      default: return 'sh_' + lang;
+    }
   },
-  getElementClass: function (token) {
-  	if (token.type === "table")
-  		return "table table-bordered table-hover table-striped table-text-center";
-  	return null;
+  getElementClass: function(token) {
+    switch (token.type) {
+      case 'table':
+        return 'table table-bordered table-text-center table-vertical-middle';
+      default:
+        return null;
+    }
   }
 };
 

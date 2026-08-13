@@ -203,7 +203,7 @@ EOD;
 		}
 
 		if (move_uploaded_file($_FILES['upload']['tmp_name'], UOJContext::documentRoot() . '/' . $path)) {
-			becomeMsgPage("<div>上传成功！最终路径：{$url}/{$path}</div>" . '<a href="javascript:history.go(-1)">返回</a>');
+			becomeMsgPage("<div>上传成功！最终路径：<a href='/{$path}'>/{$path}</a></div>" . '<a href="javascript:history.go(-1)">返回</a>');
 		} else {
 			becomeMsgPage('上传失败！');
 		}

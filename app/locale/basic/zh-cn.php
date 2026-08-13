@@ -173,4 +173,8 @@ return [
 	'manageable' => '有权限',
 	'log out all' => '在所有设备登出',
 	'cut off time' => '截止时间',
+	'problem collection' => '题单',
+	'manage' => '管理',
+	'propose' => '提议',
+	'note' => '备注',
 ];

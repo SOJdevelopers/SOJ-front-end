@@ -31,24 +31,24 @@
 			} else if ($row[0] == 100) {
 				$has_score_100 = true;
 			}
-			$score = $row[0] * 100;
+			$score = round($row[0] * 1000000);
 			$data[] = array('score' => $score, 'count' => $row[1]);
 		}
 		if (!$has_score_0) {
 			array_unshift($data, array('score' => 0, 'count' => 0));
 		}
 		if (!$has_score_100) {
-			$data[] = array('score' => 10000, 'count' => 0);
+			$data[] = array('score' => 100 * 1000000, 'count' => 0);
 		}
 		return $data;
 	}
 	
 	$data = scoreDistributionData();
+	for ($i = 0; $i < count($data); $i++) {
+		$data[$i]['score'] /= 1000000;
+	}
 	$pre_data = $data;
 	$suf_data = $data;
-	for ($i = 0; $i < count($data); $i++) {
-		$data[$i]['score'] /= 100;
-	}
 	for ($i = 1; $i < count($data); $i++) {
 		$pre_data[$i]['count'] += $pre_data[$i - 1]['count'];
 	}
@@ -134,7 +134,7 @@ new Morris.Line({
 		return (x.getTime() / 100).toString();
 	},
 	hoverCallback: function(index, options, content, row) {
-		var scr = row.score / 100;
+		var scr = row.score;
 		return '<div class="morris-hover-row-label">' + 'score: &le;' + scr + '</div>' +
 			'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= $problem['id'] ?> + '&amp;max_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
 	},
@@ -161,7 +161,7 @@ new Morris.Line({
 		return (x.getTime() / 100).toString();
 	},
 	hoverCallback: function(index, options, content, row) {
-		var scr = row.score / 100;
+		var scr = row.score;
 		return '<div class="morris-hover-row-label">' + 'score: &ge;' + scr + '</div>' +
 			'<div class="morris-hover-point">' + '<a href="/submissions?problem_id=' + <?= $problem['id'] ?> + '&amp;min_score=' + scr + '">' + 'number: ' + row.count + '</a>' + '</div>';
 	},

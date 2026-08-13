@@ -32,6 +32,14 @@ function validateInt($x) {
 	return is_string($x) and validateUInt($x[0] === '-' ? substr($x, 1) : $x);
 }
 
+function validateUReal($x) {
+    return is_string($x) and preg_match('/^(0|[1-9][0-9]{0,8})(\.[0-9]{0,6})?$/', $x);
+}
+
+function validateReal($x) {
+	return is_string($x) and validateUReal($x[0] === '-' ? substr($x, 1) : $x);
+}
+
 function validateUploadedFile($name) {
 	return isset($_FILES[$name]) && is_uploaded_file($_FILES[$name]['tmp_name']);
 }

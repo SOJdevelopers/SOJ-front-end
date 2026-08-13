@@ -183,7 +183,7 @@ function getColOfScore(score) {
 	} else if (score == 100) {
 		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(120, 100, 80)));
 	} else {
-		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(30 + score * 0.6, 100, 90)));
+		return ColorConverter.toStr(ColorConverter.toRGB(new HSV(30 + score * 0.6, 100, 90 - Math.max(Math.min(score - 30, 90 - score), 0) * 0.5)));
 	}
 }
 
@@ -281,6 +281,16 @@ function showErrorHelp(name, err) {
 		$('#div-' + name).removeClass('has-error');
 		$('#help-' + name).text('');
 		return true;
+	}
+}
+
+function showWarningHelp(name, err) {
+	if (err) {
+		$('#div-' + name).addClass('has-warning');
+		$('#help-' + name).text(err);
+	} else {
+		$('#div-' + name).removeClass('has-warning');
+		$('#help-' + name).text('');
 	}
 }
 
@@ -385,6 +395,15 @@ $.fn.uoj_blog_tag = function() {
 	});
 }
 
+$.fn.uoj_collection_tag = function() {
+	return this.each(function() {
+		var owner = $(this).data('owner');
+		var path_owner = '';
+		if(owner) path_owner = '/' + owner;
+		$(this).attr('href', '/collection' + path_owner + '?type=' + encodeURIComponent($(this).text()));
+	});
+}
+
 // click zan
 function click_zan(zan_id, zan_type, zan_delta, node) {
 	var loading_node = $('<div class="text-muted">loading...</div>');
@@ -451,8 +470,21 @@ function getCountdownStr(t) {
 	var mm = toFilledStr(x % 60, '0', 2);
 	x = Math.floor(x / 60);
 	var hh = x.toString();
+	if (x >= 24) {
+		hh = toFilledStr(x % 24, '0', 2);
+	}
+	x = Math.floor(x / 24);
+	var dd = x.toString();
 	
 	var res = '<span style="font-size: 30px">';
+	if (x > 0) {
+		res += '<span style="color: ' + getColOfScore(100) + '">' + dd + '</span>';
+		res += ' day';
+		if (dd > 1) {
+			res += 's';
+		}
+		res += ' + ';
+	}
 	res += '<span style="color: ' + getColOfScore(Math.min(t / 10800 * 100, 100)) + '">' + hh + '</span>';
 	res += ':';
 	res += '<span style="color: ' + getColOfScore(mm / 60 * 100) + '">' + mm + '</span>';
@@ -519,7 +551,7 @@ $.fn.uoj_highlight = function() {
 		$(this).find("span.uoj-groupname").each(replaceWithHighlightUsername);
 		$(this).find(".uoj-honor").uoj_honor();
 		$(this).find(".uoj-score").each(function() {
-			var score_str = $(this).text(), score = parseInt(score_str), maxscore = parseInt($(this).data('max'));
+			var score_str = $(this).text(), score = parseFloat(score_str), maxscore = parseFloat($(this).data('max'));
 			if (score_str === '?') $(this).css("color", "rgb(0, 204, 204)");
 			else if (score_str.startsWith('+')) $(this).css("color", getColOfScore(100));
 			else if (score_str.startsWith('-')) $(this).css("color", getColOfScore(0));
@@ -539,6 +571,7 @@ $.fn.uoj_highlight = function() {
 		});
 		$(this).find(".uoj-problem-tag").uoj_problem_tag();
 		$(this).find(".uoj-blog-tag").uoj_blog_tag();
+		$(this).find(".uoj-collection-tag").uoj_collection_tag();
 		$(this).find(".uoj-click-zan-block").click_zan_block();
 		$(this).find(".countdown").countdown();
 		$(this).find(".uoj-readmore").readmore({

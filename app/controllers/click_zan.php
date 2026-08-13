@@ -16,6 +16,9 @@
 	if (!Auth::check()) {
 		die('<div class="text-danger">please <a href="' . HTML::url('/login') . '">login</a></div>');
 	}
+	if (!isBlogAllowedUser(Auth::user())) {
+		die('<div class="text-danger">permission denied</div>');
+	}
 
 	$id = $_POST['id'];
 	$delta = $_POST['delta'];

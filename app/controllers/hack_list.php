@@ -9,9 +9,10 @@
 	$common = 'class="form-control input-sm" ';
 	$q_submission_id = $search_form->addText('submission_id', UOJLocale::get('problems::submission id').':', $common.'maxlength="6" style="width:5em"', 'validateUInt');
 	$q_problem_id = $search_form->addText('problem_id', UOJLocale::get('problems::problem id').':', $common.'maxlength="4" style="width:4em"', 'validateUInt');
-	$q_hacker = $search_form->addText('hacker', UOJLocale::get('problems::hacker').':', $common.'maxlength="20" style="width:10em"', 'validateUsername');
-	$q_owner = $search_form->addText('owner', UOJLocale::get('problems::owner').':', $common.'maxlength="20" style="width:10em"', 'validateUsername');
-	$q_status = $search_form->addSelect('status', UOJLocale::get('problems::result').':', $common, [''=>'All', 1=>'Success!', 2=>'Failed.']);
+	$q_hacker = $search_form->addText('hacker', UOJLocale::get('problems::hacker').':', $common.'maxlength="20" style="width:8em"', 'validateUsername');
+	$q_owner = $search_form->addText('owner', UOJLocale::get('problems::owner').':', $common.'maxlength="20" style="width:8em"', 'validateUsername');
+	$q_status = $search_form->addSelect('status', UOJLocale::get('problems::result').':', $common.'style="width:7em"', [''=>'All', 1=>'Success!', 2=>'Failed.']);
+	$q_cut_off_time = $search_form->addText('cut_off_time', UOJLocale::get('cut off time').':', $common . 'maxlength="11" style="width:8em; font-family: monospace" placeholder="YYYY-MM-DD"', "validateTime");
 	$search_form->addSubmit(UOJLocale::get('search'));
 
 	$conds = array();
@@ -32,6 +33,12 @@
 	}
 	if($q_status == 2) {
 		$conds[] = 'success = 0';
+	}
+	if ($q_cut_off_time != null) {
+		if (strlen($q_cut_off_time) == 10) {
+			$q_cut_off_time = $q_cut_off_time . ' 23:59:59';
+		}
+		$conds[] = 'submit_time <=\'' . DB::escape($q_cut_off_time) . '\'';
 	}
 	
 	if ($conds) {
